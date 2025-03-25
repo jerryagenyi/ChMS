@@ -20,6 +20,7 @@ model Organisation {
   visitors    Visitor[]
   teams       Team[]
   users       User[]
+  services    Service[]
 }
 
 model Department {
@@ -194,13 +195,13 @@ model MemberSkill {
 model Attendance {
   id            String   @id @default(cuid())
   memberId      String
-  sessionId     String
+  serviceId     String
   checkedInAt   DateTime @default(now())
   checkedOutAt  DateTime?
   isFamily      Boolean  @default(false)
 
-  member        Member        @relation(fields: [memberId], references: [id])
-  session       ClassSession  @relation(fields: [sessionId], references: [id])
+  member        Member    @relation(fields: [memberId], references: [id])
+  service       Service   @relation(fields: [serviceId], references: [id])
 }
 
 model Account {
@@ -255,4 +256,31 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-} 
+}
+
+model Invitation {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  email         String?     // Optional: for specific email invites
+  role          Role        @default(MEMBER)
+  expires       DateTime
+  used          Boolean     @default(false)
+  organisationId String
+  organisation  Organisation @relation(fields: [organisationId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([code])
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  startTime   DateTime
+  status      String   @default("SCHEDULED") // ACTIVE, SCHEDULED, COMPLETED, CANCELLED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  organisationId String
+  organisation Organisation @relation(fields: [organisationId], references: [id])
+  attendance  Attendance[]
+}

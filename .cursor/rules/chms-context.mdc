@@ -57,6 +57,34 @@ ChMS/
 5. MSW for API mocking
 6. React Hook Form with Zod for form handling
 7. date-fns for date manipulation
+8. Email service integration (with external API support)
+9. SMS gateway integration
+10. QR code generation and scanning
+
+## Core Features
+1. Organization Management
+   - Multi-department support
+   - Class/event management
+   - Family unit tracking
+   - Visitor management system
+
+2. Member Management
+   - Comprehensive profile management
+   - Family linking
+   - Skills and gifts tracking
+   - Memorable dates tracking
+   - Department assignments
+
+3. Attendance System
+   - QR-based check-in
+   - Family check-in support
+   - Offline capabilities
+   - Class attendance tracking
+
+4. Communication
+   - Mass email system
+   - SMS integration
+   - External email API support
 
 ## Development Workflow
 1. Follow Git flow branching strategy

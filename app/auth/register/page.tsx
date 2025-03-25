@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -18,52 +20,91 @@ import {
   CardBody,
   useColorModeValue,
   FormErrorMessage,
+  Radio,
+  RadioGroup,
+  VStack,
+  Textarea,
 } from "@chakra-ui/react";
+import { registerSchema, type RegisterFormData } from "@/lib/schemas/auth";
 
 export default function Register() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [orgType, setOrgType] = useState<"new" | "existing" | "invited">("new");
+  const inviteCode =
+    typeof window !== "undefined" ? sessionStorage.getItem("inviteCode") : null;
 
-  const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
+  useEffect(() => {
+    if (inviteCode) {
+      setOrgType("invited");
+      setValue("organization.inviteCode", inviteCode);
+    }
+  }, [inviteCode]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      organization: {
+        type: "new",
+      },
+    },
+  });
+
+  const handleRegistration = async (data: RegisterFormData) => {
     setIsLoading(true);
-
     try {
-      const res = await fetch("/api/auth/register", {
+      // First create user
+      const userRes = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
       });
 
-      if (res.ok) {
-        // Sign in the user after successful registration
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
+      if (!userRes.ok) {
+        throw new Error("Registration failed");
+      }
+
+      // If new organization, create it
+      if (data.organization.type === "new" && data.organization.name) {
+        const orgRes = await fetch("/api/organizations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.organization.name,
+            description: data.organization.description,
+          }),
         });
 
-        if (result?.error) {
-          setError("Error signing in");
-          return;
+        if (!orgRes.ok) {
+          throw new Error("Organization creation failed");
         }
-
-        router.push("/dashboard");
-        router.refresh();
-      } else {
-        const data = await res.json();
-        setError(data.message || "Something went wrong");
       }
+
+      // Sign in the user
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      router.push("/dashboard");
     } catch (error) {
-      setError("Something went wrong");
+      console.error(error);
+      // Handle error appropriately
     } finally {
       setIsLoading(false);
     }
@@ -72,13 +113,7 @@ export default function Register() {
   return (
     <Box bg="gray.50" minH="100vh" py={12}>
       <Container maxW="md">
-        <Card
-          bg={bgColor}
-          borderWidth="1px"
-          borderColor={borderColor}
-          borderRadius="lg"
-          shadow="sm"
-        >
+        <Card bg={useColorModeValue("white", "gray.800")}>
           <CardBody>
             <Stack spacing={6}>
               <Stack spacing={2} textAlign="center">
@@ -90,50 +125,94 @@ export default function Register() {
                 </Text>
               </Stack>
 
-              <form onSubmit={handleSubmit}>
-                <Stack spacing={4}>
-                  <FormControl isInvalid={!!error}>
-                    <FormLabel>Full Name</FormLabel>
-                    <Input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
+              <form onSubmit={handleSubmit(handleRegistration)}>
+                <VStack spacing={4}>
+                  <FormControl isInvalid={!!errors.name}>
+                    <FormLabel>Name</FormLabel>
+                    <Input {...register("name")} />
+                    <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!error}>
-                    <FormLabel>Email address</FormLabel>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                  <FormControl isInvalid={!!errors.email}>
+                    <FormLabel>Email</FormLabel>
+                    <Input type="email" {...register("email")} />
+                    <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!error}>
+                  <FormControl isInvalid={!!errors.password}>
                     <FormLabel>Password</FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    {error && <FormErrorMessage>{error}</FormErrorMessage>}
+                    <Input type="password" {...register("password")} />
+                    <FormErrorMessage>
+                      {errors.password?.message}
+                    </FormErrorMessage>
                   </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Organization</FormLabel>
+                    <RadioGroup
+                      value={orgType}
+                      onChange={(value: "new" | "existing" | "invited") =>
+                        setOrgType(value)
+                      }
+                    >
+                      <Stack>
+                        <Radio value="new">Create new organization</Radio>
+                        <Radio value="existing">
+                          Join existing organization
+                        </Radio>
+                        {inviteCode && (
+                          <Radio value="invited">Join via invitation</Radio>
+                        )}
+                      </Stack>
+                    </RadioGroup>
+                  </FormControl>
+
+                  {orgType === "invited" && (
+                    <FormControl>
+                      <FormLabel>Invitation Code</FormLabel>
+                      <Input
+                        {...register("organization.inviteCode")}
+                        defaultValue={inviteCode}
+                        isReadOnly
+                      />
+                    </FormControl>
+                  )}
+
+                  {orgType === "new" ? (
+                    <>
+                      <FormControl isInvalid={!!errors.organization?.name}>
+                        <FormLabel>Organization Name</FormLabel>
+                        <Input {...register("organization.name")} />
+                        <FormErrorMessage>
+                          {errors.organization?.name?.message}
+                        </FormErrorMessage>
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel>Description (Optional)</FormLabel>
+                        <Textarea {...register("organization.description")} />
+                      </FormControl>
+                    </>
+                  ) : (
+                    <FormControl>
+                      <FormLabel>Organization ID</FormLabel>
+                      <Input {...register("organization.id")} />
+                      <Text fontSize="sm" color="gray.500">
+                        Ask your organization administrator for the ID
+                      </Text>
+                    </FormControl>
+                  )}
 
                   <Button
                     type="submit"
                     colorScheme="purple"
                     size="lg"
-                    fontSize="md"
+                    width="full"
                     isLoading={isLoading}
-                    loadingText="Creating account..."
                   >
                     Create Account
                   </Button>
-                </Stack>
+                </VStack>
               </form>
 
               <Text textAlign="center">

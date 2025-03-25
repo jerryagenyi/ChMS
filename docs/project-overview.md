@@ -1,71 +1,109 @@
-# ChMS Africa - Church Management System
+# Church Management System (ChMS)
 
-## Project Vision
+A modern web-based solution for church administration, designed specifically for African churches.
 
-A robust, affordable, and accessible church management system designed specifically for African churches, focusing on practical needs while considering local infrastructure and resource constraints.
+## Core Features (MVP)
 
-## Core Principles
+### Organisation Management
 
-- Mobile-first approach
-- Offline-first capabilities
-- Simple but powerful
-- Cost-effective
-- Culturally relevant
-- Scalable architecture
+- Organisation setup and configuration
+- Team/department management
+- Class management (Church Academy, Marriage Classes, Baptismal Classes)
+- Family registration with children linking
+- Age data collection (optional)
+- Memorable dates tracking (wedding, baptism, conversion)
 
-## Development Philosophy
+### Member Management
 
-- Start small, build strong
-- Progressive enhancement
-- User-centered design
-- Community-driven development
+- Complete member profiles
+- Family registration and linking
+- Attendance tracking
+- Skills and gifts tracking
+- Team/department assignments
+- Class enrollment
 
-## Phase 1: Attendance Management System
+### Visitor Management
 
-The initial focus is on building a robust attendance tracking system that will serve as the foundation for the broader church management system.
+- Visitor registration
+- Follow-up tracking
+- Conversion status monitoring
 
-### Key Features
+### Attendance System
 
-1. QR Code-based Check-in
-   - Mobile PWA for scanning
-   - Offline capability
-   - Location verification
-2. Member Management
-   - Basic profile management
-   - Family unit tracking
-   - Registration workflow
-3. Admin Dashboard
+- Service attendance tracking
+- Class attendance tracking
+- Family check-in support
+- Offline capability
 
-   - Attendance reporting
-   - Member directory
-   - Basic analytics
+## Future Enhancements
 
-4. Core Infrastructure
-   - User authentication
-   - Data synchronization
-   - Backup systems
+### Communication
 
-## Future Phases
+- Mass emailing system
+- SMS integration
+- External email client API integration
 
-- Financial Management
-- Ministry Coordination
-- Event Management
-- Resource Scheduling
-- Communication System
-- Pastoral Care Tracking
+### Advanced Features
 
-## Technology Stack
+- Family check-in feature (single scan for multiple family members)
+- Advanced reporting system
+- Online giving integration
+- Mobile app for check-in
 
-- Frontend: Next.js (React)
-- Backend: Node.js with PostgreSQL
-- Infrastructure: Cloudflare (CDN, Security)
-- PWA for mobile access
-- Potential for future microservices architecture
+### Security & Compliance
 
-## Success Metrics
+- Role-based access control
+- Data encryption
+- GDPR compliance
+- Regular backups
 
-1. Adoption rate by churches
-2. System reliability
-3. User satisfaction
-4. Cost effectiveness
-5. Community engagement
+## Technical Stack
+
+- **Frontend**: Next.js with TypeScript
+- **UI Framework**: Chakra UI
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Testing**: Jest, React Testing Library, MSW
+- **Form Handling**: React Hook Form with Zod validation
+- **Date Handling**: date-fns
+
+## Getting Started
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and update the database connection string
+3. Install dependencies: `npm install`
+4. Generate Prisma client: `npm run prisma:generate`
+5. Run migrations: `npm run prisma:migrate`
+6. Start development server: `npm run dev`
+
+## Development Guidelines
+
+- Follow TypeScript best practices
+- Write tests for new features
+- Use functional components
+- Follow the established project structure
+- Document new features and APIs
+
+## Project Structure
+
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Next.js pages
+├── hooks/         # Custom React hooks
+├── utils/         # Utility functions
+├── types/         # TypeScript type definitions
+├── services/      # API and external service integrations
+└── styles/        # Global styles and theme
+```
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Write/update tests
+4. Submit a pull request
+
+## License
+
+MIT

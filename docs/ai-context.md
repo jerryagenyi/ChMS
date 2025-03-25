@@ -8,8 +8,8 @@ ChMS Africa is a church management system designed specifically for African chur
 
 - Primary Framework: Next.js with TypeScript
 - Database: PostgreSQL with Prisma ORM
-- Deployment: Docker + Oracle Cloud (Ubuntu 22.04)
-- Styling: Tailwind CSS
+- Deployment: Vercel (replacing Oracle Cloud)
+- Styling: Chakra UI (replacing Tailwind CSS)
 - Development Approach: Mobile-first, Progressive Enhancement
 - Target Environment: African context (considering internet reliability, device access)
 
@@ -17,54 +17,37 @@ ChMS Africa is a church management system designed specifically for African chur
 
 ```yaml
 Infrastructure:
-  Host: Oracle Cloud Free Tier
-  OS: Ubuntu 24.04.1 LTS (Noble)
-  Container: Docker (to be installed)
+  Host: Vercel Platform
+  Database: Railway (PostgreSQL)
+  Cache: Vercel Edge Cache
 
-Initial Server Setup:
-  System:
-    - Update system packages
-    - Configure UFW firewall
-    - Set up SSH hardening
-    - Configure timezone
-
-  Basic Tools:
-    - nginx
-    - docker
-    - docker-compose
-    - certbot (Let's Encrypt)
-    - fail2ban
-
-Services (to be deployed):
+Services:
   Web:
     - Next.js application
-    - Nginx reverse proxy
-    - SSL termination
+    - Vercel Edge Functions
+    - Automatic SSL/TLS
 
   Database:
-    - PostgreSQL container
-    - Persistent volume
+    - PostgreSQL on Railway
+    - Persistent storage
     - Automated backups
 
   Cache:
-    - Redis container
+    - Vercel Edge Cache
     - Session management
     - Real-time updates
 
 Security:
-  - UFW firewall rules:
-      - SSH (22)
-      - HTTP (80)
-      - HTTPS (443)
-  - Let's Encrypt SSL
-  - Docker network isolation
+  - Vercel's built-in security
+  - Railway's secure database
+  - Environment variable encryption
   - Regular security updates
 
 Monitoring:
-  - Docker container logs
-  - Nginx access/error logs
-  - System resource monitoring
-  - Error tracking
+  - Vercel Analytics
+  - Railway Metrics
+  - Error tracking (Sentry)
+  - Performance monitoring
 ```
 
 ## Server Setup Steps
@@ -160,7 +143,7 @@ Building the Attendance Management System MVP:
 
 3. **Frontend**:
 
-   - Tailwind CSS for styling
+   - Chakra UI for styling (replacing Tailwind)
    - Framer Motion for animations
    - SWR for real-time updates
 

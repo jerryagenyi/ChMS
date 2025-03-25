@@ -1,87 +1,176 @@
-# ChMS Africa - Overall Project Tracker
+# ChMS Project Tracker
 
-## Phase 1: Attendance Management System
+## Current Sprint
 
-Status: In Development
-Timeline: Q2 2024
+### High Priority
 
-### Milestones
+- [ ] Set up PostgreSQL database
+- [ ] Implement organisation setup flow
+- [ ] Create member registration system
+- [ ] Develop basic attendance tracking
+- [x] Set up authentication system
+  - [x] Google SSO
+  - [x] Password backup
+  - [x] Password status check API
+  - [x] UI components for auth flows
 
-- [ ] MVP Launch
+### Medium Priority
 
-  - [ ] Core attendance tracking
-  - [ ] Basic member management
-  - [ ] Simple reporting
+- [ ] Implement family management
+- [ ] Create class management system
+- [ ] Develop visitor tracking
+- [ ] Set up basic reporting
+- [ ] Implement skills and gifts tracking
 
-- [ ] First Major Update
-  - [ ] Offline capabilities
-  - [ ] Enhanced reporting
-  - [ ] Family unit management
+### Low Priority
 
-## Phase 2: Financial Management
+- [ ] Add advanced search functionality
+- [ ] Implement data export features
+- [ ] Create custom report builder
+- [ ] Add bulk operations support
+- [ ] Implement audit logging
 
-Status: Planning
-Timeline: Q4 2024
+## Upcoming Features
 
-### Planned Features
+### Phase 1 (Next 3 Months)
 
-- [ ] Giving/Tithing tracking
-- [ ] Expense management
-- [ ] Financial reporting
-- [ ] Budget planning
+- [ ] Family check-in feature
+- [ ] Advanced reporting system
+- [ ] Mobile app development
+- [ ] Mass communication system
+- [ ] External email client integration
 
-## Phase 3: Ministry Management
+### Phase 2 (3-6 Months)
 
-Status: Conceptual
-Timeline: Q2 2025
+- [ ] Online giving integration
+- [ ] Advanced analytics
+- [ ] Custom report builder
+- [ ] API integrations
+- [ ] Mobile app enhancements
 
-### Planned Features
+### Phase 3 (6-12 Months)
 
-- [ ] Ministry team organization
-- [ ] Event planning
-- [ ] Resource scheduling
-- [ ] Volunteer management
+- [ ] Advanced security features
+- [ ] GDPR compliance
+- [ ] Automated backups
+- [ ] Performance optimizations
+- [ ] Additional integrations
 
-## Phase 4: Communication System
+## Technical Debt
 
-Status: Conceptual
-Timeline: Q4 2025
+### Infrastructure
 
-### Planned Features
+- [ ] Set up Vercel deployment
+- [ ] Configure Railway database
+- [ ] Implement automated testing
+- [ ] Set up backup system
+- [ ] Implement logging
 
-- [ ] Member messaging
-- [ ] Announcement system
-- [ ] Email integration
-- [ ] SMS notifications
+### Code Quality
 
-## Phase 5: Pastoral Care
+- [x] Add TypeScript strict mode
+- [ ] Implement code coverage
+- [x] Add authentication API documentation
+- [x] Set up ESLint with Chakra UI rules
+- [ ] Add performance monitoring
 
-Status: Conceptual
-Timeline: Q2 2026
+### Security
 
-### Planned Features
+- [ ] Implement RBAC
+- [ ] Add data encryption
+- [ ] Set up audit trails
+- [ ] Configure rate limiting
+- [ ] Add security headers
 
-- [ ] Counseling scheduling
-- [ ] Visit tracking
-- [ ] Prayer request management
-- [ ] Member care notes
+## Documentation
 
-## Current Focus
+### User Documentation
 
-- Developing Attendance Management System
-- Gathering requirements for Financial Management
-- Research on African church needs
+- [ ] User manual
+- [ ] Admin guide
+- [ ] API documentation
+- [ ] Deployment guide
+- [ ] Troubleshooting guide
 
-## Key Metrics
+### Technical Documentation
 
-- Churches using system: 0
-- Total members tracked: 0
-- System uptime: N/A
-- User satisfaction: N/A
+- [ ] Architecture overview
+- [ ] Database schema
+- [ ] API endpoints
+- [ ] Security guidelines
+- [ ] Development guide
 
-## Notes
+## Resources
 
-- Update metrics monthly
-- Review timelines quarterly
-- Adjust features based on user feedback
-- Document major milestones
+### Development
+
+- Next.js documentation
+- Prisma documentation
+- PostgreSQL documentation
+- Chakra UI documentation
+- Testing best practices
+
+### Design
+
+- Chakra UI component patterns
+- Accessibility standards
+- Mobile-first design
+- Responsive design patterns
+- Dark/Light mode implementation
+
+### Infrastructure
+
+- Cloud hosting options
+- Database hosting
+- CDN setup
+- Monitoring tools
+- Backup solutions
+
+## Timeline
+
+### Month 1
+
+- Project setup
+- Database implementation
+- Basic authentication
+- Core features development
+
+### Month 2
+
+- Member management
+- Attendance system
+- Family management
+- Basic reporting
+
+### Month 3
+
+- Class management
+- Visitor tracking
+- Advanced features
+- Testing and optimization
+
+## Success Metrics
+
+### Technical
+
+- Page load time < 2s
+- API response time < 200ms
+- Test coverage > 80%
+- Zero critical bugs
+- 99.9% uptime
+
+### User Experience
+
+- < 3 clicks for check-in
+- < 5s for report generation
+- Zero data loss
+- Intuitive interface
+- Mobile responsiveness
+
+### Business
+
+- User adoption rate
+- Feature usage metrics
+- Support ticket volume
+- User satisfaction
+- System reliability

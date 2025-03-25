@@ -66,18 +66,21 @@ enum CheckInMethod {
 
 ## Phase 1: Core Check-in System (Week 1-3)
 
-- [ ] Basic Project Setup
+- [x] Basic Project Setup
 
-  - [ ] Next.js project initialization
-    - [ ] TypeScript configuration
-    - [ ] ESLint + Prettier setup
-    - [ ] Tailwind CSS integration
-  - [ ] PostgreSQL basic setup
-    - [ ] Prisma ORM setup
-    - [ ] Initial schema migration
-    - [ ] Basic seed data
+  - [x] Next.js project initialization
+  - [x] TypeScript configuration
+  - [x] ESLint + Prettier setup
+  - [x] Chakra UI integration
+  - [x] Basic authentication setup
+    - [x] Google SSO implementation
+    - [x] Password backup option
+  - [x] PostgreSQL basic setup
+    - [x] Prisma ORM setup
+    - [x] Initial schema migration
+    - [ ] Basic seed data (if needed for testing)
   - [ ] Basic deployment pipeline
-    - [ ] Vercel/Railway configuration
+    - [ ] Vercel configuration
     - [ ] Environment management
 
 - [ ] Service QR System
@@ -281,14 +284,14 @@ enum CheckInMethod {
    ```bash
    # Local Development
    ├── .env.local          # Local environment variables
-   ├── docker-compose.yml  # Local PostgreSQL + Redis
+   ├── docker-compose.yml  # Local PostgreSQL
    └── package.json        # Development scripts
    ```
 
 2. **Staging Environment** (Vercel Preview):
 
    - Automatic preview deployments
-   - Separate staging database
+   - Railway staging database
    - E2E testing environment
    - Feature flag testing
 

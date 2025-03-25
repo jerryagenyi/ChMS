@@ -1,0 +1,122 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # ChMS Project Context
+
+## Source of Truth Documents
+The following documents are the source of truth for the ChMS project:
+
+1. Project Overview: `/docs/project-overview.md`
+   - Core features and MVP requirements
+   - Technical stack and architecture
+   - Development guidelines
+   - Project structure
+
+2. Attendance App MVP: `/docs/attendance-app-mvp.md`
+   - Detailed attendance system specifications
+   - Core features and implementation details
+   - Technical requirements
+   - Testing strategy
+
+3. Project Tracker: `/planning/overall-project-tracker.md`
+   - Current sprint priorities
+   - Upcoming features
+   - Technical debt
+   - Timeline and milestones
+
+## Development Environment
+- Local: macOS (darwin 24.3.0)
+- Server: Ubuntu 24.04 LTS
+- VM: Oracle Cloud Infrastructure (OCI)
+- Database: PostgreSQL
+- Version Control: Git with GitHub
+
+## Project Structure
+```
+ChMS/
+├── src/                    # Source code
+├── docs/                   # Documentation
+│   ├── project-overview.md
+│   ├── attendance-app-mvp.md
+│   └── ai-context.md
+├── planning/              # Project planning
+│   ├── overall-project-tracker.md
+│   └── attendance-tracker.md
+├── prisma/               # Database schema and migrations
+├── .env                  # Environment variables
+└── .cursor/             # Cursor IDE configuration
+```
+
+## Key Technical Decisions
+1. Next.js with TypeScript for frontend
+2. Chakra UI for component library
+3. PostgreSQL with Prisma ORM
+4. Jest and React Testing Library for testing
+5. MSW for API mocking
+6. React Hook Form with Zod for form handling
+7. date-fns for date manipulation
+
+## Development Workflow
+1. Follow Git flow branching strategy
+2. Write tests for new features
+3. Update documentation as needed
+4. Regular commits with descriptive messages
+5. Pull request reviews required
+
+## Server Configuration
+- Ubuntu 24.04 LTS
+- Docker for containerization
+- Cloudflare for CDN and security
+- Automated backups
+- Monitoring and logging
+
+## Database Setup
+- PostgreSQL 16
+- Prisma for ORM
+- Connection string in .env
+- Regular backups
+- Migration management
+
+## Security Considerations
+- Role-based access control
+- Data encryption
+- GDPR compliance
+- Regular security audits
+- Secure communication
+
+## Performance Requirements
+- Page load < 2s
+- API response < 200ms
+- Mobile-first approach
+- Offline capabilities
+- Responsive design
+
+## Testing Strategy
+- Unit tests for components
+- Integration tests for API
+- E2E tests for critical paths
+- Test coverage > 80%
+- Automated testing in CI/CD
+
+## Documentation Requirements
+- Keep source of truth docs updated
+- Document API changes
+- Update user guides
+- Maintain technical docs
+- Version control documentation
+
+## Deployment Process
+1. Local development
+2. Testing environment
+3. Staging environment
+4. Production deployment
+5. Monitoring and maintenance
+
+## Support and Maintenance
+- Regular updates
+- Bug tracking
+- Feature requests
+- User support
+- Performance monitoring

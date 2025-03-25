@@ -4,8 +4,12 @@
 
 ### High Priority
 
-- [ ] Set up PostgreSQL database
+- [x] Set up PostgreSQL database
 - [ ] Implement organisation setup flow
+  - [ ] Organization creation form
+  - [ ] Initial admin user assignment
+  - [ ] Basic organization settings
+  - [ ] Department setup interface
 - [ ] Create member registration system
 - [ ] Develop basic attendance tracking
 - [x] Set up authentication system

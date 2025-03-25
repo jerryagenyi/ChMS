@@ -1,54 +1,31 @@
-# ChMS (Church Management System)
+# Project Name
 
-A modern, web-based Church Management System built with React and Node.js.
+## Setup Instructions
 
-## Features
+1. **Environment Variables:**
 
-- Member Management
-- Attendance Tracking
-- Event Management
-- Financial Records
-- Reporting & Analytics
+   - `DATABASE_URL`: Your PostgreSQL connection string.
+   - `NEXT_PUBLIC_APP_URL`: The base URL of your application.
+   - `NEXTAUTH_URL`: The URL used by NextAuth for authentication callbacks.
+   - `NEXTAUTH_SECRET`: A secret key for NextAuth.
+   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Credentials for Google SSO.
 
-## Getting Started
+2. **Running the Project:**
 
-### Prerequisites
+   - Install dependencies: `npm install`
+   - Run the development server: `npm run dev`
 
-- Node.js (v14 or higher)
-- npm or yarn
-- MongoDB
+3. **Authentication Features:**
 
-### Installation
+   - Google SSO with backup password setup.
+   - New API route: `/api/auth/check-password-status` for password status verification.
+   - Password setup component with Chakra UI.
 
-1. Clone the repository
+4. **Testing:**
+   - Run tests with: `npm test`
+   - Ensure all tests pass before deploying.
 
-```bash
-git clone https://github.com/jerryagenyi/ChMS.git
-cd ChMS
-```
+## Additional Information
 
-2. Install dependencies
-
-```bash
-npm install
-```
-
-3. Create environment file
-
-```bash
-cp .env.example .env
-```
-
-4. Start development server
-
-```bash
-npm run dev
-```
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Ensure your PostgreSQL server is running and accessible.
+- Follow best practices for security and performance.

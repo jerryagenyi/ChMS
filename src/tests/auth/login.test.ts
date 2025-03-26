@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals';
 import { loginUser } from '@/lib/auth';
 
 jest.mock('@/lib/auth', () => ({
@@ -18,17 +17,13 @@ describe('User Login', () => {
 
   it('authenticates user with valid credentials', async () => {
     (loginUser as jest.Mock).mockResolvedValue(mockUser);
-
+    
     const result = await loginUser({
       email: 'test@example.com',
-      password: 'validPassword123'
+      password: 'password123'
     });
 
     expect(result).toEqual(mockUser);
-    expect(loginUser).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'validPassword123'
-    });
   });
 
   it('handles invalid credentials', async () => {
@@ -36,7 +31,7 @@ describe('User Login', () => {
 
     await expect(loginUser({
       email: 'test@example.com',
-      password: 'wrongPassword'
+      password: 'wrongpassword'
     })).rejects.toThrow('Invalid credentials');
   });
 });

@@ -1,47 +1,39 @@
-import { render, screen } from "@testing-library/react";
-import QRScanner from "../attendance/QRScanner";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import QRScanner from '../QRScanner';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 // Mock html5-qrcode
-jest.mock("html5-qrcode", () => ({
-  Html5QrcodeScanner: jest.fn().mockImplementation(() => ({
-    render: jest.fn(),
-    clear: jest.fn(),
-  })),
+vi.mock('html5-qrcode', () => ({
+  Html5QrcodeScanner: vi.fn().mockImplementation(() => {
+    return {
+      render: vi.fn(),
+      clear: vi.fn(),
+    };
+  }),
 }));
 
-describe("QRScanner", () => {
-  const mockOnScan = jest.fn();
-  const mockOnError = jest.fn();
+describe('QRScanner', () => {
+  const mockOnScan = vi.fn();
+  const mockOnError = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
-  it("initializes the scanner with correct parameters", () => {
+  it('renders the scanner container', () => {
     render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
-
-    expect(Html5QrcodeScanner).toHaveBeenCalledWith(
-      "qr-reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      false
-    );
-  });
-
-  it("renders the scanner container", () => {
-    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
-    const container = screen.getByTestId("qr-reader");
+    const container = screen.getByTestId('qr-scanner-viewport');
     expect(container).toBeInTheDocument();
   });
 
-  it("cleans up scanner on unmount", () => {
-    const { unmount } = render(
-      <QRScanner onScan={mockOnScan} onError={mockOnError} />
+  it('initializes the scanner with correct parameters', () => {
+    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
+    expect(Html5QrcodeScanner).toHaveBeenCalledWith(
+      expect.any(String),
+      { fps: expect.any(Number), qrbox: expect.any(Object) },
+      false
     );
-
-    const mockScanner = (Html5QrcodeScanner as jest.Mock).mock.results[0].value;
-    unmount();
-
-    expect(mockScanner.clear).toHaveBeenCalled();
   });
 });

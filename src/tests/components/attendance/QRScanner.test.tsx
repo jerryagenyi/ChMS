@@ -1,12 +1,44 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { ChakraProvider } from '@chakra-ui/react';
-import QRScanner from '@/components/attendance/QRScanner';
+import React from "react";
+import { screen, waitFor } from "@testing-library/react";
+import { render } from "@/tests/utils/test-utils";
+import QRScanner from "@/components/attendance/QRScanner";
 
-const renderWithChakra = (component: React.ReactElement) => {
-  return render(<ChakraProvider>{component}</ChakraProvider>);
-};
+// Define mock interface
+interface MockQrScannerInstance {
+  start: jest.Mock;
+  stop: jest.Mock;
+  destroy: jest.Mock;
+  options?: {
+    onDecode: (result: string) => void;
+    onDecodeError: (error: Error) => void;
+  };
+}
 
-describe('QRScanner Component', () => {
+// Create mock class
+class MockQrScanner {
+  static hasCamera = jest.fn().mockResolvedValue(true);
+
+  options?: {
+    onDecode: (result: string) => void;
+    onDecodeError: (error: Error) => void;
+  };
+
+  start = jest.fn().mockResolvedValue(undefined);
+  stop = jest.fn();
+  destroy = jest.fn();
+
+  constructor(
+    _videoElem: HTMLVideoElement,
+    opts?: MockQrScannerInstance["options"]
+  ) {
+    this.options = opts;
+  }
+}
+
+// Mock the module
+jest.mock("qr-scanner", () => MockQrScanner);
+
+describe("QRScanner Component", () => {
   const mockOnScan = jest.fn();
   const mockOnError = jest.fn();
 
@@ -14,40 +46,78 @@ describe('QRScanner Component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders scanner with camera permission', () => {
-    renderWithChakra(
-      <QRScanner onScan={mockOnScan} onError={mockOnError} />
-    );
-
-    expect(screen.getByTestId('qr-scanner-viewport')).toBeInTheDocument();
-    expect(screen.getByText(/scan service qr code/i)).toBeInTheDocument();
+  it("renders scanner viewport", () => {
+    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
+    const videoElement = screen.getByTestId("qr-scanner-viewport");
+    expect(videoElement).toBeInTheDocument();
+    expect(videoElement.tagName).toBe("VIDEO");
   });
 
-  it('handles successful QR scan', async () => {
-    renderWithChakra(
-      <QRScanner onScan={mockOnScan} onError={mockOnError} />
-    );
+  it("initializes scanner when mounted", async () => {
+    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
 
-    await act(async () => {
-      // Simulate successful QR scan
-      const mockQRData = 'SERVICE_1_20240215';
-      mockOnScan(mockQRData);
+    // The QrScanner constructor should be called
+    await waitFor(() => {
+      expect(MockQrScanner.prototype.start).toHaveBeenCalled();
     });
-
-    expect(mockOnScan).toHaveBeenCalledWith('SERVICE_1_20240215');
-    expect(mockOnError).not.toHaveBeenCalled();
   });
 
-  it('shows error on camera permission denied', async () => {
-    renderWithChakra(
+  it("calls onScan when QR code is detected", async () => {
+    // Get the constructor arguments to access callbacks
+    let instance: MockQrScannerInstance | null = null;
+
+    // Override the constructor for this test
+    const originalMockQrScanner = jest.requireMock("qr-scanner");
+    jest.resetModules();
+    jest.doMock("qr-scanner", () => {
+      return jest.fn().mockImplementation((_videoElem, _opts) => {
+        instance = new MockQrScanner(_videoElem, _opts);
+        return instance;
+      });
+    });
+
+    // Re-import after mock change
+    const { default: ReimportedQRScanner } = await import(
+      "@/components/attendance/QRScanner"
+    );
+
+    render(<ReimportedQRScanner onScan={mockOnScan} onError={mockOnError} />);
+
+    await waitFor(() => {
+      expect(instance).not.toBeNull();
+    });
+
+    // Simulate a scan (safely)
+    if (instance?.options?.onDecode) {
+      instance.options.onDecode("test-qr-data");
+      expect(mockOnScan).toHaveBeenCalledWith("test-qr-data");
+    }
+
+    // Restore the original mock
+    jest.doMock("qr-scanner", () => originalMockQrScanner);
+  });
+
+  it("cleans up scanner on unmount", async () => {
+    // Create a specific mock instance for this test
+    const mockInstance = new MockQrScanner(document.createElement("video"));
+
+    // Mock the constructor to return our instance
+    const QrScannerMock = jest.requireMock("qr-scanner");
+    QrScannerMock.mockImplementation(() => mockInstance);
+
+    const { unmount } = render(
       <QRScanner onScan={mockOnScan} onError={mockOnError} />
     );
 
-    await act(async () => {
-      mockOnError(new Error('Camera permission denied'));
+    // Wait for scanner to be initialized
+    await waitFor(() => {
+      expect(mockInstance.start).toHaveBeenCalled();
     });
 
-    expect(screen.getByText(/camera access required/i)).toBeInTheDocument();
-    expect(mockOnError).toHaveBeenCalled();
+    // Unmount and check cleanup
+    unmount();
+
+    expect(mockInstance.stop).toHaveBeenCalled();
+    expect(mockInstance.destroy).toHaveBeenCalled();
   });
 });

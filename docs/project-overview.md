@@ -4,14 +4,18 @@ A modern web-based solution for church administration, designed specifically for
 
 ## Core Features (MVP)
 
-### Organisation Management
+### Organization Management
 
-- Organisation setup and configuration
-- Team/department management
-- Class management (Church Academy, Marriage Classes, Baptismal Classes)
-- Family registration with children linking
-- Age data collection (optional)
-- Memorable dates tracking (wedding, baptism, conversion)
+- Multi-department support
+- Class/event management
+- Family unit tracking
+- Visitor management system
+- Organization customization
+  - Brand colours (primary, secondary, background, accent)
+  - Localization preferences (language, currency, timezone)
+  - Brand assets (logo, favicon)
+  - Customizable UI theme
+  - Accessible through settings dashboard
 
 ### Member Management
 

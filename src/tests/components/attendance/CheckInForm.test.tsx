@@ -1,77 +1,59 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ChakraProvider } from '@chakra-ui/react';
-import CheckInForm from '@/components/attendance/CheckInForm';
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { render } from "@/tests/utils/test-utils";
+import CheckInForm from "@/components/attendance/CheckInForm";
 
-const renderWithChakra = (component: React.ReactElement) => {
-  return render(<ChakraProvider>{component}</ChakraProvider>);
-};
-
-describe('CheckInForm Component', () => {
+describe("CheckInForm Component", () => {
   const mockOnSubmit = jest.fn();
-  const mockMembers = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Doe' }
-  ];
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders form with member selection', () => {
-    renderWithChakra(
-      <CheckInForm 
-        members={mockMembers}
-        onSubmit={mockOnSubmit}
-      />
-    );
+  it("renders form elements", () => {
+    render(<CheckInForm onSubmit={mockOnSubmit} />);
 
-    expect(screen.getByLabelText(/select member/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /check in/i })).toBeInTheDocument();
+    expect(screen.getByTestId("check-in-form")).toBeInTheDocument();
+    expect(screen.getByTestId("member-select")).toBeInTheDocument();
+    expect(screen.getByTestId("service-select")).toBeInTheDocument();
+    expect(screen.getByTestId("submit-button")).toBeInTheDocument();
   });
 
-  it('handles single member check-in', async () => {
-    renderWithChakra(
-      <CheckInForm 
-        members={mockMembers}
-        onSubmit={mockOnSubmit}
-      />
-    );
+  it("handles form submission", async () => {
+    render(<CheckInForm onSubmit={mockOnSubmit} />);
 
-    fireEvent.change(screen.getByLabelText(/select member/i), {
-      target: { value: '1' }
-    });
+    const memberSelect = screen.getByTestId("member-select");
+    const serviceSelect = screen.getByTestId("service-select");
+    const submitButton = screen.getByTestId("submit-button");
 
-    fireEvent.click(screen.getByRole('button', { name: /check in/i }));
+    fireEvent.change(memberSelect, { target: { value: "1" } });
+    fireEvent.change(serviceSelect, { target: { value: "1" } });
+    fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
-        memberId: '1',
-        type: 'INDIVIDUAL'
+        memberId: "1",
+        serviceId: "1",
       });
     });
   });
 
-  it('handles family check-in', async () => {
-    renderWithChakra(
-      <CheckInForm 
-        members={mockMembers}
-        onSubmit={mockOnSubmit}
-      />
-    );
+  it("disables submit button when form is invalid", () => {
+    render(<CheckInForm onSubmit={mockOnSubmit} />);
 
-    fireEvent.click(screen.getByLabelText(/family check-in/i));
-    
-    // Select multiple family members
-    fireEvent.click(screen.getByText('John Doe'));
-    fireEvent.click(screen.getByText('Jane Doe'));
+    const submitButton = screen.getByTestId("submit-button");
+    expect(submitButton).toBeDisabled();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: /check in family/i }));
+  it("enables submit button when form is valid", () => {
+    render(<CheckInForm onSubmit={mockOnSubmit} />);
 
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({
-        memberIds: ['1', '2'],
-        type: 'FAMILY'
-      });
-    });
+    const memberSelect = screen.getByTestId("member-select");
+    const serviceSelect = screen.getByTestId("service-select");
+
+    fireEvent.change(memberSelect, { target: { value: "1" } });
+    fireEvent.change(serviceSelect, { target: { value: "1" } });
+
+    const submitButton = screen.getByTestId("submit-button");
+    expect(submitButton).not.toBeDisabled();
   });
 });

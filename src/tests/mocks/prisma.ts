@@ -1,13 +1,18 @@
+import { beforeEach, vi } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 
-// Create a mock instance of PrismaClient
-const prismaMock = mockDeep<PrismaClient>();
+// Create a deep mock of PrismaClient
+export const prismaMock = mockDeep<PrismaClient>();
 
 // Mock the prisma module
-jest.mock('@/lib/prisma', () => ({
+vi.mock('@/lib/prisma', () => ({
   prisma: prismaMock,
 }));
 
-export { prismaMock };
-export default prismaMock; 
+// Clear all mocks before each test
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+export type MockPrismaClient = DeepMockProxy<PrismaClient>;

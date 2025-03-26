@@ -21,6 +21,9 @@ model Organisation {
   teams       Team[]
   users       User[]
   services    Service[]
+  invitations Invitation[]
+  settings    OrganisationSettings?
+  attendance  Attendance[]
 }
 
 model Department {
@@ -62,6 +65,7 @@ model Class {
   organisation Organisation @relation(fields: [organisationId], references: [id])
   sessions     ClassSession[]
   members      MemberClass[]
+  attendance   Attendance[]
 }
 
 model ClassSession {
@@ -72,7 +76,7 @@ model ClassSession {
   updatedAt DateTime @updatedAt
 
   class     Class    @relation(fields: [classId], references: [id])
-  attendees Attendance[]
+  attendees Attendance[] @relation("ClassSessionAttendance")
 }
 
 model Member {
@@ -193,15 +197,22 @@ model MemberSkill {
 }
 
 model Attendance {
-  id            String   @id @default(cuid())
-  memberId      String
-  serviceId     String
-  checkedInAt   DateTime @default(now())
-  checkedOutAt  DateTime?
-  isFamily      Boolean  @default(false)
-
-  member        Member    @relation(fields: [memberId], references: [id])
-  service       Service   @relation(fields: [serviceId], references: [id])
+  id              String   @id @default(cuid())
+  memberId        String
+  classId         String
+  date            DateTime @default(now())
+  status          String   // PRESENT, ABSENT, LATE
+  notes           String?
+  organisationId  String
+  member          Member   @relation(fields: [memberId], references: [id])
+  class           Class    @relation(fields: [classId], references: [id])
+  organisation    Organisation @relation(fields: [organisationId], references: [id])
+  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
+  classSessionId  String?
+  service         Service? @relation(fields: [serviceId], references: [id])
+  serviceId       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Account {
@@ -259,28 +270,49 @@ model VerificationToken {
 }
 
 model Invitation {
-  id            String      @id @default(cuid())
-  code          String      @unique
-  email         String?     // Optional: for specific email invites
-  role          Role        @default(MEMBER)
-  expires       DateTime
-  used          Boolean     @default(false)
+  id            String   @id @default(cuid())
+  email         String   @unique
+  token         String   @unique
+  expiresAt     DateTime
   organisationId String
   organisation  Organisation @relation(fields: [organisationId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-
-  @@index([code])
 }
 
 model Service {
   id          String   @id @default(cuid())
   name        String
   startTime   DateTime
-  status      String   @default("SCHEDULED") // ACTIVE, SCHEDULED, COMPLETED, CANCELLED
+  endTime     DateTime?
+  status      String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED
+  organisationId String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  organisationId String
+
   organisation Organisation @relation(fields: [organisationId], references: [id])
-  attendance  Attendance[]
+  attendance   Attendance[]
+}
+
+model OrganisationSettings {
+  id              String   @id @default(cuid())
+  organisationId  String   @unique
+  organisation    Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  
+  // Brand Colours
+  primaryColor    String   @default("#000000")
+  secondaryColor  String   @default("#666666")
+  backgroundColor  String   @default("#FFFFFF")
+  accentColor     String   @default("#F5F5F5")
+  
+  // Localization
+  language        String   @default("en")
+  currency        String   @default("GBP")
+  timezone        String   @default("Europe/London")
+  
+  // Additional Settings
+  logoUrl         String?
+  faviconUrl      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

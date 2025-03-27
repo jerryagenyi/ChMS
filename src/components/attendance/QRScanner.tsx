@@ -6,15 +6,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  Button,
   VStack,
   Text,
   useToast,
   Box,
-  IconButton,
 } from '@chakra-ui/react';
-import { QrScanner } from '@yudiel/react-qr-scanner';
-import { CloseIcon, PauseIcon, PlayIcon } from '@chakra-ui/icons';
+import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/navigation';
 
 interface QRScannerProps {
@@ -22,14 +19,14 @@ interface QRScannerProps {
   onClose: () => void;
 }
 
-export function QRScanner({ isOpen, onClose }: QRScannerProps) {
+export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
   const toast = useToast();
   const router = useRouter();
 
-  const handleScan = async (result: string | null) => {
-    if (!result) return;
+  const handleScan = async (qrData: string) => {
+    if (!qrData || isValidating) return;
 
     try {
       setIsValidating(true);
@@ -38,9 +35,7 @@ export function QRScanner({ isOpen, onClose }: QRScannerProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          qrData: result,
-        }),
+        body: JSON.stringify({ qrData }),
       });
 
       const data = await response.json();
@@ -57,7 +52,6 @@ export function QRScanner({ isOpen, onClose }: QRScannerProps) {
         isClosable: true,
       });
 
-      // Navigate to attendance page
       router.push(`/attendance/class/${data.data.classId}`);
       onClose();
     } catch (error) {
@@ -73,11 +67,10 @@ export function QRScanner({ isOpen, onClose }: QRScannerProps) {
     }
   };
 
-  const handleError = (error: Error) => {
-    console.error('QR Scanner error:', error);
+  const handleError = (error: string) => {
     toast({
-      title: 'Error',
-      description: 'Failed to access camera',
+      title: 'Scanner Error',
+      description: error,
       status: 'error',
       duration: 5000,
       isClosable: true,
@@ -94,12 +87,13 @@ export function QRScanner({ isOpen, onClose }: QRScannerProps) {
           <VStack spacing={4}>
             <Box position="relative" width="100%" height="300px">
               {isScanning ? (
-                <QrScanner
-                  onDecode={handleScan}
+                <Scanner
+                  onScan={handleScan}
                   onError={handleError}
                   constraints={{
                     facingMode: 'environment',
                   }}
+                  paused={!isScanning || isValidating}
                 />
               ) : (
                 <Box
@@ -113,30 +107,7 @@ export function QRScanner({ isOpen, onClose }: QRScannerProps) {
                   <Text>Scanner paused</Text>
                 </Box>
               )}
-              <IconButton
-                aria-label={isScanning ? 'Pause scanner' : 'Resume scanner'}
-                icon={isScanning ? <PauseIcon /> : <PlayIcon />}
-                onClick={() => setIsScanning(!isScanning)}
-                position="absolute"
-                top={2}
-                right={2}
-                colorScheme="blue"
-                size="sm"
-                isDisabled={isValidating}
-              />
             </Box>
-            <Text fontSize="sm" color="gray.500">
-              Position the QR code within the frame
-            </Text>
-            <Button
-              leftIcon={<CloseIcon />}
-              onClick={onClose}
-              variant="ghost"
-              size="sm"
-              isDisabled={isValidating}
-            >
-              Close
-            </Button>
           </VStack>
         </ModalBody>
       </ModalContent>

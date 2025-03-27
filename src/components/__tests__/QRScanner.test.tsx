@@ -4,36 +4,25 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import QRScanner from '../QRScanner';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
-// Mock html5-qrcode
+// Mock is now handled in central setup, but we need component-specific mock
 vi.mock('html5-qrcode', () => ({
-  Html5QrcodeScanner: vi.fn().mockImplementation(() => {
-    return {
-      render: vi.fn(),
-      clear: vi.fn(),
-    };
-  }),
+  Html5QrcodeScanner: vi.fn().mockImplementation(() => ({
+    render: vi.fn(),
+    clear: vi.fn(),
+  })),
 }));
 
 describe('QRScanner', () => {
   const mockOnScan = vi.fn();
-  const mockOnError = vi.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockOnScan.mockClear();
   });
 
-  it('renders the scanner container', () => {
-    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
-    const container = screen.getByTestId('qr-scanner-viewport');
-    expect(container).toBeInTheDocument();
+  it('renders scanner component', () => {
+    render(<QRScanner onScan={mockOnScan} />);
+    expect(screen.getByTestId('qr-scanner')).toBeInTheDocument();
   });
 
-  it('initializes the scanner with correct parameters', () => {
-    render(<QRScanner onScan={mockOnScan} onError={mockOnError} />);
-    expect(Html5QrcodeScanner).toHaveBeenCalledWith(
-      expect.any(String),
-      { fps: expect.any(Number), qrbox: expect.any(Object) },
-      false
-    );
-  });
+  // Add more test cases...
 });

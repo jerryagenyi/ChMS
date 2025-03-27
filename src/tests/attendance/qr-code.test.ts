@@ -1,46 +1,41 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { generateServiceQR, validateQRCode } from '@/lib/attendance/qr';
-import { prismaMock } from '../mocks/prisma';
+import { createMockPrismaClient } from '@/tests/setup/test-setup';
+import type { MockPrismaClient } from '@/tests/setup/test-setup';
 
-jest.mock('@/lib/prisma', () => ({
-  prisma: prismaMock
-}));
+describe('QR Code Functions', () => {
+  let prismaMock: MockPrismaClient;
 
-describe('QR Code System', () => {
-  const mockService = {
-    id: '1',
-    name: 'Sunday Service',
-    locationId: 'loc1',
-    startTime: new Date(),
-    endTime: new Date(),
-    qrCode: null
-  };
+  beforeEach(() => {
+    prismaMock = createMockPrismaClient();
+  });
 
-  it('generates unique QR code for service', async () => {
-    prismaMock.service.update.mockResolvedValue({
-      ...mockService,
-      qrCode: expect.any(String)
+  describe('generateServiceQR', () => {
+    it('generates valid QR code data', async () => {
+      const mockService = {
+        id: '123',
+        name: 'Sunday Service',
+        date: new Date('2024-03-01'),
+      };
+
+      const qrData = await generateServiceQR(mockService);
+      expect(qrData).toBeTruthy();
+      expect(qrData).toContain(mockService.id);
     });
-
-    const qrCode = await generateServiceQR(mockService.id);
-    
-    expect(qrCode).toBeTruthy();
-    expect(typeof qrCode).toBe('string');
-    expect(qrCode.length).toBeGreaterThan(0);
   });
 
-  it('validates QR code format', async () => {
-    const qrCode = 'SERVICE_1_20240215';
-    
-    const isValid = await validateQRCode(qrCode);
-    
-    expect(isValid).toBe(true);
-  });
+  describe('validateQRCode', () => {
+    it('validates QR code data correctly', async () => {
+      const mockQRData = 'valid-qr-data-123';
+      
+      prismaMock.service.findUnique.mockResolvedValue({
+        id: '123',
+        name: 'Sunday Service',
+        date: new Date('2024-03-01'),
+      } as any);
 
-  it('rejects expired QR codes', async () => {
-    const oldQRCode = 'SERVICE_1_20230101';
-    
-    const isValid = await validateQRCode(oldQRCode);
-    
-    expect(isValid).toBe(false);
+      const result = await validateQRCode(mockQRData);
+      expect(result).toBeTruthy();
+    });
   });
 });

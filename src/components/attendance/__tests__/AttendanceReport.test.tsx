@@ -1,175 +1,111 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { AttendanceReport } from '../AttendanceReport';
-import { vi } from 'vitest';
+import { ChakraProvider } from '@chakra-ui/react';
+import AttendanceReport from '../AttendanceReport';
 
-// Mock the fetch function
-const mockFetch = vi.fn();
+// Mock data
+const mockAttendanceData = {
+  total: 150,
+  average: 75,
+  byDate: [
+    { date: '2024-01-01', count: 80 },
+    { date: '2024-01-08', count: 70 },
+  ],
+  byMember: [
+    { memberId: '1', name: 'John Doe', attendance: 8 },
+    { memberId: '2', name: 'Jane Smith', attendance: 7 },
+  ],
+};
 
-// Mock the toast function
-const mockToast = vi.fn();
+// Mock fetch
+global.fetch = vi.fn();
 
-// Mock the useToast hook
-vi.mock('@chakra-ui/react', async () => {
-  const actual = await vi.importActual('@chakra-ui/react');
-  return {
-    ...actual,
-    useToast: () => mockToast,
-  };
-});
+const renderWithChakra = (component: React.ReactElement) => {
+  return render(<ChakraProvider>{component}</ChakraProvider>);
+};
 
 describe('AttendanceReport', () => {
-  const mockReport = {
-    class: {
-      id: '1',
-      name: 'Test Class',
-      description: 'Test Description',
-    },
-    month: '2024-03',
-    members: [
-      {
-        member: {
-          id: '1',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-        },
-        stats: {
-          totalDays: 20,
-          present: 18,
-          absent: 1,
-          late: 1,
-          attendancePercentage: 90,
-        },
-        attendance: [
-          {
-            id: '1',
-            date: '2024-03-01',
-            status: 'PRESENT',
-            notes: 'On time',
-          },
-        ],
-      },
-    ],
-    overallStats: {
-      totalDays: 20,
-      totalPresent: 18,
-      totalAbsent: 1,
-      totalLate: 1,
-      averageAttendance: 90,
-    },
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = mockFetch;
   });
 
   it('renders loading state initially', () => {
-    render(<AttendanceReport />);
-    expect(screen.getByText('Loading report...')).toBeInTheDocument();
+    (global.fetch as jest.Mock).mockImplementationOnce(() => new Promise(() => {}));
+
+    renderWithChakra(<AttendanceReport />);
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it('renders error state when fetch fails', async () => {
-    mockFetch.mockRejectedValueOnce(new Error('Failed to fetch'));
-    render(<AttendanceReport />);
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
+
+    renderWithChakra(<AttendanceReport />);
 
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith({
-        title: 'Error',
-        description: 'Failed to fetch attendance report',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      expect(screen.getByText(/error loading attendance data/i)).toBeInTheDocument();
     });
   });
 
   it('renders report data when fetch succeeds', async () => {
-    mockFetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ data: mockReport }),
+      json: () => Promise.resolve(mockAttendanceData),
     });
 
-    render(<AttendanceReport />);
+    renderWithChakra(<AttendanceReport />);
 
     await waitFor(() => {
-      expect(screen.getByText('Test Class - Attendance Report')).toBeInTheDocument();
-      expect(screen.getByText('20')).toBeInTheDocument();
-      expect(screen.getByText('18')).toBeInTheDocument();
-      expect(screen.getByText('1')).toBeInTheDocument();
-      expect(screen.getByText('90.0%')).toBeInTheDocument();
+      expect(screen.getByText('Total Attendance: 150')).toBeInTheDocument();
+      expect(screen.getByText('Average Attendance: 75')).toBeInTheDocument();
     });
   });
 
   it('opens member details modal when clicking view details', async () => {
-    mockFetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ data: mockReport }),
+      json: () => Promise.resolve(mockAttendanceData),
     });
 
-    render(<AttendanceReport />);
+    renderWithChakra(<AttendanceReport />);
 
     await waitFor(() => {
-      expect(screen.getByText('View Details')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText('View Details'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Attendance Details - John Doe')).toBeInTheDocument();
-      expect(screen.getByText('On time')).toBeInTheDocument();
+      const viewDetailsButton = screen.getByText(/view details/i);
+      fireEvent.click(viewDetailsButton);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
   it('exports CSV when clicking export button', async () => {
-    mockFetch.mockResolvedValueOnce({
+    const mockCreateObjectURL = vi.fn();
+    global.URL.createObjectURL = mockCreateObjectURL;
+    global.URL.revokeObjectURL = vi.fn();
+
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ data: mockReport }),
+      json: () => Promise.resolve(mockAttendanceData),
     });
 
-    const mockCreateObjectURL = vi.fn();
-    const mockRevokeObjectURL = vi.fn();
-    const mockClick = vi.fn();
-
-    global.URL.createObjectURL = mockCreateObjectURL;
-    global.URL.revokeObjectURL = mockRevokeObjectURL;
-
-    const mockLink = {
-      href: '',
-      download: '',
-      click: mockClick,
-    };
-
-    vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
-
-    render(<AttendanceReport />);
+    renderWithChakra(<AttendanceReport />);
 
     await waitFor(() => {
-      expect(screen.getByText('Export CSV')).toBeInTheDocument();
+      const exportButton = screen.getByText(/export csv/i);
+      fireEvent.click(exportButton);
+      expect(mockCreateObjectURL).toHaveBeenCalled();
     });
-
-    fireEvent.click(screen.getByText('Export CSV'));
-
-    expect(mockCreateObjectURL).toHaveBeenCalled();
-    expect(mockClick).toHaveBeenCalled();
-    expect(mockRevokeObjectURL).toHaveBeenCalled();
   });
 
   it('changes month when selecting a different month', async () => {
-    mockFetch.mockResolvedValueOnce({
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ data: mockReport }),
+      json: () => Promise.resolve(mockAttendanceData),
     });
 
-    render(<AttendanceReport />);
+    renderWithChakra(<AttendanceReport />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Select month')).toBeInTheDocument();
+      const monthSelect = screen.getByLabelText(/select month/i);
+      fireEvent.change(monthSelect, { target: { value: '2024-02' } });
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
-
-    const select = screen.getByLabelText('Select month');
-    fireEvent.change(select, { target: { value: '2024-02' } });
-
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('month=2024-02'));
   });
 });

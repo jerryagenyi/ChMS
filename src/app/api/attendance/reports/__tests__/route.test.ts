@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NextResponse } from 'next/server';
-import { generateReport } from '../route';
-import prisma from '@/lib/prisma';
+import { GET } from '../route';
+import { prisma } from '@/lib/prisma';
 
-// Mock Prisma
 vi.mock('@/lib/prisma', () => ({
-  default: {
+  prisma: {
     attendance: {
       findMany: vi.fn(),
+      count: vi.fn(),
+    },
+    member: {
+      findMany: vi.fn(),
+    },
+    class: {
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -17,15 +22,85 @@ describe('Attendance Reports API', () => {
     vi.clearAllMocks();
   });
 
-  it('handles database errors gracefully', async () => {
-    // Mock prisma to throw an error
-    (prisma.attendance.findMany as any).mockRejectedValue(new Error('DB Error'));
+  it('handles successful attendance report generation', async () => {
+    const mockAttendanceData = [
+      {
+        id: '1',
+        date: new Date('2024-01-01'),
+        memberId: '1',
+        serviceId: '1',
+        status: 'PRESENT',
+      },
+    ];
 
-    const response = await generateReport();
-    expect(response.status).toBe(500);
+    const mockMembers = [
+      {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+      },
+    ];
+
+    (prisma.attendance.findMany as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce(mockAttendanceData);
+    (prisma.member.findMany as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce(mockMembers);
+
+    const request = new Request(
+      'http://localhost:3000/api/attendance/reports?month=2024-01',
+      { method: 'GET' }
+    );
+
+    const response = await GET(request);
     const data = await response.json();
-    expect(data).toEqual({ error: 'Failed to generate attendance report' });
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data.data).toHaveProperty('month');
+    expect(data.data).toHaveProperty('members');
+    expect(data.data).toHaveProperty('overallStats');
   });
 
-  // Add more test cases here...
-}); 
+  it('handles database errors gracefully', async () => {
+    (prisma.attendance.findMany as ReturnType<typeof vi.fn>)
+      .mockRejectedValueOnce(new Error('Database error'));
+
+    const request = new Request(
+      'http://localhost:3000/api/attendance/reports?month=2024-01',
+      { method: 'GET' }
+    );
+
+    const response = await GET(request);
+    expect(response.status).toBe(500);
+    
+    const data = await response.json();
+    expect(data).toHaveProperty('error');
+  });
+
+  it('validates required query parameters', async () => {
+    const request = new Request(
+      'http://localhost:3000/api/attendance/reports',
+      { method: 'GET' }
+    );
+
+    const response = await GET(request);
+    expect(response.status).toBe(400);
+    
+    const data = await response.json();
+    expect(data.error).toBe('Month parameter is required');
+  });
+
+  it('handles invalid date format', async () => {
+    const request = new Request(
+      'http://localhost:3000/api/attendance/reports?month=invalid-date',
+      { method: 'GET' }
+    );
+
+    const response = await GET(request);
+    expect(response.status).toBe(400);
+    
+    const data = await response.json();
+    expect(data.error).toBe('Invalid date format');
+  });
+});

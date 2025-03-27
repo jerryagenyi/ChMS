@@ -1,27 +1,29 @@
-import { renderWithProviders } from '@/tests/utils/test-helpers';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '@/tests/utils/test-utils';
 import ServiceSelector from '@/components/attendance/ServiceSelector';
 
+type Service = {
+  id: string;
+  name: string;
+  startTime: string;
+  status: 'ACTIVE' | 'SCHEDULED' | 'COMPLETED';
+};
+
 describe('ServiceSelector Component', () => {
-  const mockServices = [
-    { id: '1', name: 'Sunday Morning', startTime: '09:00', status: 'ACTIVE' },
-    { id: '2', name: 'Sunday Evening', startTime: '18:00', status: 'ACTIVE' },
-    { id: '3', name: 'Wednesday', startTime: '19:00', status: 'SCHEDULED' }
+  const mockServices: Service[] = [
+    { id: '1', name: 'Sunday Service', startTime: '10:00', status: 'ACTIVE' as const },
+    { id: '2', name: 'Wednesday Service', startTime: '19:00', status: 'SCHEDULED' as const },
   ];
 
-  const mockOnSelect = jest.fn();
+  const mockOnSelect = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
-  it('renders all services correctly', () => {
-    renderWithProviders(
-      <ServiceSelector 
-        services={mockServices} 
-        onSelect={mockOnSelect} 
-      />
-    );
+  it('renders service options', () => {
+    render(<ServiceSelector services={mockServices} onSelect={mockOnSelect} />);
 
     mockServices.forEach(service => {
       expect(screen.getByText(service.name)).toBeInTheDocument();
@@ -29,30 +31,34 @@ describe('ServiceSelector Component', () => {
     });
   });
 
-  it('handles service selection', async () => {
-    renderWithProviders(
-      <ServiceSelector 
-        services={mockServices} 
-        onSelect={mockOnSelect} 
+  it('calls onSelect when a service is selected', () => {
+    render(<ServiceSelector services={mockServices} onSelect={mockOnSelect} />);
+
+    const serviceOption = screen.getByText(mockServices[0].name);
+    fireEvent.click(serviceOption);
+
+    expect(mockOnSelect).toHaveBeenCalledWith(mockServices[0]);
+  });
+
+  it('highlights selected service', () => {
+    render(
+      <ServiceSelector
+        services={mockServices}
+        onSelect={mockOnSelect}
+        selectedId={mockServices[0].id}
       />
     );
 
-    fireEvent.click(screen.getByText('Sunday Morning'));
-
-    await waitFor(() => {
-      expect(mockOnSelect).toHaveBeenCalledWith(mockServices[0]);
+    const selectedService = screen.getByText(mockServices[0].name);
+    expect(selectedService.closest('button')).toHaveStyle({
+      backgroundColor: 'var(--chakra-colors-blue-50)',
     });
   });
 
-  it('disables non-active services', () => {
-    renderWithProviders(
-      <ServiceSelector 
-        services={mockServices} 
-        onSelect={mockOnSelect} 
-      />
-    );
+  it('disables scheduled services', () => {
+    render(<ServiceSelector services={mockServices} onSelect={mockOnSelect} />);
 
-    const wednesdayService = screen.getByText('Wednesday').closest('button');
-    expect(wednesdayService).toBeDisabled();
+    const scheduledService = screen.getByText(mockServices[1].name).closest('button');
+    expect(scheduledService).toBeDisabled();
   });
 });

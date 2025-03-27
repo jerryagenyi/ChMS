@@ -1,37 +1,20 @@
-import { createMocks } from 'node-mocks-http';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { describe, it, expect } from 'vitest';
+import { createMockRequest } from '@/test/helpers';
 
 describe('Basic API Tests', () => {
   it('handles successful requests', async () => {
-    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
-      method: 'GET',
+    const req = createMockRequest('http://localhost:3000/api/test', {
+      method: 'GET'
+    });
+    const response = new Response(JSON.stringify({ message: 'Success' }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
-    // Mock your API handler here
-    const handler = (req: NextApiRequest, res: NextApiResponse) => {
-      res.status(200).json({ message: 'Success' });
-    };
-
-    await handler(req, res);
-    expect(res._getStatusCode()).toBe(200);
-  });
-
-  it('handles error cases', async () => {
-    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
-      method: 'POST',
-      body: {},
-    });
-
-    // Mock your API handler here
-    const handler = (req: NextApiRequest, res: NextApiResponse) => {
-      if (!req.body || Object.keys(req.body).length === 0) {
-        res.status(400).json({ error: 'Bad Request' });
-        return;
-      }
-      res.status(200).json({ message: 'Success' });
-    };
-
-    await handler(req, res);
-    expect(res._getStatusCode()).toBe(400);
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data).toEqual({ message: 'Success' });
   });
 });

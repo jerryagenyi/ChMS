@@ -1,9 +1,9 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+description: Core context rules for ChMS Africa project
+globs: ["**/*"]
+alwaysApply: true
 ---
- # ChMS Project Context
+# ChMS Project Context
 
 ## Source of Truth Documents
 The following documents are the source of truth for the ChMS project:
@@ -14,137 +14,130 @@ The following documents are the source of truth for the ChMS project:
    - Development guidelines
    - Project structure
 
-2. Attendance App MVP: `/docs/attendance-app-mvp.md`
-   - Detailed attendance system specifications
-   - Core features and implementation details
-   - Technical requirements
-   - Testing strategy
+2. Technical Documentation:
+   - Architecture: `/docs/architecture.md`
+   - Testing Strategy: `/docs/testing-strategy.md`
+   - Component Library: `/docs/component-library.md`
+   - API Documentation: `/docs/api-docs.md`
 
-3. Project Tracker: `/planning/overall-project-tracker.md`
-   - Current sprint priorities
-   - Upcoming features
-   - Technical debt
-   - Timeline and milestones
-
-## Development Environment
-- Local: macOS (darwin 24.3.0)
-- Server: Ubuntu 24.04 LTS
-- VM: Oracle Cloud Infrastructure (OCI)
-- Database: PostgreSQL
-- Version Control: Git with GitHub
+3. Project Management:
+   - Project Tracker: `/docs/project-tracker.md`
+   - Sprint Planning: `/docs/sprint-planning.md`
+   - Development Workflow: `/docs/development-workflow.md`
 
 ## Project Structure
 ```
 ChMS/
-├── src/                    # Source code
-├── docs/                   # Documentation
-│   ├── project-overview.md
-│   ├── attendance-app-mvp.md
-│   └── ai-context.md
-├── planning/              # Project planning
-│   ├── overall-project-tracker.md
-│   └── attendance-tracker.md
-├── prisma/               # Database schema and migrations
-├── .env                  # Environment variables
-└── .cursor/             # Cursor IDE configuration
+├── src/
+│   ├── components/         # React components
+│   │   └── ComponentName/
+│   │       ├── index.ts
+│   │       ├── ComponentName.tsx
+│   │       ├── ComponentName.test.tsx
+│   │       └── types.ts
+│   ├── hooks/             # Custom React hooks
+│   ├── pages/             # Next.js pages
+│   ├── services/          # External service integrations
+│   ├── store/             # State management
+│   ├── styles/            # Global styles
+│   ├── types/             # TypeScript types
+│   └── utils/             # Utility functions
+├── docs/                  # Documentation
+├── prisma/               # Database schema
+├── public/              # Static assets
+└── tests/               # Test utilities and setup
 ```
 
-## Key Technical Decisions
-1. Next.js with TypeScript for frontend
-2. Chakra UI for component library
-3. PostgreSQL with Prisma ORM
-4. Jest and React Testing Library for testing
-5. MSW for API mocking
-6. React Hook Form with Zod for form handling
-7. date-fns for date manipulation
-8. Email service integration (with external API support)
-9. SMS gateway integration
-10. QR code generation and scanning
+## Development Standards
 
-## Core Features
-1. Organization Management
-   - Multi-department support
-   - Class/event management
-   - Family unit tracking
-   - Visitor management system
+### Code Organization
+1. Feature-based structure
+2. Atomic design principles
+3. Clear separation of concerns
+4. Type-safe implementations
+5. Test-driven development
 
-2. Member Management
-   - Comprehensive profile management
-   - Family linking
-   - Skills and gifts tracking
-   - Memorable dates tracking
-   - Department assignments
+### Testing Requirements
+1. Unit tests for all components
+2. Integration tests for features
+3. E2E tests for critical paths
+4. Minimum 85% coverage
+5. Performance testing
 
-3. Attendance System
-   - QR-based check-in
-   - Family check-in support
-   - Offline capabilities
-   - Class attendance tracking
+### Performance Standards
+1. Page load < 2s
+2. API response < 200ms
+3. First contentful paint < 1.5s
+4. Time to interactive < 2s
+5. Offline capability
 
-4. Communication
-   - Mass email system
-   - SMS integration
-   - External email API support
+### Security Requirements
+1. Role-based access control
+2. Data encryption
+3. Input validation
+4. XSS protection
+5. CSRF protection
+6. Rate limiting
 
 ## Development Workflow
-1. Follow Git flow branching strategy
-2. Write tests for new features
-3. Update documentation as needed
-4. Regular commits with descriptive messages
-5. Pull request reviews required
+1. Feature branch creation
+2. TDD approach
+3. Code review
+4. CI/CD pipeline
+5. Documentation updates
 
-## Server Configuration
-- Ubuntu 24.04 LTS
-- Docker for containerization
-- Cloudflare for CDN and security
-- Automated backups
-- Monitoring and logging
+## Technical Stack
+1. Frontend:
+   - Next.js 14
+   - TypeScript 5
+   - Chakra UI
+   - React Hook Form
+   - Zod validation
+   - SWR for data fetching
 
-## Database Setup
-- PostgreSQL 16
-- Prisma for ORM
-- Connection string in .env
-- Regular backups
-- Migration management
+2. Backend:
+   - Next.js API routes
+   - Prisma ORM
+   - PostgreSQL
+   - NextAuth.js
 
-## Security Considerations
-- Role-based access control
-- Data encryption
-- GDPR compliance
-- Regular security audits
-- Secure communication
+3. Testing:
+   - Jest
+   - React Testing Library
+   - MSW
+   - Cypress
+   - Playwright
 
-## Performance Requirements
-- Page load < 2s
-- API response < 200ms
-- Mobile-first approach
-- Offline capabilities
-- Responsive design
+4. DevOps:
+   - GitHub Actions
+   - Docker
+   - Vercel
+   - Railway (Database)
 
-## Testing Strategy
-- Unit tests for components
-- Integration tests for API
-- E2E tests for critical paths
-- Test coverage > 80%
-- Automated testing in CI/CD
+## Implementation Phases
+
+### Phase 1: Foundation
+1. Project setup
+2. Core components
+3. Authentication
+4. Basic routing
+5. Database setup
+
+### Phase 2: Core Features
+1. Organization management
+2. Member management
+3. Attendance system
+4. Basic reporting
+
+### Phase 3: Advanced Features
+1. Family management
+2. Communication system
+3. Advanced reporting
+4. Mobile optimization
 
 ## Documentation Requirements
-- Keep source of truth docs updated
-- Document API changes
-- Update user guides
-- Maintain technical docs
-- Version control documentation
-
-## Deployment Process
-1. Local development
-2. Testing environment
-3. Staging environment
-4. Production deployment
-5. Monitoring and maintenance
-
-## Support and Maintenance
-- Regular updates
-- Bug tracking
-- Feature requests
-- User support
-- Performance monitoring
+1. Component documentation
+2. API documentation
+3. Testing documentation
+4. Deployment guides
+5. User guides

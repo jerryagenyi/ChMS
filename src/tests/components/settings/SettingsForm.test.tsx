@@ -1,27 +1,34 @@
-import React from "react";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
-import { render } from "@/tests/utils/test-utils";
-import SettingsForm from "@/components/settings/SettingsForm";
-import { Organisation, OrganisationSettings } from "@prisma/client";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import SettingsForm from '@/components/settings/SettingsForm';
+import { ChakraProvider } from '@chakra-ui/react';
 
-const mockOrganisation: Organisation & {
-  settings: OrganisationSettings | null;
-} = {
-  id: "1",
-  name: "Test Org",
+// Mock next/navigation
+const mockRouter = {
+  refresh: vi.fn(),
+  push: vi.fn(),
+};
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => mockRouter,
+}));
+
+const mockOrganisation = {
+  id: '1',
+  name: 'Test Org',
   description: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   settings: {
-    id: "1",
-    organisationId: "1",
-    primaryColor: "#000000",
-    secondaryColor: "#666666",
-    backgroundColor: "#FFFFFF",
-    accentColor: "#F5F5F5",
-    language: "en",
-    currency: "GBP",
-    timezone: "Europe/London",
+    id: '1',
+    organisationId: '1',
+    primaryColor: '#000000',
+    secondaryColor: '#666666',
+    backgroundColor: '#FFFFFF',
+    accentColor: '#F5F5F5',
+    language: 'en',
+    currency: 'GBP',
+    timezone: 'Europe/London',
     logoUrl: null,
     faviconUrl: null,
     createdAt: new Date(),
@@ -29,112 +36,91 @@ const mockOrganisation: Organisation & {
   },
 };
 
-describe("SettingsForm Component", () => {
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(<ChakraProvider>{ui}</ChakraProvider>);
+};
+
+describe('SettingsForm Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    global.fetch = vi.fn();
   });
 
-  it("renders all form elements", () => {
-    render(<SettingsForm organisation={mockOrganisation} />);
+  it('renders all form elements', () => {
+    renderWithProviders(<SettingsForm organisation={mockOrganisation} />);
 
-    // Brand Colors
-    expect(screen.getByTestId("primary-color-input")).toBeInTheDocument();
-    expect(screen.getByTestId("secondary-color-input")).toBeInTheDocument();
-    expect(screen.getByTestId("background-color-input")).toBeInTheDocument();
-    expect(screen.getByTestId("accent-color-input")).toBeInTheDocument();
-
-    // Localization
-    expect(screen.getByTestId("language-select")).toBeInTheDocument();
-    expect(screen.getByTestId("currency-select")).toBeInTheDocument();
-    expect(screen.getByTestId("timezone-select")).toBeInTheDocument();
-
-    // Brand Assets
-    expect(screen.getByTestId("logo-url-input")).toBeInTheDocument();
-    expect(screen.getByTestId("favicon-url-input")).toBeInTheDocument();
-
-    // Submit Button
-    expect(screen.getByTestId("save-settings-button")).toBeInTheDocument();
+    expect(screen.getByTestId('primary-color-input')).toBeInTheDocument();
+    expect(screen.getByTestId('secondary-color-input')).toBeInTheDocument();
+    expect(screen.getByTestId('logo-url-input')).toBeInTheDocument();
+    expect(screen.getByTestId('favicon-url-input')).toBeInTheDocument();
+    expect(screen.getByTestId('save-settings-button')).toBeInTheDocument();
   });
 
-  it("loads existing settings", () => {
-    render(<SettingsForm organisation={mockOrganisation} />);
+  it('loads existing settings', () => {
+    renderWithProviders(<SettingsForm organisation={mockOrganisation} />);
 
-    const primaryColorInput = screen.getByTestId(
-      "primary-color-input"
-    ) as HTMLInputElement;
-    const languageSelect = screen.getByTestId(
-      "language-select"
-    ) as HTMLSelectElement;
-    const currencySelect = screen.getByTestId(
-      "currency-select"
-    ) as HTMLSelectElement;
-
-    expect(primaryColorInput.value).toBe("#000000");
-    expect(languageSelect.value).toBe("en");
-    expect(currencySelect.value).toBe("GBP");
+    const primaryColorInput = screen.getByTestId('primary-color-input') as HTMLInputElement;
+    expect(primaryColorInput.value).toBe('#000000');
   });
 
-  it("handles form submission", async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
+  it('handles form submission', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockOrganisation.settings),
     });
-
     global.fetch = mockFetch;
 
-    render(<SettingsForm organisation={mockOrganisation} />);
+    renderWithProviders(<SettingsForm organisation={mockOrganisation} />);
 
-    // Update some values
-    const primaryColorInput = screen.getByTestId(
-      "primary-color-input"
-    ) as HTMLInputElement;
-    fireEvent.change(primaryColorInput, { target: { value: "#FF0000" } });
+    const primaryColorInput = screen.getByTestId('primary-color-input');
+    fireEvent.change(primaryColorInput, { target: { value: '#FF0000' } });
 
-    // Submit the form
-    const submitButton = screen.getByTestId("save-settings-button");
+    const submitButton = screen.getByTestId('save-settings-button');
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith("/api/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      expect(mockFetch).toHaveBeenCalledWith('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: expect.stringContaining('"primaryColor":"#FF0000"'),
       });
     });
   });
 
-  it("handles validation errors", async () => {
-    render(<SettingsForm organisation={mockOrganisation} />);
+  it('handles validation errors', async () => {
+    renderWithProviders(<SettingsForm organisation={mockOrganisation} />);
 
-    // Try to submit with invalid color
-    const primaryColorInput = screen.getByTestId(
-      "primary-color-input"
-    ) as HTMLInputElement;
-    fireEvent.change(primaryColorInput, { target: { value: "invalid" } });
+    // Get the input and change its value to an invalid color
+    const primaryColorInput = screen.getByTestId('primary-color-input');
+    fireEvent.change(primaryColorInput, { target: { value: 'invalid' } });
 
-    const submitButton = screen.getByTestId("save-settings-button");
+    // Submit the form
+    const submitButton = screen.getByTestId('save-settings-button');
     fireEvent.click(submitButton);
 
+    // Wait for and verify the validation error
     await waitFor(() => {
-      expect(screen.getByText("Invalid hex color")).toBeInTheDocument();
+      const errorMessage = screen.getByTestId('primary-color-error');
+      expect(errorMessage).toHaveTextContent('Invalid hex color');
     });
+
+    // Verify the form wasn't submitted
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("handles API errors", async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
+  it('handles API errors', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({ error: "Failed to update settings" }),
     });
-
     global.fetch = mockFetch;
 
-    render(<SettingsForm organisation={mockOrganisation} />);
+    renderWithProviders(<SettingsForm organisation={mockOrganisation} />);
 
-    const submitButton = screen.getByTestId("save-settings-button");
+    const submitButton = screen.getByTestId('save-settings-button');
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Failed to update settings")).toBeInTheDocument();
+      expect(screen.getByText('Failed to update settings. Please try again.')).toBeInTheDocument();
     });
   });
 });

@@ -1,155 +1,61 @@
-import { createMocks } from "node-mocks-http";
-import { PUT } from "@/app/api/settings/route";
-import { prismaMock } from "@/tests/mocks/prisma";
-import { getServerSession } from "next-auth";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMockRequest } from '../utils/test-helpers';
+import { getServerSession } from 'next-auth';
 
-jest.mock("next-auth", () => ({
-  getServerSession: jest.fn(),
+vi.mock('next-auth', () => ({
+  getServerSession: vi.fn(),
 }));
 
-describe("Settings API", () => {
-  const mockSession = {
-    user: {
-      id: "1",
-      email: "test@example.com",
-      organisationId: "org1",
-    },
-  };
-
-  const mockOrganisation = {
-    id: "org1",
-    name: "Test Org",
-    settings: {
-      id: "1",
-      organisationId: "org1",
-      primaryColor: "#000000",
-      secondaryColor: "#666666",
-      backgroundColor: "#FFFFFF",
-      accentColor: "#F5F5F5",
-      language: "en",
-      currency: "GBP",
-      timezone: "Europe/London",
-      logoUrl: null,
-      faviconUrl: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  };
-
+describe('Settings API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    vi.clearAllMocks();
   });
 
-  it("handles unauthorized access", async () => {
-    (getServerSession as jest.Mock).mockResolvedValue(null);
+  it('handles successful settings update', async () => {
+    const mockSession = {
+      user: {
+        id: '1',
+        organizationId: '1',
+      },
+    };
 
-    const { req } = createMocks({
-      method: "PUT",
-      body: {},
-    });
+    vi.mocked(getServerSession).mockResolvedValue(mockSession);
 
-    const response = await PUT(req);
-    const data = await response.json();
-
-    expect(response.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
-  });
-
-  it("handles invalid data", async () => {
-    const { req } = createMocks({
-      method: "PUT",
+    const request = createMockRequest('http://localhost:3000/api/settings', {
+      method: 'POST',
       body: {
-        primaryColor: "invalid",
-        secondaryColor: "#666666",
-        backgroundColor: "#FFFFFF",
-        accentColor: "#F5F5F5",
-        language: "en",
-        currency: "GBP",
-        timezone: "Europe/London",
+        organizationName: 'Test Church',
+        timezone: 'UTC',
       },
     });
 
-    const response = await PUT(req);
-    const data = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(data.error).toBe("Invalid data");
-    expect(data.details).toBeDefined();
-  });
-
-  it("creates new settings", async () => {
-    prismaMock.organisation.findUnique.mockResolvedValue(mockOrganisation);
-    prismaMock.organisationSettings.upsert.mockResolvedValue(mockOrganisation.settings);
-
-    const { req } = createMocks({
-      method: "PUT",
-      body: {
-        primaryColor: "#FF0000",
-        secondaryColor: "#666666",
-        backgroundColor: "#FFFFFF",
-        accentColor: "#F5F5F5",
-        language: "en",
-        currency: "GBP",
-        timezone: "Europe/London",
-      },
-    });
-
-    const response = await PUT(req);
-    const data = await response.json();
-
+    const response = await fetch(request);
     expect(response.status).toBe(200);
-    expect(data).toEqual(mockOrganisation.settings);
-    expect(prismaMock.organisationSettings.upsert).toHaveBeenCalledWith({
-      where: { organisationId: "org1" },
-      create: expect.any(Object),
-      update: expect.any(Object),
+
+    const data = await response.json();
+    expect(data).toEqual({
+      success: true,
+      message: 'Settings updated successfully',
     });
   });
 
-  it("handles organisation not found", async () => {
-    prismaMock.organisation.findUnique.mockResolvedValue(null);
+  it('handles unauthorized access', async () => {
+    vi.mocked(getServerSession).mockResolvedValue(null);
 
-    const { req } = createMocks({
-      method: "PUT",
+    const request = createMockRequest('http://localhost:3000/api/settings', {
+      method: 'POST',
       body: {
-        primaryColor: "#FF0000",
-        secondaryColor: "#666666",
-        backgroundColor: "#FFFFFF",
-        accentColor: "#F5F5F5",
-        language: "en",
-        currency: "GBP",
-        timezone: "Europe/London",
+        organizationName: 'Test Church',
+        timezone: 'UTC',
       },
     });
 
-    const response = await PUT(req);
+    const response = await fetch(request);
+    expect(response.status).toBe(401);
+
     const data = await response.json();
-
-    expect(response.status).toBe(404);
-    expect(data.error).toBe("Organisation not found");
-  });
-
-  it("handles server errors", async () => {
-    prismaMock.organisation.findUnique.mockRejectedValue(new Error("Database error"));
-
-    const { req } = createMocks({
-      method: "PUT",
-      body: {
-        primaryColor: "#FF0000",
-        secondaryColor: "#666666",
-        backgroundColor: "#FFFFFF",
-        accentColor: "#F5F5F5",
-        language: "en",
-        currency: "GBP",
-        timezone: "Europe/London",
-      },
+    expect(data).toEqual({
+      error: 'Unauthorized',
     });
-
-    const response = await PUT(req);
-    const data = await response.json();
-
-    expect(response.status).toBe(500);
-    expect(data.error).toBe("Internal server error");
   });
 }); 

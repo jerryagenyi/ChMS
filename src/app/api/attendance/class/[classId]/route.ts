@@ -19,11 +19,7 @@ type ValidatedRequest = Request & {
 };
 
 // Get attendance records for a class
-export const GET = validate({
-  params: z.object({
-    classId: z.string().uuid(),
-  }),
-})(async (req: Request) => {
+const getHandler = async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -33,16 +29,33 @@ export const GET = validate({
     const validatedReq = req as ValidatedRequest;
     const { params } = validatedReq.validatedData;
 
-    const attendance = await prisma.$queryRaw`
-      SELECT a.*, m.firstName, m.lastName
-      FROM "Attendance" a
-      JOIN "Member" m ON a."memberId" = m.id
-      WHERE a."classId" = ${params.classId}
-      AND a."organisationId" = ${session.user.organisationId}
-      ORDER BY a."createdAt" DESC
-    `;
+    const attendance = await prisma.attendance.findMany({
+      where: {
+        classId: params.classId,
+      },
+      include: {
+        member: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
 
-    return NextResponse.json({ data: attendance });
+    return NextResponse.json({
+      data: attendance.map(record => ({
+        id: record.id,
+        memberId: record.memberId,
+        classId: record.classId,
+        organisationId: record.organisationId,
+        status: record.status,
+        notes: record.notes,
+        date: record.date.toISOString(),
+        firstName: record.member.firstName,
+        lastName: record.member.lastName,
+      }))
+    });
   } catch (error) {
     logger.error('Failed to fetch attendance records', error as Error);
     return NextResponse.json(
@@ -50,15 +63,16 @@ export const GET = validate({
       { status: 500 }
     );
   }
-});
+};
 
-// Create attendance record for a class
-export const POST = validate({
+export const GET = validate({
   params: z.object({
     classId: z.string().uuid(),
   }),
-  body: createAttendanceSchema,
-})(async (req: Request) => {
+})(getHandler);
+
+// Create attendance record for a class
+const postHandler = async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -67,6 +81,15 @@ export const POST = validate({
 
     const validatedReq = req as ValidatedRequest;
     const { params, body } = validatedReq.validatedData;
+
+    // Add an explicit check for organisationId for type safety
+    if (!session.user.organisationId) {
+      logger.error('Organisation ID missing from session');
+      return NextResponse.json(
+        { error: 'Internal server error: Organisation ID missing' },
+        { status: 500 }
+      );
+    }
 
     if (!body) {
       return NextResponse.json(
@@ -106,32 +129,21 @@ export const POST = validate({
       );
     }
 
-    const attendance = await prisma.$executeRaw`
-      INSERT INTO "Attendance" (
-        id,
-        "memberId",
-        "classId",
-        "organisationId",
-        status,
-        notes,
-        date,
-        "createdAt",
-        "updatedAt"
-      ) VALUES (
-        gen_random_uuid(),
-        ${body.memberId},
-        ${params.classId},
-        ${session.user.organisationId},
-        ${body.status},
-        ${body.notes},
-        ${new Date(body.date)},
-        NOW(),
-        NOW()
-      ) RETURNING *
-    `;
+    // Use prisma.attendance.create for type safety and returning the created record
+    const newAttendance = await prisma.attendance.create({
+      data: {
+        memberId: body.memberId,
+        classId: params.classId,
+        organisationId: session.user.organisationId,
+        status: body.status,
+        notes: body.notes,
+        date: body.date, // Keep as ISO string
+      },
+    });
 
-    logger.info('Attendance record created', { attendanceId: attendance });
-    return NextResponse.json(attendance);
+    logger.info('Attendance record created', { attendanceId: newAttendance.id });
+    // Return the newly created attendance record
+    return NextResponse.json(newAttendance);
   } catch (error) {
     logger.error('Failed to create attendance record', error as Error);
     return NextResponse.json(
@@ -139,4 +151,11 @@ export const POST = validate({
       { status: 500 }
     );
   }
-}); 
+};
+
+export const POST = validate({
+  params: z.object({
+    classId: z.string().uuid(),
+  }),
+  body: createAttendanceSchema,
+})(postHandler);

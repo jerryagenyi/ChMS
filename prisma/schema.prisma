@@ -1,233 +1,37 @@
-generator client {
-  provider = "prisma-client-js"
-}
+# prisma/schema.prisma
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Organisation {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  departments Department[]
-  classes     Class[]
-  members     Member[]
-  visitors    Visitor[]
-  teams       Team[]
-  users       User[]
-  services    Service[]
-  invitations Invitation[]
-  settings    OrganisationSettings?
-  attendance  Attendance[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model Department {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  organisationId String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  teams        Team[]
-}
-
-model Team {
-  id           String   @id @default(cuid())
-  name         String
-  description  String?
-  departmentId String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  department   Department @relation(fields: [departmentId], references: [id])
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  organisationId String
-  members      MemberTeam[]
-}
-
-model Class {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  startDate      DateTime?
-  endDate        DateTime?
-  organisationId String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  sessions     ClassSession[]
-  members      MemberClass[]
-  attendance   Attendance[]
-}
-
-model ClassSession {
-  id        String   @id @default(cuid())
-  date      DateTime
-  classId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  class     Class    @relation(fields: [classId], references: [id])
-  attendees Attendance[] @relation("ClassSessionAttendance")
-}
-
-model Member {
-  id             String   @id @default(cuid())
-  firstName      String
-  lastName       String
+model User {
+  id            String    @id @default(cuid())
+  name          String?
   email         String?   @unique
-  phone         String?
-  dateOfBirth   DateTime?
-  conversionDate DateTime?
-  baptismDate   DateTime?
-  weddingDate   DateTime?
-  organisationId String
-  familyId      String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  family       Family?     @relation(fields: [familyId], references: [id])
-  teams        MemberTeam[]
-  classes      MemberClass[]
-  attendance   Attendance[]
-  gifts        MemberGift[]
-  skills       MemberSkill[]
-}
-
-model Family {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members   Member[]
-}
-
-model Visitor {
-  id             String   @id @default(cuid())
-  firstName      String
-  lastName       String
-  email         String?
-  phone         String?
-  visitDate     DateTime
-  followUpDate  DateTime?
-  status        String    @default("NEW") // NEW, CONTACTED, CONVERTED
-  organisationId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-}
-
-model Gift {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  members     MemberGift[]
-}
-
-model Skill {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  members     MemberSkill[]
-}
-
-model MemberTeam {
-  memberId    String
-  teamId      String
-  role        String?
-  joinedAt    DateTime @default(now())
-
-  member      Member    @relation(fields: [memberId], references: [id])
-  team        Team      @relation(fields: [teamId], references: [id])
-
-  @@id([memberId, teamId])
-}
-
-model MemberClass {
-  memberId    String
-  classId     String
-  status      String    @default("ENROLLED") // ENROLLED, COMPLETED, DROPPED
-  enrolledAt  DateTime @default(now())
-  completedAt DateTime?
-
-  member      Member    @relation(fields: [memberId], references: [id])
-  class       Class     @relation(fields: [classId], references: [id])
-
-  @@id([memberId, classId])
-}
-
-model MemberGift {
-  memberId    String
-  giftId      String
-  confirmedAt DateTime @default(now())
-
-  member      Member    @relation(fields: [memberId], references: [id])
-  gift        Gift      @relation(fields: [giftId], references: [id])
-
-  @@id([memberId, giftId])
-}
-
-model MemberSkill {
-  memberId    String
-  skillId     String
-  level       String    @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
-  confirmedAt DateTime @default(now())
-
-  member      Member    @relation(fields: [memberId], references: [id])
-  skill       Skill     @relation(fields: [skillId], references: [id])
-
-  @@id([memberId, skillId])
-}
-
-model Attendance {
-  id              String   @id @default(cuid())
-  memberId        String
-  classId         String
-  date            DateTime @default(now())
-  status          String   // PRESENT, ABSENT, LATE
-  notes           String?
-  organisationId  String
-  member          Member   @relation(fields: [memberId], references: [id])
-  class           Class    @relation(fields: [classId], references: [id])
-  organisation    Organisation @relation(fields: [organisationId], references: [id])
-  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
-  classSessionId  String?
-  service         Service? @relation(fields: [serviceId], references: [id])
-  serviceId       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  type             String
-  provider         String
+  type              String
+  provider          String
   providerAccountId String
-  refresh_token    String? @db.Text
-  access_token     String? @db.Text
-  expires_at       Int?
-  token_type       String?
-  scope            String?
-  id_token         String? @db.Text
-  session_state    String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -240,79 +44,4 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-enum Role {
-  ADMIN
-  MEMBER
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role      @default(MEMBER)
-  organisationId String?
-  organisation  Organisation? @relation(fields: [organisationId], references: [id])
-  accounts      Account[]
-  sessions      Session[]
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model Invitation {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  token         String   @unique
-  expiresAt     DateTime
-  organisationId String
-  organisation  Organisation @relation(fields: [organisationId], references: [id])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-model Service {
-  id          String   @id @default(cuid())
-  name        String
-  startTime   DateTime
-  endTime     DateTime?
-  status      String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED
-  organisationId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  attendance   Attendance[]
-}
-
-model OrganisationSettings {
-  id              String   @id @default(cuid())
-  organisationId  String   @unique
-  organisation    Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
-  
-  // Brand Colours
-  primaryColor    String   @default("#000000")
-  secondaryColor  String   @default("#666666")
-  backgroundColor  String   @default("#FFFFFF")
-  accentColor     String   @default("#F5F5F5")
-  
-  // Localization
-  language        String   @default("en")
-  currency        String   @default("GBP")
-  timezone        String   @default("Europe/London")
-  
-  // Additional Settings
-  logoUrl         String?
-  faviconUrl      String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }

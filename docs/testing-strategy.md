@@ -1,7 +1,9 @@
 # Testing Strategy
 
 ## Overview
+
 Our testing approach follows the Testing Trophy principle:
+
 - Static Analysis (TypeScript, ESLint)
 - Unit Tests
 - Integration Tests
@@ -10,6 +12,7 @@ Our testing approach follows the Testing Trophy principle:
 ## Test Categories
 
 ### 1. Component Tests
+
 - Render testing
 - User interaction testing
 - State management testing
@@ -18,37 +21,43 @@ Our testing approach follows the Testing Trophy principle:
 - Accessibility testing
 
 ### 2. Hook Tests
+
 - Custom hook behavior
 - State updates
 - Side effects
 - Error cases
 
 ### 3. API Tests
+
 - Request/response validation
 - Error handling
 - Authentication/Authorization
 - Rate limiting
 
 ### 4. Integration Tests
+
 - Component integration
 - API integration
 - Database operations
 - Form submissions
 
 ### 5. E2E Tests
+
 - Critical user paths
 - Authentication flows
 - Data persistence
 - Cross-browser compatibility
 
 ## Testing Tools
+
 - Jest
 - React Testing Library
 - MSW (Mock Service Worker)
-- Cypress (E2E)
+- Cypress
 - Playwright (Cross-browser)
 
 ## Test File Structure
+
 ```
 src/
 ├── components/
@@ -66,9 +75,18 @@ src/
         └── utilName.test.ts
 ```
 
+## Coverage Requirements
+
+- Components: 90%
+- Hooks: 95%
+- Utils: 95%
+- API Routes: 90%
+- Integration: 85%
+
 ## Testing Guidelines
 
 ### Component Tests
+
 - Test user interactions
 - Verify rendered content
 - Check accessibility
@@ -77,6 +95,7 @@ src/
 - Test loading states
 
 ### API Tests
+
 - Test successful responses
 - Test error responses
 - Validate request payloads
@@ -84,14 +103,8 @@ src/
 - Test rate limiting
 
 ### Integration Tests
+
 - Test component composition
 - Verify data flow
 - Test form submissions
 - Validate API integration
-
-## Test Coverage Requirements
-- Components: 90%
-- Hooks: 95%
-- Utils: 95%
-- API Routes: 90%
-- Integration: 85%

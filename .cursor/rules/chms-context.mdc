@@ -5,6 +5,26 @@ alwaysApply: true
 ---
 # ChMS Project Context
 
+## Documentation Standards
+
+### File Documentation
+Every source code file must include a JSDoc comment header with:
+1. Clear description of the file's purpose
+2. Module categorization
+3. Category tag for logical grouping
+4. Any relevant dependencies or requirements
+
+Example for TypeScript/JavaScript files:
+```typescript
+/**
+ * [Clear description of the file's purpose]
+ * [Additional context or important notes]
+ * 
+ * @module [Module Name]
+ * @category [Category Name]
+ */
+```
+
 ## Source of Truth Documents
 The following documents are the source of truth for the ChMS project:
 

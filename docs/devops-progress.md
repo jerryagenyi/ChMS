@@ -2,124 +2,88 @@
 
 ## Current State
 
-- Project initialized with Next.js and TypeScript
-- PostgreSQL 17 installed locally (via EnterpriseDB installer)
-- Currently experiencing PostgreSQL connection issues
-- Decision pending on whether to use Supabase temporarily
+- Clean rebuild phase
+- Infrastructure setup pending
+- Local development environment setup pending
 
-## Infrastructure Setup Completed
+## Infrastructure Setup Required
 
-1. **Version Control**
+1. Version Control
 
    - GitHub repository initialized
-   - Git configuration completed
-   - SSH keys configured for GitHub access
+   - Branch protection rules needed
+   - Commit message conventions to be established
 
-2. **Development Environment**
+2. Development Environment
 
-   - Next.js with TypeScript
-   - Chakra UI for components
-   - Jest and React Testing Library for testing
-   - Prisma ORM configured for database access
+   - Next.js with TypeScript (pending)
+   - PostgreSQL setup (pending)
+   - Environment variables configuration (pending)
 
-3. **Documentation**
-   - Project overview created
-   - Attendance MVP specs documented
-   - Project tracker established
-   - Cursor rules implemented for context
+3. CI/CD Requirements
 
-## Pending Tasks
+   - GitHub Actions setup
+   - Testing pipeline
+   - Deployment workflow
+   - Environment management
 
-### Immediate
-
-1. **Database Access**
-
-   - Fix local PostgreSQL 17 access issues
-   - OR Set up Supabase as temporary solution
-   - Backup existing databases before any changes
-
-2. **Core Features Setup**
-   - Authentication system (Next priority)
-   - Organization setup flow
-   - Member registration system
-
-### Technical Configuration
-
-1. **Database**
-
-   - Connection string in .env
-   - Prisma migrations
-   - Data backup strategy
-
-2. **Authentication**
-   - NextAuth.js implementation
-   - Role-based access control
-   - Session management
-
-## Environment Details
-
-- OS: macOS (darwin 24.3.0)
-- PostgreSQL: Version 17 (EnterpriseDB installation)
-- Node.js: Latest LTS
-- Location: `/Applications/PostgreSQL 17/`
-- Data Directory: `/Library/PostgreSQL/17/data/`
+4. Database Strategy
+   - PostgreSQL setup
+   - Migration strategy
+   - Backup procedures
+   - Connection security
 
 ## Next Steps
 
-1. Resolve PostgreSQL access issues:
+1. Development Environment Setup
 
-   - Try system restart
-   - Reset PostgreSQL service
-   - Consider temporary Supabase migration
+   - Initialize Next.js project
+   - Configure TypeScript
+   - Set up ESLint and Prettier
+   - Configure testing environment
 
-2. Begin authentication implementation:
+2. Database Setup
 
-   - Set up NextAuth.js
-   - Configure user roles
-   - Implement login/registration
+   - Install PostgreSQL
+   - Configure connection
+   - Set up Prisma
+   - Create initial schemas
 
-3. Start organization setup:
-   - Create database schema
-   - Implement API endpoints
-   - Build setup wizard UI
+3. Authentication Implementation
+   - Configure NextAuth.js
+   - Set up OAuth providers
+   - Implement role-based access
+   - Session management
 
-## Notes
+## Environment Requirements
 
-- PostgreSQL was installed via EnterpriseDB installer (not Homebrew)
-- pgAdmin4 is the current database management tool
-- Consider backup strategy before any database changes
-- May need to revisit PostgreSQL installation method
+### Development
 
-## Environment Variables
+- Node.js (LTS)
+- PostgreSQL 17
+- npm/yarn
+- Git
+
+### Environment Variables
 
 ```env
+# Required variables structure - DO NOT ADD ACTUAL VALUES HERE
 DATABASE_URL="postgresql://user:password@localhost:5432/chms"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
 ```
 
-## Current Challenges
+## Monitoring Strategy
 
-1. PostgreSQL connection issues:
+- Error tracking setup
+- Performance monitoring
+- Log management
+- Uptime monitoring
 
-   - Connection refused on port 5432
-   - Permission issues with postgres user
-   - Service status uncertain
+## Security Requirements
 
-2. Decision Points:
-   - Whether to fix local PostgreSQL or use Supabase
-   - Authentication implementation strategy
-   - Database migration approach
-
-## Resources
-
-- Project documentation in `/docs`
-- Planning documents in `/planning`
-- Database backups (pending)
-- Infrastructure configuration files
-
-## Next Session Tasks
-
-1. Confirm database strategy (local vs Supabase)
-2. Begin authentication implementation
-3. Start organization setup flow
-4. Set up member registration system
+- HTTPS enforcement
+- Environment variable protection
+- Database connection security
+- API rate limiting

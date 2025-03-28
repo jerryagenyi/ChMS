@@ -4,7 +4,7 @@ Hey there! 👋 This guide will help you understand how our attendance system wo
 
 ## 1. Overview
 
-Think of our attendance system like a digital register that helps track who's present at church services and classes. It's like taking attendance in school, but way cooler with QR codes! 😎
+Think of our attendance system like a digital register that helps track who's present at church services, classes and events. It's like taking attendance in school, but way cooler with QR codes! 😎
 
 ## 2. Main Features
 
@@ -18,6 +18,7 @@ Think of our attendance system like a digital register that helps track who's pr
 
 - **Service Attendance**: Track who comes to church services
 - **Class Attendance**: Keep record of who attends different classes
+- **Event Attendance**: Keep record of who came for our events
 - **Reports**: See attendance patterns and statistics
 
 ## 3. Components Breakdown

@@ -24,6 +24,7 @@ model Organisation {
   invitations Invitation[]
   settings    OrganisationSettings?
   attendance  Attendance[]
+  events      Event[]
 }
 
 model Department {
@@ -101,6 +102,7 @@ model Member {
   attendance   Attendance[]
   gifts        MemberGift[]
   skills       MemberSkill[]
+  eventRegistrations EventRegistration[]
 }
 
 model Family {
@@ -315,4 +317,51 @@ model OrganisationSettings {
   faviconUrl      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Event {
+  id             String    @id @default(cuid())
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime?
+  venue          String?
+  capacity       Int?
+  isPublic       Boolean   @default(true)
+  organisationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  registrations  EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  guestType String   // MEMBER, VISITOR
+  status    String   @default("REGISTERED") // REGISTERED, ATTENDED, NO_SHOW
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id])
+  member    Member?  @relation(fields: [memberId], references: [id])
+  memberId  String?
+  guest     EventGuest? @relation(fields: [guestId], references: [id])
+  guestId   String?
+}
+
+model EventGuest {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  organisation String?
+  dietaryRestrictions String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  registrations EventRegistration[]
 }

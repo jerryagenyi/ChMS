@@ -6,7 +6,7 @@ interface OrganizationData {
 }
 
 export async function createOrganization(data: OrganizationData) {
-  return prisma.organisation.create({
+  return prisma.organization.create({
     data,
   });
 }
@@ -15,7 +15,7 @@ export async function addUserToOrganization(userId: string, organizationId: stri
   return prisma.user.update({
     where: { id: userId },
     data: {
-      organisation: {
+      organization: {
         connect: { id: organizationId },
       },
       role: 'MEMBER',

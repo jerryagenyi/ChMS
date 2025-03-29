@@ -48,7 +48,7 @@ const getHandler = async (req: Request) => {
         id: record.id,
         memberId: record.memberId,
         classId: record.classId,
-        organisationId: record.organisationId,
+        organizationId: record.organizationId,
         status: record.status,
         notes: record.notes,
         date: record.date.toISOString(),
@@ -82,11 +82,11 @@ const postHandler = async (req: Request) => {
     const validatedReq = req as ValidatedRequest;
     const { params, body } = validatedReq.validatedData;
 
-    // Add an explicit check for organisationId for type safety
-    if (!session.user.organisationId) {
-      logger.error('Organisation ID missing from session');
+    // Add an explicit check for organizationId for type safety
+    if (!session.user.organizationId) {
+      logger.error('Organization ID missing from session');
       return NextResponse.json(
-        { error: 'Internal server error: Organisation ID missing' },
+        { error: 'Internal server error: Organization ID missing' },
         { status: 500 }
       );
     }
@@ -98,11 +98,11 @@ const postHandler = async (req: Request) => {
       );
     }
 
-    // Check if class exists and belongs to the organisation
+    // Check if class exists and belongs to the organization
     const classExists = await prisma.class.findFirst({
       where: {
         id: params.classId,
-        organisationId: session.user.organisationId,
+        organizationId: session.user.organizationId,
       },
     });
 
@@ -134,7 +134,7 @@ const postHandler = async (req: Request) => {
       data: {
         memberId: body.memberId,
         classId: params.classId,
-        organisationId: session.user.organisationId,
+        organizationId: session.user.organizationId,
         status: body.status,
         notes: body.notes,
         date: body.date, // Keep as ISO string

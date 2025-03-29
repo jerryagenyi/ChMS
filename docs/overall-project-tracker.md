@@ -97,7 +97,7 @@
 ### High Priority
 
 - [x] Set up PostgreSQL database
-- [ ] Implement organisation setup flow
+- [ ] Implement organization setup flow
   - [ ] Organization creation form
   - [ ] Initial admin user assignment
   - [ ] Basic organization settings
@@ -117,11 +117,60 @@
   - [ ] Registration flow
   - [ ] Follow-up management
   - [ ] Conversion tracking
+  - [ ] Touchpoint tracking
+    - [ ] Touchpoint selection UI
+    - [ ] Touchpoint analytics
+    - [ ] Touchpoint reporting
 - [x] Set up authentication system
   - [x] Google SSO
   - [x] Password backup
   - [x] Password status check API
   - [x] UI components for auth flows
+
+### UI Design Requirements
+
+- [ ] Core Components
+
+  - [ ] Table Component (reusable for all list views)
+  - [ ] Form Components (reusable for all forms)
+  - [ ] Card Components (reusable for grid views)
+  - [ ] Modal/Dialog Components
+  - [ ] Loading States
+  - [ ] Error States
+  - [ ] Success States
+  - [ ] Empty States
+
+- [ ] Event Management Pages
+  - [ ] Events Dashboard (`/events`)
+    - [ ] Event list view with filters
+    - [ ] Event cards/grid view
+    - [ ] Stats/analytics summary
+  - [ ] Event Creation (`/events/new`)
+    - [ ] Form layout
+    - [ ] Date/time picker
+    - [ ] Capacity settings
+    - [ ] Privacy settings
+  - [ ] Event Details (`/events/[eventId]`)
+    - [ ] Event header/banner
+    - [ ] Registration status
+    - [ ] Attendee list
+    - [ ] Event stats
+    - [ ] Action buttons
+  - [ ] Event Registration (`/events/[eventId]/register`)
+    - [ ] Registration form
+    - [ ] Ticket types
+    - [ ] Guest information
+    - [ ] Confirmation screen
+  - [ ] Event Check-in (`/events/[eventId]/check-in`)
+    - [ ] QR code scanner layout
+    - [ ] Manual check-in form
+    - [ ] Attendee search
+    - [ ] Check-in confirmation
+  - [ ] Event Reports (`/events/reports`)
+    - [ ] Analytics dashboard
+    - [ ] Attendance graphs
+    - [ ] Registration trends
+    - [ ] Export options
 
 ### Medium Priority
 

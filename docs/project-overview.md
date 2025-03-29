@@ -41,17 +41,66 @@ A modern web-based solution for church administration, designed specifically for
 
 ## Future Enhancements
 
-### Communication
+### Communication System
 
 - Mass emailing system
 - SMS integration
 - External email client API integration
+- Automated notifications for:
+  - Event reminders
+  - Birthday wishes
+  - Welcome messages
+  - Follow-up messages
+  - Announcements
+
+### Financial Management
+
+- Tithe and offering tracking
+- Online giving integration
+- Expense tracking
+- Financial reports
+- Gift Aid tracking
+
+### Ministry Scheduling
+
+- Service roster management
+- Volunteer scheduling
+- Team availability tracking
+- Automatic schedule generation
+- Conflict detection
+
+### Resource Management
+
+- Room/venue booking system
+- Equipment tracking
+- Resource allocation for events
+- Maintenance scheduling
+
+### Enhanced Reporting & Analytics
+
+- Attendance trends and patterns
+- Growth metrics and KPIs
+- Member engagement scores
+- Financial dashboards
+- Custom report builder
+- Visitor conversion tracking
+- Event success metrics
+- Ministry performance analytics
+
+### Small Groups Management
+
+- Home cell groups tracking
+- Bible study groups
+- Meeting attendance
+- Discussion topics
+- Resource sharing
+- Leader assignment
+- Member participation tracking
 
 ### Advanced Features
 
 - Family check-in feature (single scan for multiple family members)
 - Advanced reporting system
-- Online giving integration
 - Mobile app for check-in
 
 ### Security & Compliance

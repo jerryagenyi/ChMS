@@ -1,0 +1,462 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Chakra UI Components in ChMS
+
+## Overview
+
+This document outlines how we use various Chakra UI components in our project, including modals, tables, and data display components.
+
+## Modals
+
+### 1. Basic Modal
+```typescript
+// src/components/common/Modal.tsx
+export const BasicModal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+}) => (
+  <Modal isOpen={isOpen} onClose={onClose}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>{title}</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>{children}</ModalBody>
+      <ModalFooter>
+        <Button variant="ghost" mr={3} onClick={onClose}>
+          Cancel
+        </Button>
+        <Button colorScheme="brand">Save</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+);
+```
+
+### 2. Confirmation Modal
+```typescript
+// src/components/common/ConfirmationModal.tsx
+export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+}) => (
+  <Modal isOpen={isOpen} onClose={onClose}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>{title}</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <Text>{message}</Text>
+      </ModalBody>
+      <ModalFooter>
+        <Button variant="ghost" mr={3} onClick={onClose}>
+          Cancel
+        </Button>
+        <Button colorScheme="red" onClick={onConfirm}>
+          Confirm
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+);
+```
+
+### 3. Form Modal
+```typescript
+// src/components/common/FormModal.tsx
+export const FormModal: React.FC<FormModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  onSubmit,
+  submitLabel = "Save",
+}) => (
+  <Modal isOpen={isOpen} onClose={onClose}>
+    <ModalOverlay />
+    <ModalContent>
+      <form onSubmit={onSubmit}>
+        <ModalHeader>{title}</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>{children}</ModalBody>
+        <ModalFooter>
+          <Button variant="ghost" mr={3} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" colorScheme="brand">
+            {submitLabel}
+          </Button>
+        </ModalFooter>
+      </form>
+    </ModalContent>
+  </Modal>
+);
+```
+
+## Tables
+
+### 1. Basic Table
+```typescript
+// src/components/common/Table.tsx
+export const BasicTable: React.FC<TableProps> = ({
+  headers,
+  data,
+  onRowClick,
+}) => (
+  <TableContainer>
+    <Table variant="simple">
+      <Thead>
+        <Tr>
+          {headers.map((header) => (
+            <Th key={header.key}>{header.label}</Th>
+          ))}
+        </Tr>
+      </Thead>
+      <Tbody>
+        {data.map((row) => (
+          <Tr
+            key={row.id}
+            onClick={() => onRowClick?.(row)}
+            cursor={onRowClick ? "pointer" : "default"}
+            _hover={onRowClick ? { bg: "gray.50" } : undefined}
+          >
+            {headers.map((header) => (
+              <Td key={header.key}>{row[header.key]}</Td>
+            ))}
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  </TableContainer>
+);
+```
+
+### 2. Sortable Table
+```typescript
+// src/components/common/SortableTable.tsx
+export const SortableTable: React.FC<SortableTableProps> = ({
+  headers,
+  data,
+  onSort,
+}) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: null,
+    direction: "asc",
+  });
+
+  const handleSort = (key: string) => {
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "asc" ? "desc" : "asc";
+    setSortConfig({ key, direction });
+    onSort?.(key, direction);
+  };
+
+  return (
+    <TableContainer>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            {headers.map((header) => (
+              <Th
+                key={header.key}
+                cursor="pointer"
+                onClick={() => handleSort(header.key)}
+              >
+                <HStack>
+                  <Text>{header.label}</Text>
+                  {sortConfig.key === header.key && (
+                    <Icon
+                      as={sortConfig.direction === "asc" ? ChevronUpIcon : ChevronDownIcon}
+                    />
+                  )}
+                </HStack>
+              </Th>
+            ))}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {data.map((row) => (
+            <Tr key={row.id}>
+              {headers.map((header) => (
+                <Td key={header.key}>{row[header.key]}</Td>
+              ))}
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  );
+};
+```
+
+### 3. Paginated Table
+```typescript
+// src/components/common/PaginatedTable.tsx
+export const PaginatedTable: React.FC<PaginatedTableProps> = ({
+  headers,
+  data,
+  pageSize = 10,
+  onPageChange,
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(data.length / pageSize);
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }, [data, currentPage, pageSize]);
+
+  return (
+    <Box>
+      <TableContainer>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              {headers.map((header) => (
+                <Th key={header.key}>{header.label}</Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {paginatedData.map((row) => (
+              <Tr key={row.id}>
+                {headers.map((header) => (
+                  <Td key={header.key}>{row[header.key]}</Td>
+                ))}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+      <Flex justify="center" mt={4}>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            onPageChange?.(page);
+          }}
+        />
+      </Flex>
+    </Box>
+  );
+};
+```
+
+## Data Display
+
+### 1. Stat Card
+```typescript
+// src/components/common/StatCard.tsx
+export const StatCard: React.FC<StatCardProps> = ({
+  label,
+  value,
+  icon,
+  trend,
+  isLoading,
+}) => (
+  <Card>
+    <CardBody>
+      <HStack justify="space-between">
+        <VStack align="start" spacing={1}>
+          <Text color="gray.500" fontSize="sm">
+            {label}
+          </Text>
+          {isLoading ? (
+            <Skeleton height="24px" width="100px" />
+          ) : (
+            <Text fontSize="2xl" fontWeight="bold">
+              {value}
+            </Text>
+          )}
+          {trend && (
+            <HStack>
+              <Icon
+                as={trend > 0 ? ArrowUpIcon : ArrowDownIcon}
+                color={trend > 0 ? "green.500" : "red.500"}
+              />
+              <Text
+                fontSize="sm"
+                color={trend > 0 ? "green.500" : "red.500"}
+              >
+                {Math.abs(trend)}%
+              </Text>
+            </HStack>
+          )}
+        </VStack>
+        {icon && (
+          <Box
+            p={2}
+            bg="brand.50"
+            color="brand.500"
+            rounded="full"
+          >
+            {icon}
+          </Box>
+        )}
+      </HStack>
+    </CardBody>
+  </Card>
+);
+```
+
+### 2. Data Grid
+```typescript
+// src/components/common/DataGrid.tsx
+export const DataGrid: React.FC<DataGridProps> = ({
+  data,
+  columns,
+  onRowClick,
+  isLoading,
+}) => (
+  <SimpleGrid
+    columns={{ base: 1, md: 2, lg: 3 }}
+    spacing={4}
+    p={4}
+  >
+    {isLoading ? (
+      Array(6)
+        .fill(null)
+        .map((_, i) => (
+          <Skeleton key={i} height="200px" />
+        ))
+    ) : (
+      data.map((item) => (
+        <Card
+          key={item.id}
+          onClick={() => onRowClick?.(item)}
+          cursor={onRowClick ? "pointer" : "default"}
+          _hover={onRowClick ? { shadow: "md" } : undefined}
+        >
+          <CardBody>
+            {columns.map((column) => (
+              <Box key={column.key} mb={2}>
+                <Text color="gray.500" fontSize="sm">
+                  {column.label}
+                </Text>
+                <Text>{item[column.key]}</Text>
+              </Box>
+            ))}
+          </CardBody>
+        </Card>
+      ))
+    )}
+  </SimpleGrid>
+);
+```
+
+### 3. Timeline
+```typescript
+// src/components/common/Timeline.tsx
+export const Timeline: React.FC<TimelineProps> = ({ items }) => (
+  <VStack spacing={4} align="stretch">
+    {items.map((item, index) => (
+      <HStack key={item.id} spacing={4}>
+        <Box
+          w={2}
+          h={2}
+          rounded="full"
+          bg="brand.500"
+          position="relative"
+        >
+          {index < items.length - 1 && (
+            <Box
+              position="absolute"
+              top={2}
+              left="50%"
+              w="2px"
+              h="100%"
+              bg="gray.200"
+              transform="translateX(-50%)"
+            />
+          )}
+        </Box>
+        <Box flex={1}>
+          <Text fontWeight="bold">{item.title}</Text>
+          <Text color="gray.500" fontSize="sm">
+            {item.date}
+          </Text>
+          <Text mt={2}>{item.description}</Text>
+        </Box>
+      </HStack>
+    ))}
+  </VStack>
+);
+```
+
+## Best Practices
+
+1. **Modals**
+   - Use `AnimatedModal` for smooth transitions
+   - Handle keyboard events (Esc to close)
+   - Focus management
+   - Proper ARIA attributes
+
+2. **Tables**
+   - Use `TableContainer` for horizontal scrolling
+   - Implement proper loading states
+   - Handle empty states
+   - Consider mobile responsiveness
+
+3. **Data Display**
+   - Use appropriate loading skeletons
+   - Implement error states
+   - Consider data density
+   - Use consistent spacing
+
+## Common Gotchas
+
+1. **Modal Focus**
+   ```typescript
+   // ❌ Missing focus management
+   <Modal isOpen={isOpen} onClose={onClose}>
+     <ModalContent>
+       <Input /> {/* No initial focus */}
+     </ModalContent>
+   </Modal>
+
+   // ✅ Proper focus management
+   <Modal isOpen={isOpen} onClose={onClose}>
+     <ModalContent>
+       <Input ref={initialFocusRef} />
+     </ModalContent>
+   </Modal>
+   ```
+
+2. **Table Performance**
+   ```typescript
+   // ❌ Re-rendering on every render
+   {data.map(item => (
+     <Tr key={item.id}>
+       <Td>{item.name}</Td>
+       <Td>{item.email}</Td>
+     </Tr>
+   ))}
+
+   // ✅ Memoized row component
+   const TableRow = memo(({ item }: { item: DataItem }) => (
+     <Tr>
+       <Td>{item.name}</Td>
+       <Td>{item.email}</Td>
+     </Tr>
+   ));
+   ```
+
+3. **Data Loading**
+   ```typescript
+   // ❌ No loading state
+   <StatCard value={data.value} />
+
+   // ✅ Proper loading state
+   <StatCard
+     value={data.value}
+     isLoading={isLoading}
+   />
+   ```

@@ -72,6 +72,7 @@ enum CheckInMethod {
 ## Core Features
 
 ### 1. Service Attendance
+
 - QR code-based check-in
 - Manual entry option
 - Offline capability
@@ -79,12 +80,14 @@ enum CheckInMethod {
 - Family check-in support (future)
 
 ### 2. Class Attendance
+
 - Multiple class types support
 - Session management
 - Attendance tracking
 - Student enrollment tracking
 
 ### 3. Family Management
+
 - Family registration
 - Child linking
 - Family unit tracking
@@ -95,6 +98,7 @@ enum CheckInMethod {
 ### Phase 1: Core Check-in System (Week 1-3)
 
 - [x] Basic Project Setup
+
   - [x] Next.js initialization
   - [x] TypeScript configuration
   - [x] ESLint + Prettier
@@ -129,17 +133,20 @@ enum CheckInMethod {
 ## Technical Standards
 
 ### Performance Targets
+
 - First contentful paint < 1.5s
 - Time to interactive < 2s
 - Animation frame rate > 55fps
 
 ### Security
+
 - OWASP compliance
 - Rate limiting
 - CSRF protection
 - XSS prevention
 
 ### Accessibility
+
 - WCAG 2.1 Level AA
 - Keyboard navigation
 - Screen reader support
@@ -148,6 +155,7 @@ enum CheckInMethod {
 ## Monitoring & Logging
 
 ### Performance Monitoring
+
 ```typescript
 // Implementation in lib/monitoring.ts
 export const performanceMonitor = {
@@ -158,11 +166,12 @@ export const performanceMonitor = {
       logger.info({ type: 'performance', label, duration });
       return duration;
     };
-  }
+  },
 };
 ```
 
 ### Error Tracking
+
 ```typescript
 export const trackError = (error: Error, context: Record<string, any> = {}) => {
   logger.error({
@@ -177,11 +186,9 @@ export const trackError = (error: Error, context: Record<string, any> = {}) => {
 ```
 
 ### Usage Analytics
+
 ```typescript
-export const trackEvent = (
-  eventName: string,
-  properties: Record<string, any> = {}
-) => {
+export const trackEvent = (eventName: string, properties: Record<string, any> = {}) => {
   logger.info({
     type: 'event',
     event: eventName,
@@ -197,20 +204,21 @@ export const features = {
   CHECK_IN: {
     QR_SCANNING: true,
     MANUAL_ENTRY: true,
-    GEOFENCING: false,  // Future feature
+    GEOFENCING: false, // Future feature
     FACIAL_RECOGNITION: false,
   },
   NOTIFICATIONS: {
     EMAIL: true,
-    PUSH: false,  // Phase 2
-    SMS: false,   // Future feature
-  }
+    PUSH: false, // Phase 2
+    SMS: false, // Future feature
+  },
 };
 ```
 
 ## Success Metrics
 
 ### Technical
+
 - Page load time < 2s
 - API response time < 200ms
 - Test coverage > 80%
@@ -218,6 +226,7 @@ export const features = {
 - 99.9% uptime
 
 ### User Experience
+
 - < 3 clicks for check-in
 - < 5s for report generation
 - Zero data loss

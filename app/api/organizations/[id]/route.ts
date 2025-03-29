@@ -17,7 +17,7 @@ export async function GET(
       )
     }
 
-    const organization = await prisma.organisation.findFirst({
+    const organization = await prisma.organization.findFirst({
       where: {
         id: params.id,
         users: {
@@ -67,7 +67,7 @@ export async function PATCH(
     const user = await prisma.user.findFirst({
       where: {
         email: session.user.email,
-        organisationId: params.id,
+        organizationId: params.id,
         role: "ADMIN"
       }
     })
@@ -80,7 +80,7 @@ export async function PATCH(
     }
 
     const { name, description } = await req.json()
-    const updatedOrg = await prisma.organisation.update({
+    const updatedOrg = await prisma.organization.update({
       where: { id: params.id },
       data: {
         name,

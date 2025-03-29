@@ -1,0 +1,69 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Language Standards
+
+## Overview
+
+This document defines the language standards for the ChMS project, ensuring consistency across code, documentation, and user interfaces.
+
+## Standards
+
+### 1. Code & Documentation
+
+- Use American English for consistency with technical ecosystem
+- Follow standard technical terminology
+- Maintain consistent spelling across all files
+- Examples:
+  - "color" not "colour"
+  - "center" not "centre"
+  - "customize" not "customise"
+  - "organization" not "organisation"
+
+### 2. UI Text
+
+- Use American English for all user-facing text
+- Maintain consistency with technical terms
+- Follow platform conventions
+
+### 3. Comments & Documentation
+
+- Use American English in code comments
+- Use American English in technical documentation
+- Use American English in API documentation
+
+## Rationale
+
+1. **Consistency**: Aligns with technical ecosystem and frameworks
+2. **Maintenance**: Reduces overhead in maintaining mixed language standards
+3. **Clarity**: Ensures clear communication for international contributors
+4. **Convention**: Follows standard technical documentation practices
+
+## Examples
+
+```typescript
+// ✅ Correct (American English)
+const backgroundColor = "blue";
+const textAlign = "center";
+const customizeButton = "Customize Profile";
+
+// ❌ Incorrect (British English)
+const backgroundColour = "blue";
+const textAlign = "centre";
+const customiseButton = "Customise Profile";
+```
+
+## Implementation
+
+1. **Code Review**: Check for consistent language usage
+2. **Linting**: Use appropriate linting rules to catch inconsistencies
+3. **Documentation**: Maintain consistent language in all documentation
+4. **UI Text**: Review all user-facing text for consistency
+
+## References
+
+- React Documentation Style Guide
+- MDN Web Docs Style Guide
+- Technical Writing Standards

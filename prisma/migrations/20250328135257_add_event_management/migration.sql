@@ -6,7 +6,7 @@
   - You are about to drop the column `isFamily` on the `Attendance` table. All the data in the column will be lost.
   - You are about to drop the column `sessionId` on the `Attendance` table. All the data in the column will be lost.
   - Added the required column `classId` to the `Attendance` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `organisationId` to the `Attendance` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `organizationId` to the `Attendance` table without a default value. This is not possible if the table is not empty.
   - Added the required column `status` to the `Attendance` table without a default value. This is not possible if the table is not empty.
   - Added the required column `updatedAt` to the `Attendance` table without a default value. This is not possible if the table is not empty.
 
@@ -24,7 +24,7 @@ ADD COLUMN     "classSessionId" TEXT,
 ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "notes" TEXT,
-ADD COLUMN     "organisationId" TEXT NOT NULL,
+ADD COLUMN     "organizationId" TEXT NOT NULL,
 ADD COLUMN     "serviceId" TEXT,
 ADD COLUMN     "status" TEXT NOT NULL,
 ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
@@ -35,7 +35,7 @@ CREATE TABLE "Invitation" (
     "email" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
-    "organisationId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -49,7 +49,7 @@ CREATE TABLE "Service" (
     "startTime" TIMESTAMP(3) NOT NULL,
     "endTime" TIMESTAMP(3),
     "status" TEXT NOT NULL DEFAULT 'SCHEDULED',
-    "organisationId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -57,9 +57,9 @@ CREATE TABLE "Service" (
 );
 
 -- CreateTable
-CREATE TABLE "OrganisationSettings" (
+CREATE TABLE "OrganizationSettings" (
     "id" TEXT NOT NULL,
-    "organisationId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
     "primaryColor" TEXT NOT NULL DEFAULT '#000000',
     "secondaryColor" TEXT NOT NULL DEFAULT '#666666',
     "backgroundColor" TEXT NOT NULL DEFAULT '#FFFFFF',
@@ -72,7 +72,7 @@ CREATE TABLE "OrganisationSettings" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "OrganisationSettings_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "OrganizationSettings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -85,7 +85,7 @@ CREATE TABLE "Event" (
     "venue" TEXT,
     "capacity" INTEGER,
     "isPublic" BOOLEAN NOT NULL DEFAULT true,
-    "organisationId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -113,7 +113,7 @@ CREATE TABLE "EventGuest" (
     "lastName" TEXT NOT NULL,
     "email" TEXT,
     "phone" TEXT,
-    "organisation" TEXT,
+    "organization" TEXT,
     "dietaryRestrictions" TEXT,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -129,13 +129,13 @@ CREATE UNIQUE INDEX "Invitation_email_key" ON "Invitation"("email");
 CREATE UNIQUE INDEX "Invitation_token_key" ON "Invitation"("token");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "OrganisationSettings_organisationId_key" ON "OrganisationSettings"("organisationId");
+CREATE UNIQUE INDEX "OrganizationSettings_organizationId_key" ON "OrganizationSettings"("organizationId");
 
 -- AddForeignKey
 ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_classSessionId_fkey" FOREIGN KEY ("classSessionId") REFERENCES "ClassSession"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -144,16 +144,16 @@ ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_classSessionId_fkey" FOREIGN
 ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Service" ADD CONSTRAINT "Service_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Service" ADD CONSTRAINT "Service_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrganisationSettings" ADD CONSTRAINT "OrganisationSettings_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "OrganizationSettings" ADD CONSTRAINT "OrganizationSettings_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Event" ADD CONSTRAINT "Event_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Event" ADD CONSTRAINT "Event_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EventRegistration" ADD CONSTRAINT "EventRegistration_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

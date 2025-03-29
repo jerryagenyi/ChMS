@@ -32,25 +32,25 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const validatedData = settingsSchema.parse(body);
 
-    const organisation = await prisma.organisation.findUnique({
-      where: { id: session.user.organisationId },
+    const organization = await prisma.organization.findUnique({
+      where: { id: session.user.organizationId },
       include: { settings: true },
     });
 
-    if (!organisation) {
+    if (!organization) {
       return NextResponse.json(
-        { error: "Organisation not found" },
+        { error: "Organization not found" },
         { status: 404 }
       );
     }
 
-    const settings = await prisma.organisationSettings.upsert({
+    const settings = await prisma.organizationSettings.upsert({
       where: {
-        organisationId: organisation.id,
+        organizationId: organization.id,
       },
       update: validatedData,
       create: {
-        organisationId: organisation.id,
+        organizationId: organization.id,
         ...validatedData,
       },
     });

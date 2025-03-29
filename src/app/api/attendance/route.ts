@@ -30,7 +30,7 @@ export const POST = validate({
     const attendance = await prisma.attendance.create({
       data: {
         ...body,
-        organisationId: session.user.organisationId,
+        organizationId: session.user.organizationId,
       },
       include: {
         member: true,
@@ -76,7 +76,7 @@ export const GET = validate({
     const { query } = req.validatedData;
 
     const where = {
-      organisationId: session.user.organisationId,
+      organizationId: session.user.organizationId,
       ...(query.memberId && { memberId: query.memberId }),
       ...(query.classId && { classId: query.classId }),
       ...(query.startDate && { date: { gte: new Date(query.startDate) } }),

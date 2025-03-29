@@ -27,10 +27,10 @@ export async function POST(req: Request) {
     // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organisation: true },
+      include: { organization: true },
     });
 
-    if (!user?.organisation || user.role !== "ADMIN") {
+    if (!user?.organization || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         await prisma.user.create({
           data: {
             ...validatedData,
-            organisationId: user.organisationId!,
+            organizationId: user.organizationId!,
             // Generate a random temporary password that will need to be changed
             password: Math.random().toString(36).slice(-8),
             // Additional fields can be added here

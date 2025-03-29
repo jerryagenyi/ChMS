@@ -1,0 +1,341 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # Chakra UI Forms in ChMS
+
+## Overview
+
+This document outlines how we use Chakra UI forms in combination with React Hook Form and Zod validation in our project.
+
+## Form Components
+
+### 1. Base Form Field
+```typescript
+// src/components/common/FormField.tsx
+export const FormField: React.FC<FormFieldProps> = ({
+  label,
+  error,
+  children,
+  ...props
+}) => (
+  <FormControl isInvalid={!!error} {...props}>
+    <FormLabel>{label}</FormLabel>
+    {children}
+    {error && <FormErrorMessage>{error}</FormErrorMessage>}
+  </FormControl>
+);
+```
+
+### 2. Input Field
+```typescript
+// src/components/common/InputField.tsx
+export const InputField: React.FC<InputFieldProps> = ({
+  name,
+  label,
+  register,
+  error,
+  ...props
+}) => (
+  <FormField label={label} error={error?.message}>
+    <Input
+      {...register(name)}
+      {...props}
+      isInvalid={!!error}
+    />
+  </FormField>
+);
+```
+
+### 3. Select Field
+```typescript
+// src/components/common/SelectField.tsx
+export const SelectField: React.FC<SelectFieldProps> = ({
+  name,
+  label,
+  options,
+  register,
+  error,
+  ...props
+}) => (
+  <FormField label={label} error={error?.message}>
+    <Select {...register(name)} isInvalid={!!error} {...props}>
+      {options.map(option => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </Select>
+  </FormField>
+);
+```
+
+## Form Patterns
+
+### 1. Basic Form
+```typescript
+// src/components/attendance/CheckInForm.tsx
+export const CheckInForm: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CheckInFormData>({
+    resolver: zodResolver(checkInSchema),
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <VStack spacing={4}>
+        <InputField
+          name="memberId"
+          label="Member ID"
+          register={register}
+          error={errors.memberId}
+        />
+        <InputField
+          name="serviceId"
+          label="Service"
+          register={register}
+          error={errors.serviceId}
+        />
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          colorScheme="brand"
+        >
+          Check In
+        </Button>
+      </VStack>
+    </form>
+  );
+};
+```
+
+### 2. Dynamic Form
+```typescript
+// src/components/attendance/AttendanceForm.tsx
+export const AttendanceForm: React.FC = () => {
+  const { fields, append, remove } = useFieldArray({
+    name: "attendees",
+    control,
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <VStack spacing={4}>
+        {fields.map((field, index) => (
+          <HStack key={field.id}>
+            <InputField
+              name={`attendees.${index}.name`}
+              label="Name"
+              register={register}
+              error={errors.attendees?.[index]?.name}
+            />
+            <IconButton
+              aria-label="Remove attendee"
+              icon={<DeleteIcon />}
+              onClick={() => remove(index)}
+              colorScheme="red"
+            />
+          </HStack>
+        ))}
+        <Button
+          type="button"
+          onClick={() => append({ name: "" })}
+          variant="outline"
+        >
+          Add Attendee
+        </Button>
+      </VStack>
+    </form>
+  );
+};
+```
+
+### 3. Form with Validation
+```typescript
+// src/components/attendance/ServiceForm.tsx
+const serviceSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  date: z.date(),
+  type: z.enum(["SUNDAY", "WEDNESDAY"]),
+});
+
+export const ServiceForm: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ServiceFormData>({
+    resolver: zodResolver(serviceSchema),
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <VStack spacing={4}>
+        <InputField
+          name="name"
+          label="Service Name"
+          register={register}
+          error={errors.name}
+        />
+        <InputField
+          name="date"
+          label="Date"
+          type="date"
+          register={register}
+          error={errors.date}
+        />
+        <SelectField
+          name="type"
+          label="Service Type"
+          options={[
+            { value: "SUNDAY", label: "Sunday Service" },
+            { value: "WEDNESDAY", label: "Wednesday Service" },
+          ]}
+          register={register}
+          error={errors.type}
+        />
+      </VStack>
+    </form>
+  );
+};
+```
+
+## Form Validation
+
+### 1. Zod Schemas
+```typescript
+// src/schemas/attendance.ts
+export const checkInSchema = z.object({
+  memberId: z.string().min(1, "Member ID is required"),
+  serviceId: z.string().min(1, "Service is required"),
+  notes: z.string().optional(),
+});
+
+export const serviceSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  date: z.date(),
+  type: z.enum(["SUNDAY", "WEDNESDAY"]),
+  description: z.string().optional(),
+});
+```
+
+### 2. Custom Validation
+```typescript
+// src/utils/validation.ts
+export const validateMemberId = async (value: string) => {
+  const member = await getMember(value);
+  if (!member) {
+    return "Invalid member ID";
+  }
+  return true;
+};
+
+// Usage in form
+const {
+  register,
+  formState: { errors },
+} = useForm({
+  resolver: async (data) => {
+    const result = await checkInSchema.safeParseAsync(data);
+    if (!result.success) {
+      return { errors: result.error.formErrors.fieldErrors };
+    }
+    const memberValid = await validateMemberId(data.memberId);
+    if (memberValid !== true) {
+      return {
+        errors: { memberId: { message: memberValid } },
+      };
+    }
+    return { values: result.data };
+  },
+});
+```
+
+## Best Practices
+
+1. **Form Structure**
+   - Use semantic HTML elements
+   - Group related fields
+   - Provide clear labels
+   - Show validation errors
+
+2. **Validation**
+   - Use Zod for schema validation
+   - Validate on submit
+   - Show inline errors
+   - Prevent invalid submissions
+
+3. **User Experience**
+   - Show loading states
+   - Disable submit button when invalid
+   - Provide clear feedback
+   - Support keyboard navigation
+
+4. **Accessibility**
+   - Use proper ARIA labels
+   - Support screen readers
+   - Handle focus management
+   - Provide error announcements
+
+## Common Gotchas
+
+1. **Form Reset**
+   ```typescript
+   // ❌ Don't reset form manually
+   const handleSubmit = (data: FormData) => {
+     onSubmit(data);
+     setValue("name", ""); // Manual reset
+   };
+
+   // ✅ Use form reset
+   const handleSubmit = (data: FormData) => {
+     onSubmit(data);
+     reset(); // Proper reset
+   };
+   ```
+
+2. **Validation Timing**
+   ```typescript
+   // ❌ Validate on every change
+   const { register } = useForm({
+     mode: "onChange",
+   });
+
+   // ✅ Validate on submit and blur
+   const { register } = useForm({
+     mode: "onTouched",
+   });
+   ```
+
+3. **Error Handling**
+   ```typescript
+   // ❌ Ignore form errors
+   const onSubmit = (data: FormData) => {
+     try {
+       await submitData(data);
+     } catch (error) {
+       console.error(error);
+     }
+   };
+
+   // ✅ Handle form errors
+   const onSubmit = async (data: FormData) => {
+     try {
+       await submitData(data);
+       toast({
+         title: "Success",
+         status: "success",
+       });
+     } catch (error) {
+       toast({
+         title: "Error",
+         description: error.message,
+         status: "error",
+       });
+     }
+   };
+   ```

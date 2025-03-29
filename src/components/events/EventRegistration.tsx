@@ -13,6 +13,7 @@ import {
   Stack,
   Textarea,
 } from '@chakra-ui/react';
+import { VisitorTouchpointSelector } from '@/components/visitor/VisitorTouchpointSelector';
 
 interface RegistrationFormData {
   guestType: 'MEMBER' | 'VISITOR';
@@ -21,9 +22,13 @@ interface RegistrationFormData {
   lastName?: string;
   email?: string;
   phone?: string;
-  organisation?: string;
+  organization?: string;
   dietaryRestrictions?: string;
   notes?: string;
+  touchpoint?: {
+    touchpoint: string;
+    source: string;
+  };
 }
 
 interface EventRegistrationProps {
@@ -34,6 +39,10 @@ interface EventRegistrationProps {
 export const EventRegistration = ({ eventId, onSubmit }: EventRegistrationProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [guestType, setGuestType] = useState<'MEMBER' | 'VISITOR'>('VISITOR');
+  const [touchpoint, setTouchpoint] = useState<{ touchpoint: string; source: string }>({
+    touchpoint: '',
+    source: '',
+  });
   const toast = useToast();
   const {
     register,
@@ -44,7 +53,7 @@ export const EventRegistration = ({ eventId, onSubmit }: EventRegistrationProps)
   const onSubmitHandler = async (data: RegistrationFormData) => {
     try {
       setIsLoading(true);
-      await onSubmit({ ...data, guestType });
+      await onSubmit({ ...data, guestType, touchpoint });
       toast({
         title: 'Registration successful',
         status: 'success',
@@ -104,8 +113,8 @@ export const EventRegistration = ({ eventId, onSubmit }: EventRegistrationProps)
             </FormControl>
 
             <FormControl>
-              <FormLabel>Organisation</FormLabel>
-              <Input {...register('organisation')} />
+              <FormLabel>Organization</FormLabel>
+              <Input {...register('organization')} />
             </FormControl>
 
             <FormControl>
@@ -117,6 +126,12 @@ export const EventRegistration = ({ eventId, onSubmit }: EventRegistrationProps)
               <FormLabel>Additional Notes</FormLabel>
               <Textarea {...register('notes')} />
             </FormControl>
+
+            <VisitorTouchpointSelector
+              value={touchpoint}
+              onChange={setTouchpoint}
+              isRequired
+            />
           </>
         )}
 

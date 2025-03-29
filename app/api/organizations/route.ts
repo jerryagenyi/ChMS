@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     // Start a transaction to create org and update user
     const result = await prisma.$transaction(async (tx) => {
       // Create the organization
-      const organization = await tx.organisation.create({
+      const organization = await tx.organization.create({
         data: {
           name,
           description,
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         where: { email: session.user.email },
         data: {
           role: "ADMIN",
-          organisationId: organization.id,
+          organizationId: organization.id,
         },
       })
 
@@ -66,7 +66,7 @@ export async function GET(req: Request) {
       )
     }
 
-    const organizations = await prisma.organisation.findMany({
+    const organizations = await prisma.organization.findMany({
       where: {
         users: {
           some: {

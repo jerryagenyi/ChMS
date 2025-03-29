@@ -45,11 +45,11 @@ model Event {
   venue          String?
   capacity       Int?
   isPublic       Boolean   @default(true)
-  organisationId String
+  organizationId String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
   registrations  EventRegistration[]
 }
 
@@ -74,7 +74,7 @@ model EventGuest {
   lastName    String
   email       String?
   phone       String?
-  organisation String?
+  organization String?
   dietaryRestrictions String?
   notes       String?
   createdAt   DateTime @default(now())

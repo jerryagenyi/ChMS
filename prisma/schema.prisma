@@ -7,35 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Organisation {
-  id          String   @id @default(cuid())
+model Organization {
+  id          String    @id @default(cuid())
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   departments Department[]
-  classes     Class[]
-  members     Member[]
-  visitors    Visitor[]
   teams       Team[]
   users       User[]
-  services    Service[]
   invitations Invitation[]
-  settings    OrganisationSettings?
+  settings    OrganizationSettings?
+  members     Member[]
+  visitors    Visitor[]
+  services    Service[]
+  classes     Class[]
+  metrics     Metric[]
+  reports     Report[]
   attendance  Attendance[]
   events      Event[]
+  touchpoints OrganizationTouchpoint[]
 }
 
 model Department {
   id             String   @id @default(cuid())
   name           String
   description    String?
-  organisationId String
+  organizationId String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organisation Organisation @relation(fields: [organisationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   teams        Team[]
 }
 
@@ -48,8 +51,8 @@ model Team {
   updatedAt    DateTime @updatedAt
 
   department   Department @relation(fields: [departmentId], references: [id])
-  organisation Organisation @relation(fields: [organisationId], references: [id])
-  organisationId String
+  organization Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
   members      MemberTeam[]
 }
 
@@ -59,25 +62,26 @@ model Class {
   description    String?
   startDate      DateTime?
   endDate        DateTime?
-  organisationId String
+  organizationId String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organisation Organisation @relation(fields: [organisationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   sessions     ClassSession[]
   members      MemberClass[]
   attendance   Attendance[]
 }
 
 model ClassSession {
-  id        String   @id @default(cuid())
-  date      DateTime
-  classId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  classId     String
+  date        DateTime
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  class     Class    @relation(fields: [classId], references: [id])
-  attendees Attendance[] @relation("ClassSessionAttendance")
+  class       Class     @relation(fields: [classId], references: [id])
+  attendance  Attendance[]
 }
 
 model Member {
@@ -90,12 +94,12 @@ model Member {
   conversionDate DateTime?
   baptismDate   DateTime?
   weddingDate   DateTime?
-  organisationId String
+  organizationId String
   familyId      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  organisation Organisation @relation(fields: [organisationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   family       Family?     @relation(fields: [familyId], references: [id])
   teams        MemberTeam[]
   classes      MemberClass[]
@@ -115,19 +119,27 @@ model Family {
 }
 
 model Visitor {
-  id             String   @id @default(cuid())
-  firstName      String
-  lastName       String
-  email         String?
-  phone         String?
-  visitDate     DateTime
-  followUpDate  DateTime?
-  status        String    @default("NEW") // NEW, CONTACTED, CONVERTED
-  organisationId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String    @id @default(cuid())
+  organizationId  String
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String?
+  source          String?   // How they found the church
+  interests       String[]  // Areas of interest
+  prayerRequests  String[]  // Prayer needs
+  visitDate       DateTime  @default(now())
+  followUpDate    DateTime?
+  status          String    @default("NEW") // NEW, CONTACTED, CONVERTED
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  organisation Organisation @relation(fields: [organisationId], references: [id])
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  eventRegistrations EventRegistration[]
+  touchpoints     VisitorTouchpoint[]
+
+  @@index([organizationId])
 }
 
 model Gift {
@@ -199,22 +211,23 @@ model MemberSkill {
 }
 
 model Attendance {
-  id              String   @id @default(cuid())
-  memberId        String
-  classId         String
-  date            DateTime @default(now())
-  status          String   // PRESENT, ABSENT, LATE
-  notes           String?
-  organisationId  String
-  member          Member   @relation(fields: [memberId], references: [id])
-  class           Class    @relation(fields: [classId], references: [id])
-  organisation    Organisation @relation(fields: [organisationId], references: [id])
-  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
-  classSessionId  String?
-  service         Service? @relation(fields: [serviceId], references: [id])
-  serviceId       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(cuid())
+  organizationId String
+  memberId       String
+  serviceId      String?
+  classId        String?
+  classSessionId String?
+  date           DateTime  @default(now())
+  status         String    @default("PRESENT") // PRESENT, ABSENT, LATE
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  member         Member       @relation(fields: [memberId], references: [id])
+  service        Service?     @relation(fields: [serviceId], references: [id])
+  class          Class?       @relation(fields: [classId], references: [id])
+  classSession   ClassSession? @relation(fields: [classSessionId], references: [id])
 }
 
 model Account {
@@ -257,8 +270,8 @@ model User {
   image         String?
   password      String?
   role          Role      @default(MEMBER)
-  organisationId String?
-  organisation  Organisation? @relation(fields: [organisationId], references: [id])
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
   accounts      Account[]
   sessions      Session[]
 }
@@ -276,8 +289,8 @@ model Invitation {
   email         String   @unique
   token         String   @unique
   expiresAt     DateTime
-  organisationId String
-  organisation  Organisation @relation(fields: [organisationId], references: [id])
+  organizationId String
+  organization  Organization @relation(fields: [organizationId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -288,18 +301,18 @@ model Service {
   startTime   DateTime
   endTime     DateTime?
   status      String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED
-  organisationId String
+  organizationId String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  organisation Organisation @relation(fields: [organisationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   attendance   Attendance[]
 }
 
-model OrganisationSettings {
+model OrganizationSettings {
   id              String   @id @default(cuid())
-  organisationId  String   @unique
-  organisation    Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  organizationId  String   @unique
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   // Brand Colours
   primaryColor    String   @default("#000000")
@@ -327,12 +340,12 @@ model Event {
   endDate        DateTime?
   venue          String?
   capacity       Int?
-  isPublic       Boolean   @default(true)
-  organisationId String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  isPublic       Boolean  @default(true)
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
   registrations  EventRegistration[]
 }
 
@@ -347,21 +360,78 @@ model EventRegistration {
   event     Event    @relation(fields: [eventId], references: [id])
   member    Member?  @relation(fields: [memberId], references: [id])
   memberId  String?
-  guest     EventGuest? @relation(fields: [guestId], references: [id])
-  guestId   String?
+  visitor   Visitor? @relation(fields: [visitorId], references: [id])
+  visitorId String?
 }
 
-model EventGuest {
-  id          String   @id @default(cuid())
-  firstName   String
-  lastName    String
-  email       String?
-  phone       String?
-  organisation String?
-  dietaryRestrictions String?
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Metric {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String   // ATTENDANCE, VISITOR, MEMBER, EVENT, FINANCIAL
+  name           String   // e.g., "total_attendance", "visitor_conversion_rate"
+  value          Float
+  date           DateTime
+  metadata       Json?    // Additional context data
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  registrations EventRegistration[]
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([type, date])
+}
+
+model Report {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  type           String   // ATTENDANCE, VISITOR, MEMBER, EVENT, FINANCIAL
+  parameters     Json     // Report configuration
+  schedule       String?  // DAILY, WEEKLY, MONTHLY, or cron expression
+  lastRun        DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  snapshots      ReportSnapshot[]
+}
+
+model ReportSnapshot {
+  id        String   @id @default(cuid())
+  reportId  String
+  data      Json     // Report data
+  createdAt DateTime @default(now())
+
+  report    Report   @relation(fields: [reportId], references: [id])
+}
+
+model OrganizationTouchpoint {
+  id             String       @id @default(cuid())
+  organizationId String
+  type           String       // e.g., "SOCIAL_MEDIA", "EVENT", etc.
+  source         String       // e.g., "FACEBOOK", "INSTAGRAM", etc.
+  label          String       // Display label
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  touchpoints    VisitorTouchpoint[]
+
+  @@unique([organizationId, type, source])
+  @@index([organizationId])
+}
+
+model VisitorTouchpoint {
+  id          String   @id @default(cuid())
+  visitorId   String
+  organizationId String
+  touchpoint  String   // e.g., "SOCIAL_MEDIA", "EVENT", etc.
+  source      String?  // e.g., "FACEBOOK", "INSTAGRAM", etc.
+  createdAt   DateTime @default(now())
+  visitor     Visitor  @relation(fields: [visitorId], references: [id])
+  organizationTouchpoint OrganizationTouchpoint? @relation(fields: [organizationId, touchpoint, source], references: [organizationId, type, source])
+
+  @@index([visitorId])
+  @@index([organizationId, touchpoint, source])
 }

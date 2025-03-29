@@ -1,0 +1,256 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # Chakra UI Animations in ChMS
+
+## Overview
+
+This document outlines how we use animations in ChMS, combining Chakra UI's built-in animations with Framer Motion for complex interactions.
+
+## Basic Animations
+
+### 1. Page Transitions
+```typescript
+// src/components/layout/PageTransition.tsx
+export const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.3 }}
+  >
+    {children}
+  </motion.div>
+);
+```
+
+### 2. List Item Animations
+```typescript
+// src/components/attendance/AttendanceList.tsx
+<AnimatePresence>
+  {attendances.map((attendance) => (
+    <motion.div
+      key={attendance.id}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <AttendanceListItem attendance={attendance} />
+    </motion.div>
+  ))}
+</AnimatePresence>
+```
+
+### 3. Modal Animations
+```typescript
+// src/components/common/AnimatedModal.tsx
+export const AnimatedModal: React.FC<ModalProps> = ({ children, ...props }) => (
+  <Modal {...props}>
+    <ModalOverlay
+      as={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    />
+    <ModalContent
+      as={motion.div}
+      initial={{ scale: 0.95, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.95, opacity: 0 }}
+    >
+      {children}
+    </ModalContent>
+  </Modal>
+);
+```
+
+## Interactive Animations
+
+### 1. Hover Effects
+```typescript
+// src/components/common/AnimatedCard.tsx
+export const AnimatedCard: React.FC<CardProps> = ({ children, ...props }) => (
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+  >
+    <Card {...props}>{children}</Card>
+  </motion.div>
+);
+```
+
+### 2. Loading States
+```typescript
+// src/components/common/LoadingSpinner.tsx
+export const LoadingSpinner: React.FC = () => (
+  <motion.div
+    animate={{ rotate: 360 }}
+    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+  >
+    <Spinner size="xl" color="brand.500" />
+  </motion.div>
+);
+```
+
+### 3. Form Field Animations
+```typescript
+// src/components/common/AnimatedFormField.tsx
+export const AnimatedFormField: React.FC<FormFieldProps> = ({
+  error,
+  children,
+  ...props
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.2 }}
+  >
+    <FormControl isInvalid={!!error} {...props}>
+      {children}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <FormErrorMessage>{error}</FormErrorMessage>
+        </motion.div>
+      )}
+    </FormControl>
+  </motion.div>
+);
+```
+
+## Animation Patterns
+
+### 1. Staggered Lists
+```typescript
+// src/components/attendance/AttendanceGrid.tsx
+export const AttendanceGrid: React.FC<{ items: Attendance[] }> = ({ items }) => (
+  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+    {items.map((item, index) => (
+      <motion.div
+        key={item.id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
+      >
+        <AttendanceCard attendance={item} />
+      </motion.div>
+    ))}
+  </SimpleGrid>
+);
+```
+
+### 2. Slide Transitions
+```typescript
+// src/components/navigation/Sidebar.tsx
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, children }) => (
+  <motion.div
+    initial={false}
+    animate={{ x: isOpen ? 0 : -300 }}
+    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+  >
+    <Box
+      position="fixed"
+      left={0}
+      top={0}
+      h="100vh"
+      w="300px"
+      bg="white"
+      boxShadow="lg"
+      p={4}
+    >
+      {children}
+    </Box>
+  </motion.div>
+);
+```
+
+### 3. Fade Transitions
+```typescript
+// src/components/common/FadeIn.tsx
+export const FadeIn: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.3 }}
+  >
+    {children}
+  </motion.div>
+);
+```
+
+## Best Practices
+
+1. **Performance**
+   - Use `AnimatePresence` for exit animations
+   - Use `layout` prop for smooth layout changes
+   - Avoid animating too many elements simultaneously
+
+2. **Accessibility**
+   - Respect `prefers-reduced-motion`
+   - Provide fallbacks for disabled animations
+   - Keep animations subtle and purposeful
+
+3. **User Experience**
+   - Use spring animations for natural movement
+   - Keep animations short (200-300ms)
+   - Use easing functions for smooth transitions
+
+4. **Code Organization**
+   - Create reusable animation components
+   - Use animation variants for consistency
+   - Keep animation logic separate from business logic
+
+## Common Gotchas
+
+1. **Animation Conflicts**
+   ```typescript
+   // ❌ Avoid conflicting animations
+   <motion.div animate={{ scale: 1.1 }}>
+     <ChakraButton animate={{ scale: 1.2 }}>Click me</ChakraButton>
+   </motion.div>
+
+   // ✅ Use a single animation source
+   <motion.div animate={{ scale: 1.1 }}>
+     <ChakraButton>Click me</ChakraButton>
+   </motion.div>
+   ```
+
+2. **Performance Issues**
+   ```typescript
+   // ❌ Animating too many elements
+   {items.map(item => (
+     <motion.div animate={{ opacity: 1 }} key={item.id}>
+       <ListItem>{item.name}</ListItem>
+     </motion.div>
+   ))}
+
+   // ✅ Use CSS transitions for simple animations
+   <Box
+     transition="all 0.2s"
+     _hover={{ opacity: 0.8 }}
+   >
+     {items.map(item => (
+       <ListItem key={item.id}>{item.name}</ListItem>
+     ))}
+   </Box>
+   ```
+
+3. **Layout Shifts**
+   ```typescript
+   // ❌ Causing layout shifts
+   <motion.div animate={{ height: "auto" }}>
+     <DynamicContent />
+   </motion.div>
+
+   // ✅ Use layout animations
+   <motion.div layout>
+     <DynamicContent />
+   </motion.div>
+   ```

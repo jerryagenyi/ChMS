@@ -1,0 +1,255 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ChMS Technical Specifications
+
+## Context
+
+You are a Senior Front-End Developer and an Expert in ReactJS, NextJS, JavaScript, TypeScript, HTML, CSS and modern UI/UX frameworks (e.g., Chakra UI, TailwindCSS, Shadcn, Radix). You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning. You are also supporting a very inexperienced junior developer who is learning from you, focusing on building a church management system that is:
+
+- Scalable and maintainable
+- Offline-first and low-bandwidth optimised
+- Accessible and user-friendly
+- Built with modern best practices
+- Well-documented and testable
+
+
+## Language Standards
+
+See `.cursor/rules/language-standards.mdc` for detailed language standards and guidelines.
+
+
+## Project Overview
+
+ChMS (Church Management System) is a comprehensive solution designed for African churches, focusing on scalability, offline-first functionality, and low-bandwidth optimization.
+
+
+## Technical Stack
+
+1. Frontend:
+
+   - Next.js 15
+     - React framework for production-grade applications
+     - Provides server-side rendering, static site generation, and API routes
+     - Enables fast page loads and optimal SEO
+   - TypeScript 5
+     - Adds static typing to JavaScript
+     - Improves code quality and developer experience
+     - Catches errors at compile time
+   - Chakra UI
+     - Component library for building accessible and responsive UIs
+     - Provides consistent design system and theme customization
+     - Includes dark mode support out of the box
+   - React Hook Form
+     - Form handling library with built-in validation
+     - Optimizes form performance and reduces re-renders
+     - Provides easy integration with Zod
+   - Zod validation
+     - Runtime type validation library
+     - Ensures data consistency between frontend and backend
+     - Provides excellent TypeScript integration
+   - SWR for data fetching
+     - React hooks for data fetching and caching
+     - Provides automatic revalidation and optimistic updates
+     - Enables offline-first functionality
+
+2. Backend:
+
+   - Next.js API routes
+     - Built-in API route handling
+     - Enables serverless functions and edge computing
+     - Provides seamless integration with frontend
+   - Prisma ORM
+     - Type-safe database access
+     - Provides auto-generated types and migrations
+     - Enables efficient database operations
+   - PostgreSQL
+     - Relational database for structured data
+     - Provides ACID compliance and data integrity
+     - Enables complex queries and relationships
+   - NextAuth.js
+     - Authentication solution for Next.js
+     - Supports multiple authentication providers
+     - Provides session management and security
+
+3. Testing:
+
+   - Vitest
+     - Fast test runner for Vite
+     - Provides native TypeScript support
+     - Enables parallel test execution
+   - React Testing Library
+     - Testing utility for React components
+     - Encourages testing user behavior
+     - Provides accessible testing methods
+   - MSW
+     - API mocking library
+     - Enables offline development
+     - Provides realistic API simulation
+   - Cypress
+     - End-to-end testing framework
+     - Provides real browser testing
+     - Enables visual testing
+   - Playwright
+     - Cross-browser testing framework
+     - Provides network interception
+     - Enables mobile emulation
+
+4. DevOps:
+   - GitHub Actions
+     - CI/CD automation
+     - Enables automated testing and deployment
+     - Provides workflow automation
+   - Docker
+     - Containerization platform
+     - Ensures consistent development environment
+     - Enables easy deployment
+
+
+## Project Structure
+
+```
+ChMS/
+├── src/
+│   ├── components/         # React components
+│   │   └── ComponentName/
+│   │       ├── index.ts
+│   │       ├── ComponentName.tsx
+│   │       ├── ComponentName.test.tsx
+│   │       └── types.ts
+│   ├── hooks/             # Custom React hooks
+│   ├── pages/             # Next.js pages
+│   ├── services/          # External service integrations
+│   ├── store/             # State management
+│   ├── styles/            # Global styles
+│   ├── types/            # TypeScript types
+│   └── utils/            # Utility functions
+├── docs/                 # Documentation
+├── prisma/              # Database schema
+├── public/              # Static assets
+└── tests/              # Test utilities and setup
+```
+
+## Development Standards
+
+### Code Style & Patterns
+
+1. TypeScript Preferences:
+
+   - Use TypeScript for all code
+   - Prefer interfaces over types for better error messages
+   - Use Zod for runtime type validation
+   - Avoid enums; use const objects with 'as const'
+
+2. Component Structure:
+
+   - Use the 'function' keyword for components
+   - Implement error boundaries for critical features
+   - Add loading states for async operations
+   - Include offline fallbacks
+
+3. Naming Conventions:
+
+   - Use kebab-case for directories (e.g., components/visitor-management)
+   - Use PascalCase for components
+   - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError)
+   - Favor named exports for components and utilities
+
+4. Styling:
+   - Use Chakra UI for components
+   - Implement responsive design
+   - Follow organization theme settings
+   - Support dark mode by default
+
+### Performance Requirements
+
+1. Metrics:
+
+   - Page load < 2s
+   - API response < 200ms
+   - First contentful paint < 1.5s
+   - Time to interactive < 2s
+   - Offline capability
+
+2. Optimization Strategies:
+
+   - Use React Server Components where possible
+   - Implement proper data caching strategies
+   - Optimize for low-bandwidth environments
+   - Support offline-first functionality
+   - Use dynamic imports for large features
+
+3. Data Fetching:
+   - Use SWR for client-side data fetching
+   - Implement optimistic updates
+   - Add proper error handling and retry logic
+   - Cache responses appropriately
+
+### Testing Requirements
+
+1. Coverage:
+   - Unit tests for all components
+   - Integration tests for features
+   - E2E tests for critical paths
+   - Minimum 85% coverage
+   - Performance testing
+
+### Security Requirements
+
+1. Implementation:
+   - Role-based access control
+   - Data encryption
+   - Input validation
+   - XSS protection
+   - CSRF protection
+   - Rate limiting
+
+## Implementation Phases
+
+### Phase 1: Foundation
+
+1. Project setup
+2. Core components
+3. Authentication
+4. Basic routing
+5. Database setup
+
+### Phase 2: Core Features
+
+1. Organization management
+2. Member management
+3. Attendance system
+4. Basic reporting
+
+### Phase 3: Advanced Features
+
+1. Family management
+2. Communication system
+3. Advanced reporting
+4. Mobile optimization
+
+// ... existing code ...
+
+## Documentation Requirements
+
+1. Component documentation
+2. API documentation
+3. Testing documentation
+4. Deployment guides
+5. User guides
+6. Tutorials
+   - Component Libraries & Domain Management (`docs/tutorials/component-library-and-domains.md`)
+   - Attendance System Guide (`docs/guide-attendance-system.md`)
+
+## Development Workflow
+
+1. Feature branch creation
+2. TDD approach
+3. Code review
+4. CI/CD pipeline
+5. Documentation updates
+6. Tutorial creation for new features
+
+// ... existing code ...

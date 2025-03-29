@@ -11,7 +11,7 @@ describe('Class Attendance API', () => {
   const mockSession = {
     user: {
       id: '1',
-      organisationId: '1',
+      organizationId: '1',
     },
   };
 

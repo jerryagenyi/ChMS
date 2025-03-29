@@ -32,7 +32,7 @@ export const GET = validate(reportSchema, async (req: Request) => {
 
     // Build where clause
     const where = {
-      organisationId: session.user.organisationId,
+      organizationId: session.user.organizationId,
       date: {
         gte: startDate,
         lte: endDate,
@@ -56,7 +56,7 @@ export const GET = validate(reportSchema, async (req: Request) => {
     // Get all members who should have attendance records
     const members = await prisma.member.findMany({
       where: {
-        organisationId: session.user.organisationId,
+        organizationId: session.user.organizationId,
         ...(classId && {
           memberClasses: {
             some: {

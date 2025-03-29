@@ -18,7 +18,7 @@ import {
   SimpleGrid,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { Organisation, OrganisationSettings } from '@prisma/client';
+import { Organization, OrganizationSettings } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 
 const settingsSchema = z.object({
@@ -41,8 +41,8 @@ const settingsSchema = z.object({
 type SettingsFormData = z.infer<typeof settingsSchema>;
 
 interface SettingsFormProps {
-  organisation: Organisation & {
-    settings: OrganisationSettings | null;
+  organization: Organization & {
+    settings: OrganizationSettings | null;
   };
 }
 
@@ -67,21 +67,21 @@ const timezones = [
   { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
 ];
 
-export default function SettingsForm({ organisation }: SettingsFormProps) {
+export default function SettingsForm({ organization }: SettingsFormProps) {
   const router = useRouter();
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const defaultValues: SettingsFormData = {
-    primaryColor: organisation.settings?.primaryColor ?? '#000000',
-    secondaryColor: organisation.settings?.secondaryColor ?? '#666666',
-    backgroundColor: organisation.settings?.backgroundColor ?? '#FFFFFF',
-    accentColor: organisation.settings?.accentColor ?? '#F5F5F5',
-    language: (organisation.settings?.language as any) ?? 'en',
-    currency: (organisation.settings?.currency as any) ?? 'GBP',
-    timezone: organisation.settings?.timezone ?? 'Europe/London',
-    logoUrl: organisation.settings?.logoUrl ?? '',
-    faviconUrl: organisation.settings?.faviconUrl ?? '',
+    primaryColor: organization.settings?.primaryColor ?? '#000000',
+    secondaryColor: organization.settings?.secondaryColor ?? '#666666',
+    backgroundColor: organization.settings?.backgroundColor ?? '#FFFFFF',
+    accentColor: organization.settings?.accentColor ?? '#F5F5F5',
+    language: (organization.settings?.language as any) ?? 'en',
+    currency: (organization.settings?.currency as any) ?? 'GBP',
+    timezone: organization.settings?.timezone ?? 'Europe/London',
+    logoUrl: organization.settings?.logoUrl ?? '',
+    faviconUrl: organization.settings?.faviconUrl ?? '',
   };
 
   const {

@@ -30,14 +30,14 @@ describe('AttendanceReport', () => {
   });
 
   it('renders loading state initially', () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() => new Promise(() => {}));
+    (global.fetch as any).mockImplementationOnce(() => new Promise(() => {}));
 
     renderWithChakra(<AttendanceReport />);
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it('renders error state when fetch fails', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Failed to fetch'));
+    (global.fetch as any).mockRejectedValueOnce(new Error('Failed to fetch'));
 
     renderWithChakra(<AttendanceReport />);
 
@@ -47,7 +47,7 @@ describe('AttendanceReport', () => {
   });
 
   it('renders report data when fetch succeeds', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockAttendanceData),
     });
@@ -61,7 +61,7 @@ describe('AttendanceReport', () => {
   });
 
   it('opens member details modal when clicking view details', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockAttendanceData),
     });
@@ -80,7 +80,7 @@ describe('AttendanceReport', () => {
     global.URL.createObjectURL = mockCreateObjectURL;
     global.URL.revokeObjectURL = vi.fn();
 
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockAttendanceData),
     });
@@ -95,7 +95,7 @@ describe('AttendanceReport', () => {
   });
 
   it('changes month when selecting a different month', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve(mockAttendanceData),
     });

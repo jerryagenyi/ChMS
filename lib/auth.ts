@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          organisationId: user.organisationId
+          organizationId: user.organizationId
         };
       }
     })
@@ -72,14 +72,14 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub!;
         session.user.role = token.role as string;
-        session.user.organisationId = token.organisationId as string;
+        session.user.organizationId = token.organizationId as string;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
-        token.organisationId = user.organisationId;
+        token.organizationId = user.organizationId;
       }
       return token;
     }

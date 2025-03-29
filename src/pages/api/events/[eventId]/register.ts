@@ -1,100 +1,117 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '../../auth/[...nextauth]';
+import { getSession } from 'next-auth/react';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const session = await getServerSession(req, res, authOptions);
-  const eventId = req.query.eventId as string;
+  const { eventId } = req.query;
+  const session = await getSession({ req });
+
+  if (!session) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  if (!eventId) {
+    return res.status(400).json({ message: 'Event ID is required' });
+  }
 
   try {
-    // First, check if the event exists and has capacity
     const event = await prisma.event.findUnique({
-      where: { id: eventId },
-      include: {
-        registrations: true,
-      },
+      where: { id: eventId as string },
     });
 
     if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
+      return res.status(404).json({ message: 'Event not found' });
     }
 
-    if (event.capacity && event.registrations.length >= event.capacity) {
-      return res.status(400).json({ error: 'Event is at full capacity' });
+    const {
+      guestType,
+      memberId,
+      firstName,
+      lastName,
+      email,
+      phone,
+      organization,
+      dietaryRestrictions,
+      notes,
+      touchpoint,
+    } = req.body;
+
+    if (!guestType) {
+      return res.status(400).json({ message: 'Guest type is required' });
     }
 
-    const { guestType, memberId, firstName, lastName, email, phone, organisation, dietaryRestrictions, notes } = req.body;
+    let registration;
 
     if (guestType === 'MEMBER') {
-      // Verify member exists
-      const member = await prisma.member.findUnique({
-        where: { id: memberId },
-      });
-
-      if (!member) {
-        return res.status(404).json({ error: 'Member not found' });
+      if (!memberId) {
+        return res.status(400).json({ message: 'Member ID is required' });
       }
 
-      // Check if member is already registered
-      const existingRegistration = await prisma.eventRegistration.findFirst({
-        where: {
-          eventId,
-          memberId,
-        },
-      });
-
-      if (existingRegistration) {
-        return res.status(400).json({ error: 'Member is already registered' });
-      }
-
-      // Create registration for member
-      const registration = await prisma.eventRegistration.create({
+      registration = await prisma.eventRegistration.create({
         data: {
-          eventId,
+          eventId: eventId as string,
+          guestType: 'MEMBER',
           memberId,
-          guestType,
-          status: 'REGISTERED',
         },
       });
+    } else if (guestType === 'VISITOR') {
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: 'First name and last name are required' });
+      }
 
-      return res.status(201).json(registration);
+      // Create visitor and registration in a transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Create visitor
+        const visitor = await tx.visitor.create({
+          data: {
+            organizationId: event.organizationId,
+            firstName,
+            lastName,
+            email,
+            phone,
+            visitDate: new Date(),
+          },
+        });
+
+        // Create registration
+        const registration = await tx.eventRegistration.create({
+          data: {
+            eventId: eventId as string,
+            guestType: 'VISITOR',
+            visitorId: visitor.id,
+          },
+        });
+
+        // Create touchpoint if provided
+        if (touchpoint?.touchpoint && touchpoint?.source) {
+          await tx.visitorTouchpoint.create({
+            data: {
+              visitorId: visitor.id,
+              organizationId: event.organizationId,
+              touchpoint: touchpoint.touchpoint,
+              source: touchpoint.source,
+            },
+          });
+        }
+
+        return registration;
+      });
+
+      registration = result;
     } else {
-      // Create event guest
-      const guest = await prisma.eventGuest.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          phone,
-          organisation,
-          dietaryRestrictions,
-          notes,
-        },
-      });
-
-      // Create registration for guest
-      const registration = await prisma.eventRegistration.create({
-        data: {
-          eventId,
-          guestId: guest.id,
-          guestType,
-          status: 'REGISTERED',
-        },
-      });
-
-      return res.status(201).json(registration);
+      return res.status(400).json({ message: 'Invalid guest type' });
     }
+
+    return res.status(201).json(registration);
   } catch (error) {
     console.error('Error registering for event:', error);
-    return res.status(500).json({ error: 'Error registering for event' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 } 

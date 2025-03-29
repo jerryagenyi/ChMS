@@ -1,16 +1,18 @@
-export const PrismaAdapter = jest.fn(() => ({
-  createUser: jest.fn(),
-  getUser: jest.fn(),
-  getUserByEmail: jest.fn(),
-  updateUser: jest.fn(),
-  deleteUser: jest.fn(),
-  linkAccount: jest.fn(),
-  unlinkAccount: jest.fn(),
-  getAccount: jest.fn(),
-  getSessionAndUser: jest.fn(),
-  createSession: jest.fn(),
-  updateSession: jest.fn(),
-  deleteSession: jest.fn(),
-  createVerificationToken: jest.fn(),
-  useVerificationToken: jest.fn(),
+import { vi } from 'vitest';
+
+export const PrismaAdapter = vi.fn(() => ({
+  createUser: vi.fn(),
+  getUser: vi.fn(),
+  getUserByEmail: vi.fn(),
+  updateUser: vi.fn(),
+  deleteUser: vi.fn(),
+  linkAccount: vi.fn(),
+  unlinkAccount: vi.fn(),
+  getAccount: vi.fn(),
+  getSessionAndUser: vi.fn(),
+  createSession: vi.fn(),
+  updateSession: vi.fn(),
+  deleteSession: vi.fn(),
+  createVerificationToken: vi.fn(),
+  useVerificationToken: vi.fn(),
 }));

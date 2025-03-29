@@ -1,0 +1,232 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Chakra UI Usage in ChMS
+
+## Overview
+
+This document outlines how Chakra UI is used in the ChMS project, including our conventions, patterns, and best practices.
+
+## Theme Configuration
+
+### Color Scheme
+```typescript
+// src/theme/colors.ts
+export const colors = {
+  brand: {
+    50: '#E6F6FF',
+    100: '#BAE3FF',
+    200: '#7CC4FA',
+    300: '#47A3F3',
+    400: '#2186EB',
+    500: '#0967D2', // Primary brand color
+    600: '#0552B5',
+    700: '#03449E',
+    800: '#01337D',
+    900: '#002159',
+  },
+  // ... other colors
+};
+```
+
+### Component Variants
+```typescript
+// src/theme/components.ts
+export const components = {
+  Button: {
+    variants: {
+      primary: {
+        bg: 'brand.500',
+        color: 'white',
+        _hover: { bg: 'brand.600' },
+      },
+      secondary: {
+        bg: 'gray.100',
+        color: 'gray.800',
+        _hover: { bg: 'gray.200' },
+      },
+    },
+  },
+  // ... other components
+};
+```
+
+## Common Patterns
+
+### 1. Responsive Design
+```typescript
+// Use responsive values for spacing, sizes, etc.
+<Box
+  p={{ base: 4, md: 6, lg: 8 }}
+  fontSize={{ base: 'sm', md: 'md', lg: 'lg' }}
+>
+  Content
+</Box>
+```
+
+### 2. Dark Mode Support
+```typescript
+// Use semantic color tokens
+<Box
+  bg="bg.primary"
+  color="text.primary"
+  borderColor="border.primary"
+>
+  Content
+</Box>
+```
+
+### 3. Loading States
+```typescript
+// Use Chakra's built-in loading states
+<Button
+  isLoading={isLoading}
+  loadingText="Processing..."
+>
+  Submit
+</Button>
+```
+
+### 4. Form Components
+```typescript
+// Use Chakra's form components with React Hook Form
+<FormControl isInvalid={!!errors.name}>
+  <FormLabel>Name</FormLabel>
+  <Input {...register('name')} />
+  <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+</FormControl>
+```
+
+### 5. Modal Dialogs
+```typescript
+// Use Chakra's modal components
+<Modal isOpen={isOpen} onClose={onClose}>
+  <ModalOverlay />
+  <ModalContent>
+    <ModalHeader>Title</ModalHeader>
+    <ModalCloseButton />
+    <ModalBody>Content</ModalBody>
+    <ModalFooter>
+      <Button variant="ghost" mr={3} onClick={onClose}>
+        Cancel
+      </Button>
+      <Button colorScheme="brand">Confirm</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+```
+
+## Component Examples
+
+### 1. Card Component
+```typescript
+// src/components/common/Card.tsx
+export const Card: React.FC<CardProps> = ({
+  children,
+  ...props
+}) => (
+  <Box
+    bg="bg.card"
+    borderRadius="lg"
+    boxShadow="sm"
+    p={4}
+    {...props}
+  >
+    {children}
+  </Box>
+);
+```
+
+### 2. Form Field Component
+```typescript
+// src/components/common/FormField.tsx
+export const FormField: React.FC<FormFieldProps> = ({
+  label,
+  error,
+  children,
+  ...props
+}) => (
+  <FormControl isInvalid={!!error} {...props}>
+    <FormLabel>{label}</FormLabel>
+    {children}
+    {error && <FormErrorMessage>{error}</FormErrorMessage>}
+  </FormControl>
+);
+```
+
+## Best Practices
+
+1. **Component Structure**
+   - Use Chakra's base components (`Box`, `Stack`, etc.)
+   - Extend with custom variants when needed
+   - Keep styling consistent with theme
+
+2. **Responsive Design**
+   - Use responsive values for all dimensions
+   - Test on multiple screen sizes
+   - Use `Stack` for vertical layouts
+
+3. **Accessibility**
+   - Use semantic HTML elements
+   - Include ARIA labels
+   - Maintain color contrast
+   - Support keyboard navigation
+
+4. **Performance**
+   - Use `memo` for pure components
+   - Avoid inline styles
+   - Use theme tokens for consistency
+
+5. **State Management**
+   - Use Chakra's built-in state hooks
+   - Combine with React Query for data
+   - Use context for theme changes
+
+## Common Gotchas
+
+1. **Theme Access**
+   ```typescript
+   // Use useTheme hook for dynamic theme access
+   const theme = useTheme();
+   const color = theme.colors.brand[500];
+   ```
+
+2. **Style Props**
+   ```typescript
+   // Use style props for one-off styles
+   <Box
+     bg="brand.500"
+     _hover={{ bg: 'brand.600' }}
+     _active={{ bg: 'brand.700' }}
+   >
+   ```
+
+3. **Responsive Values**
+   ```typescript
+   // Use array syntax for responsive values
+   <Box
+     p={[2, 4, 6]} // [base, md, lg]
+     fontSize={['sm', 'md', 'lg']}
+   >
+   ```
+
+## Testing
+
+```typescript
+// src/test-utils/render.tsx
+export function render(ui: React.ReactElement) {
+  return rtlRender(
+    <ChakraProvider theme={theme}>
+      {ui}
+    </ChakraProvider>
+  );
+}
+
+// Usage in tests
+test('renders button', () => {
+  render(<Button>Click me</Button>);
+  expect(screen.getByText('Click me')).toBeInTheDocument();
+});
+```

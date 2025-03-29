@@ -29,7 +29,7 @@ export const POST = validate(validateQRSchema, async (req: Request) => {
     const classRecord = await prisma.class.findFirst({
       where: {
         id: decodedData.classId,
-        organisationId: session.user.organisationId,
+        organizationId: session.user.organizationId,
       },
     });
 

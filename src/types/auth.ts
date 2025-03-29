@@ -31,7 +31,7 @@ export interface RolePermissions {
 export interface UserRole {
   userId: string;
   role: Role;
-  organisationId: string;
+  organizationId: string;
 }
 
 export interface SessionUser {
@@ -40,7 +40,7 @@ export interface SessionUser {
   name: string;
   role: Role;
   permissions: Permission[];
-  organisationId: string;
+  organizationId: string;
 }
 
 export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
@@ -81,7 +81,7 @@ export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
       'manage:visitors',
       'manage:communications',
     ],
-    description: 'Organisation-level administrative access',
+    description: 'Organization-level administrative access',
   },
   manager: {
     role: 'manager',

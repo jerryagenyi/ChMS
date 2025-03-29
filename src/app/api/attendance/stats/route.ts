@@ -31,7 +31,7 @@ export const GET = validate(statsSchema, async (req: Request) => {
 
     // Build where clause
     const where = {
-      organisationId: session.user.organisationId,
+      organizationId: session.user.organizationId,
       date: {
         gte: startDate,
         lte: endDate,

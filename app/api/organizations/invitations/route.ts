@@ -15,10 +15,10 @@ export async function POST(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organisation: true }
+      include: { organization: true }
     })
 
-    if (!user?.organisation || user.role !== "ADMIN") {
+    if (!user?.organization || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         email,
         role,
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        organisationId: user.organisationId!
+        organizationId: user.organizationId!
       }
     })
 
@@ -55,16 +55,16 @@ export async function GET(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organisation: true }
+      include: { organization: true }
     })
 
-    if (!user?.organisation || user.role !== "ADMIN") {
+    if (!user?.organization || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const invitations = await prisma.invitation.findMany({
       where: { 
-        organisationId: user.organisationId,
+        organizationId: user.organizationId,
         used: false,
         expires: { gt: new Date() }
       }

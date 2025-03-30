@@ -1,0 +1,437 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  departments Department[]
+  teams       Team[]
+  users       User[]
+  invitations Invitation[]
+  settings    OrganizationSettings?
+  members     Member[]
+  visitors    Visitor[]
+  services    Service[]
+  classes     Class[]
+  metrics     Metric[]
+  reports     Report[]
+  attendance  Attendance[]
+  events      Event[]
+  touchpoints OrganizationTouchpoint[]
+}
+
+model Department {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  teams        Team[]
+}
+
+model Team {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  departmentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department   Department @relation(fields: [departmentId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  members      MemberTeam[]
+}
+
+model Class {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  startDate      DateTime?
+  endDate        DateTime?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  sessions     ClassSession[]
+  members      MemberClass[]
+  attendance   Attendance[]
+}
+
+model ClassSession {
+  id          String    @id @default(cuid())
+  classId     String
+  date        DateTime
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  class       Class     @relation(fields: [classId], references: [id])
+  attendance  Attendance[]
+}
+
+model Member {
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  email         String?   @unique
+  phone         String?
+  dateOfBirth   DateTime?
+  conversionDate DateTime?
+  baptismDate   DateTime?
+  weddingDate   DateTime?
+  organizationId String
+  familyId      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  family       Family?     @relation(fields: [familyId], references: [id])
+  teams        MemberTeam[]
+  classes      MemberClass[]
+  attendance   Attendance[]
+  gifts        MemberGift[]
+  skills       MemberSkill[]
+  eventRegistrations EventRegistration[]
+}
+
+model Family {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members   Member[]
+}
+
+model Visitor {
+  id              String    @id @default(cuid())
+  organizationId  String
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String?
+  source          String?   // How they found the church
+  interests       String[]  // Areas of interest
+  prayerRequests  String[]  // Prayer needs
+  visitDate       DateTime  @default(now())
+  followUpDate    DateTime?
+  status          String    @default("NEW") // NEW, CONTACTED, CONVERTED
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  eventRegistrations EventRegistration[]
+  touchpoints     VisitorTouchpoint[]
+
+  @@index([organizationId])
+}
+
+model Gift {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     MemberGift[]
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     MemberSkill[]
+}
+
+model MemberTeam {
+  memberId    String
+  teamId      String
+  role        String?
+  joinedAt    DateTime @default(now())
+
+  member      Member    @relation(fields: [memberId], references: [id])
+  team        Team      @relation(fields: [teamId], references: [id])
+
+  @@id([memberId, teamId])
+}
+
+model MemberClass {
+  memberId    String
+  classId     String
+  status      String    @default("ENROLLED") // ENROLLED, COMPLETED, DROPPED
+  enrolledAt  DateTime @default(now())
+  completedAt DateTime?
+
+  member      Member    @relation(fields: [memberId], references: [id])
+  class       Class     @relation(fields: [classId], references: [id])
+
+  @@id([memberId, classId])
+}
+
+model MemberGift {
+  memberId    String
+  giftId      String
+  confirmedAt DateTime @default(now())
+
+  member      Member    @relation(fields: [memberId], references: [id])
+  gift        Gift      @relation(fields: [giftId], references: [id])
+
+  @@id([memberId, giftId])
+}
+
+model MemberSkill {
+  memberId    String
+  skillId     String
+  level       String    @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
+  confirmedAt DateTime @default(now())
+
+  member      Member    @relation(fields: [memberId], references: [id])
+  skill       Skill     @relation(fields: [skillId], references: [id])
+
+  @@id([memberId, skillId])
+}
+
+model Attendance {
+  id             String    @id @default(cuid())
+  organizationId String
+  memberId       String
+  serviceId      String?
+  classId        String?
+  classSessionId String?
+  date           DateTime  @default(now())
+  status         String    @default("PRESENT") // PRESENT, ABSENT, LATE
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  member         Member       @relation(fields: [memberId], references: [id])
+  service        Service?     @relation(fields: [serviceId], references: [id])
+  class          Class?       @relation(fields: [classId], references: [id])
+  classSession   ClassSession? @relation(fields: [classSessionId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type             String
+  provider         String
+  providerAccountId String
+  refresh_token    String? @db.Text
+  access_token     String? @db.Text
+  expires_at       Int?
+  token_type       String?
+  scope            String?
+  id_token         String? @db.Text
+  session_state    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(MEMBER)
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Invitation {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  token         String   @unique
+  expiresAt     DateTime
+  organizationId String
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  startTime   DateTime
+  endTime     DateTime?
+  status      String   @default("SCHEDULED") // SCHEDULED, ACTIVE, COMPLETED
+  organizationId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  attendance   Attendance[]
+}
+
+model OrganizationSettings {
+  id              String   @id @default(cuid())
+  organizationId  String   @unique
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Brand Colours
+  primaryColor    String   @default("#000000")
+  secondaryColor  String   @default("#666666")
+  backgroundColor  String   @default("#FFFFFF")
+  accentColor     String   @default("#F5F5F5")
+  
+  // Localization
+  language        String   @default("en")
+  currency        String   @default("GBP")
+  timezone        String   @default("Europe/London")
+  
+  // Additional Settings
+  logoUrl         String?
+  faviconUrl      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Event {
+  id             String    @id @default(cuid())
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime?
+  venue          String?
+  capacity       Int?
+  isPublic       Boolean  @default(true)
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  registrations  EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  guestType String   // MEMBER, VISITOR
+  status    String   @default("REGISTERED") // REGISTERED, ATTENDED, NO_SHOW
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id])
+  member    Member?  @relation(fields: [memberId], references: [id])
+  memberId  String?
+  visitor   Visitor? @relation(fields: [visitorId], references: [id])
+  visitorId String?
+}
+
+model Metric {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String   // ATTENDANCE, VISITOR, MEMBER, EVENT, FINANCIAL
+  name           String   // e.g., "total_attendance", "visitor_conversion_rate"
+  value          Float
+  date           DateTime
+  metadata       Json?    // Additional context data
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([type, date])
+}
+
+model Report {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  type           String   // ATTENDANCE, VISITOR, MEMBER, EVENT, FINANCIAL
+  parameters     Json     // Report configuration
+  schedule       String?  // DAILY, WEEKLY, MONTHLY, or cron expression
+  lastRun        DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  snapshots      ReportSnapshot[]
+}
+
+model ReportSnapshot {
+  id        String   @id @default(cuid())
+  reportId  String
+  data      Json     // Report data
+  createdAt DateTime @default(now())
+
+  report    Report   @relation(fields: [reportId], references: [id])
+}
+
+model OrganizationTouchpoint {
+  id             String       @id @default(cuid())
+  organizationId String
+  type           String       // e.g., "SOCIAL_MEDIA", "EVENT", etc.
+  source         String       // e.g., "FACEBOOK", "INSTAGRAM", etc.
+  label          String       // Display label
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  touchpoints    VisitorTouchpoint[]
+
+  @@unique([organizationId, type, source])
+  @@index([organizationId])
+}
+
+model VisitorTouchpoint {
+  id          String   @id @default(cuid())
+  visitorId   String
+  organizationId String
+  touchpoint  String   // e.g., "SOCIAL_MEDIA", "EVENT", etc.
+  source      String?  // e.g., "FACEBOOK", "INSTAGRAM", etc.
+  createdAt   DateTime @default(now())
+  visitor     Visitor  @relation(fields: [visitorId], references: [id])
+  organizationTouchpoint OrganizationTouchpoint? @relation(fields: [organizationId, touchpoint, source], references: [organizationId, type, source])
+
+  @@index([visitorId])
+  @@index([organizationId, touchpoint, source])
+}

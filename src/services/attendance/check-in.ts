@@ -1,21 +1,21 @@
 import { prisma } from '@/lib/prisma';
-
-export interface CheckInData {
-  memberId: string;
-  serviceId: string;
-  isFamily?: boolean;
-}
+import type { CheckInData } from '@/types/attendance';
+import { getCurrentOrganizationId } from '@/lib/organization';
 
 export async function checkInMember(data: CheckInData) {
   return await prisma.attendance.create({
     data: {
       memberId: data.memberId,
-      serviceId: data.serviceId,
-      isFamily: data.isFamily || false
+      classId: data.classId,
+      sessionId: data.sessionId,
+      checkedInAt: new Date(),
+      isFamily: data.isFamily || false,
+      organizationId: await getCurrentOrganizationId()
     },
     include: {
       member: true,
-      service: true
+      class: true,
+      session: true
     }
   });
 }

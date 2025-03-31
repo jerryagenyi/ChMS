@@ -1,0 +1,118 @@
+/* Profile Image Upload */
+.profile-image-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.profile-image-preview {
+  margin-bottom: var(--spacing-md);
+}
+
+.profile-image {
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.profile-image-upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.profile-image-input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--chakra-colors-gray-300);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+}
+
+.profile-image-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.1);
+}
+
+.profile-image-help-text {
+  font-size: 0.875rem;
+  color: var(--chakra-colors-gray-600);
+}
+
+.profile-image-upload-status {
+  color: var(--chakra-colors-gray-600);
+}
+
+/* Error Boundary */
+.error-boundary-container {
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.error-boundary-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.error-boundary-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--chakra-colors-gray-800);
+}
+
+.error-boundary-message {
+  color: var(--chakra-colors-gray-600);
+}
+
+.error-boundary-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.error-boundary-button:hover {
+  background: var(--chakra-colors-purple-600);
+}
+
+.error-boundary-button:disabled {
+  background: var(--chakra-colors-gray-400);
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.loading-state-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.loading-spinner {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 9999px;
+  border-bottom-width: 2px;
+  border-color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-left: var(--spacing-sm);
+  color: var(--chakra-colors-gray-600);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

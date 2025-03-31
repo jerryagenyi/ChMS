@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, VStack } from '@chakra-ui/react';
+import '@/styles/components/qr/QRCodeGenerator.css';
 import QRCode from 'qrcode';
 import { QRCodeGeneratorProps, QRCodeGeneratorState } from './types';
 
 export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   data,
   size = 256,
-  errorCorrectionLevel = 'M',
   includeDownload = true,
-  containerStyle,
-  qrStyle,
   onGenerated,
 }) => {
   const [state, setState] = useState<QRCodeGeneratorState>({
@@ -20,7 +18,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 
   useEffect(() => {
     generateQRCode();
-  }, [data, size, errorCorrectionLevel]);
+  }, [data, size]);
 
   const generateQRCode = async () => {
     try {
@@ -28,7 +26,6 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       const dataUrl = await QRCode.toDataURL(data, {
         width: size,
         margin: 1,
-        errorCorrectionLevel,
         color: {
           dark: '#000000',
           light: '#ffffff',
@@ -54,7 +51,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   };
 
   return (
-    <VStack spacing={4} style={containerStyle}>
+    <VStack className="qr-code-container">
       {state.isGenerating ? (
         <Text>Generating QR code...</Text>
       ) : state.error ? (
@@ -62,7 +59,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       ) : state.dataUrl ? (
         <>
           <Box
-            style={qrStyle}
+            className="qr-code-preview"
             as="img"
             src={state.dataUrl}
             alt="QR Code"
@@ -71,9 +68,9 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             borderRadius="md"
           />
           {includeDownload && (
-            <Button onClick={handleDownload} colorScheme="blue">
-              Download QR Code
-            </Button>
+            <div className="qr-code-actions">
+              <Button onClick={handleDownload}>Download</Button>
+            </div>
           )}
         </>
       ) : (

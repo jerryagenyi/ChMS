@@ -79,13 +79,13 @@ export interface SessionUser {
 }
 
 export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
-  super_admin: {
-    role: 'super_admin',
+  SUPER_ADMIN: {
+    role: Role.SUPER_ADMIN,
     permissions: [/* all permissions */],
     description: 'Full system access with all permissions',
   },
-  admin: {
-    role: 'admin',
+  ADMIN: {
+    role: Role.ADMIN,
     permissions: [
       'read:members', 'write:members',
       'read:attendance', 'write:attendance', 'manage:attendance',
@@ -100,8 +100,8 @@ export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
     ],
     description: 'Organization-level administrative access',
   },
-  manager: {
-    role: 'manager',
+  MANAGER: {
+    role: Role.MANAGER,
     permissions: [
       'read:members', 'write:members',
       'read:attendance', 'write:attendance',
@@ -114,8 +114,8 @@ export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
     ],
     description: 'Department/Ministry unit management access',
   },
-  staff: {
-    role: 'staff',
+  STAFF: {
+    role: Role.STAFF,
     permissions: [
       'read:members', 'write:members',
       'read:attendance', 'write:attendance',
@@ -128,8 +128,8 @@ export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
     ],
     description: 'Basic staff access for daily operations',
   },
-  viewer: {
-    role: 'viewer',
+  VIEWER: {
+    role: Role.VIEWER,
     permissions: [
       'read:members',
       'read:attendance',

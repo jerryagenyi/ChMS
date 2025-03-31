@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createUser, validateSession } from '@/lib/auth';
+import { createUser, validateSession } from '@/services/auth';
 import { prismaMock } from '@/tests/mocks/prisma';
 import { hash } from 'bcryptjs';
 import { Role } from '@prisma/client';

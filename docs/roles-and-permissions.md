@@ -3,6 +3,7 @@
 ## Role Hierarchy
 
 1. **Super Admin**
+
    - Full system access
    - Can manage all roles and permissions
    - Can create other super admins
@@ -10,6 +11,7 @@
    - Cannot be deleted through the interface
 
 2. **Admin**
+
    - Organization-level administrative access
    - Can manage users, roles, and permissions (except super admin)
    - Full access to all ministry management features
@@ -17,6 +19,7 @@
    - Cannot modify system settings
 
 3. **Manager**
+
    - Department/Ministry unit management
    - Can manage assigned ministry units
    - Can manage members and attendance
@@ -24,13 +27,23 @@
    - Cannot access system settings or audit logs
 
 4. **Staff**
+
    - Basic operational access
    - Can record attendance
    - Can view and update member information
    - Can view events and reports
    - Cannot modify system settings
 
-5. **Viewer**
+5. **Member**
+
+   - Basic member access
+   - Can view and update own profile
+   - Can view events and register
+   - Can submit attendance
+   - Can access member-specific features
+   - Cannot access administrative functions
+
+6. **Viewer**
    - Read-only access
    - Can view members, attendance, and events
    - Cannot modify any data
@@ -39,43 +52,72 @@
 ## Permission Categories
 
 ### Member Management
+
 - `read:members`: View member information
 - `write:members`: Create/update member records
 - `delete:members`: Remove member records
+- `manage:member_images`: Manage member profile images
+
+### Image Management
+
+- `upload:images`: Upload new images
+- `read:images`: View images
+- `process:images`: Apply image transformations
+- `delete:images`: Remove images
+- `manage:image_settings`: Configure image processing settings
 
 ### Attendance Management
+
 - `read:attendance`: View attendance records
 - `write:attendance`: Record attendance
 - `manage:attendance`: Modify/delete attendance records
 
 ### Event Management
+
 - `read:events`: View events
 - `write:events`: Create/update events
 - `manage:events`: Full event management including deletion
 
 ### Report Management
+
 - `read:reports`: View reports
 - `write:reports`: Create custom reports
 - `manage:reports`: Manage report templates and settings
 
 ### Settings & Configuration
+
 - `manage:settings`: Access to system settings
 - `manage:users`: User management
 - `manage:roles`: Role and permission management
+- `manage:storage`: Manage storage settings and quotas
 
 ### Ministry Units Management
+
 - `read:ministry_units`: View ministry units
 - `write:ministry_units`: Create/update ministry units
 - `manage:ministry_units`: Full ministry unit management
 
+## Role-Permission Matrix
+
+| Permission            | Super Admin | Admin | Manager | Staff | Viewer |
+| --------------------- | ----------- | ----- | ------- | ----- | ------ |
+| manage:member_images  | ✓           | ✓     | ✓       | -     | -      |
+| upload:images         | ✓           | ✓     | ✓       | ✓     | -      |
+| read:images           | ✓           | ✓     | ✓       | ✓     | ✓      |
+| process:images        | ✓           | ✓     | ✓       | -     | -      |
+| delete:images         | ✓           | ✓     | -       | -     | -      |
+| manage:image_settings | ✓           | -     | -       | -     | -      |
+
 ## Best Practices
 
 1. **Role Assignment**
+
    - Always use the principle of least privilege
    - Regularly review user roles and permissions
    - Document any role changes in the audit log
 
 2. **Permission Management**
+
    - Only super admins should modify system-level permissions
    - Keep audit logs of all permission changes
    - Regular backup of permission configurations
@@ -88,6 +130,7 @@
 ## Audit Logging
 
 All changes to roles and permissions are automatically logged with:
+
 - Who made the change
 - What was changed
 - When it was changed

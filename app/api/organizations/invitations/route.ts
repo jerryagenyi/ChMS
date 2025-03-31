@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authOptions } from "@/services/auth/auth-options"
 import { prisma } from "@/lib/prisma"
 import { nanoid } from 'nanoid'
 
@@ -15,10 +15,13 @@ export async function POST(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organization: true }
+      include: { 
+        organization: true,
+        permissions: true
+      }
     })
 
-    if (!user?.organization || user.role !== "ADMIN") {
+    if (!user?.organization || !user.permissions?.some(p => p.name === "ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -26,7 +29,7 @@ export async function POST(req: Request) {
 
     const invitation = await prisma.invitation.create({
       data: {
-        code: nanoid(8), // Generate 8-character unique code
+        token: nanoid(8), // Generate 8-character unique code
         email,
         role,
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
@@ -55,16 +58,19 @@ export async function GET(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organization: true }
+      include: { 
+        organization: true,
+        permissions: true
+      }
     })
 
-    if (!user?.organization || user.role !== "ADMIN") {
+    if (!user?.organization || !user.permissions?.some(p => p.name === "ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const invitations = await prisma.invitation.findMany({
       where: { 
-        organizationId: user.organizationId,
+        organizationId: user.organizationId!,
         used: false,
         expires: { gt: new Date() }
       }

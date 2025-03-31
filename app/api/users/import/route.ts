@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/services/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
@@ -27,10 +27,13 @@ export async function POST(req: Request) {
     // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { organization: true },
+      include: { 
+        organization: true,
+        permissions: true
+      }
     });
 
-    if (!user?.organization || user.role !== "ADMIN") {
+    if (!user?.organization || !user.permissions?.some(p => p.name === "ADMIN")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -71,7 +74,7 @@ export async function POST(req: Request) {
       } catch (error) {
         results.failed++;
         results.errors.push(
-          `Failed to import ${record.email}: ${error.message}`
+          `Failed to import ${record.email}: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
       }
     }

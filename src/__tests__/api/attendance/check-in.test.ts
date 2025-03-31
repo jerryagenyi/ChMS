@@ -3,7 +3,7 @@ import { createMocks } from 'node-mocks-http';
 import checkInHandler from '@/pages/api/attendance/check-in';
 import { prismaMock } from '@/tests/mocks/prisma';
 
-vi.mock('@/lib/auth', () => ({
+vi.mock('@/services/auth', () => ({
   validateSession: vi.fn(() => Promise.resolve({ userId: '1' }))
 }));
 

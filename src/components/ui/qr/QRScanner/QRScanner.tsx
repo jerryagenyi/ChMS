@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Button, Text, VStack } from '@chakra-ui/react';
-import { QRScannerProps, QRScannerState } from './types';
+import '@/styles/components/qr/QRScanner.css';
 
 export const QRScanner: React.FC<QRScannerProps> = ({
   onScan,
@@ -8,7 +8,6 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   isActive = true,
   errorMessage = 'Failed to access camera',
   showPreview = true,
-  containerStyle,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<QRScannerState>({
@@ -63,27 +62,12 @@ export const QRScanner: React.FC<QRScannerProps> = ({
   };
 
   return (
-    <VStack spacing={4} style={containerStyle}>
+    <VStack className="qr-scanner-container" spacing={4}>
       {showPreview && (
-        <Box position="relative" width="100%" maxWidth="400px">
-          <video
-            ref={handleVideoRef}
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '8px',
-              display: state.isScanning ? 'block' : 'none',
-            }}
-            playsInline
-          />
+        <Box className="qr-scanner-viewport">
+          <video ref={handleVideoRef} className="qr-scanner-video" playsInline />
           {!state.isScanning && (
-            <Box
-              position="absolute"
-              top="50%"
-              left="50%"
-              transform="translate(-50%, -50%)"
-              textAlign="center"
-            >
+            <Box className="qr-scanner-error">
               <Text>Camera not active</Text>
               <Button onClick={startScanning} mt={2}>
                 Start Scanning

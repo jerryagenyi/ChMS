@@ -1,0 +1,73 @@
+/* Global Styles */
+:root {
+  /* Colors */
+  --primary-color: var(--chakra-colors-purple-500);
+  --secondary-color: var(--chakra-colors-gray-500);
+
+  /* Spacing */
+  --spacing-xs: var(--chakra-space-1);
+  --spacing-sm: var(--chakra-space-2);
+  --spacing-md: var(--chakra-space-4);
+  --spacing-lg: var(--chakra-space-6);
+  --spacing-xl: var(--chakra-space-8);
+
+  /* Border Radius */
+  --radius-sm: var(--chakra-radii-sm);
+  --radius-md: var(--chakra-radii-md);
+  --radius-lg: var(--chakra-radii-lg);
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--chakra-fonts-body);
+  line-height: 1.5;
+  color: var(--chakra-colors-gray-800);
+  background: var(--chakra-colors-gray-50);
+}
+
+/* Common Utility Classes */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+/* Utility Classes */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

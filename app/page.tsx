@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import Link from 'next/link';
 
 export default function Home() {
-  redirect("/auth/signin");
+  return (
+    <div>
+      <h1>Welcome to ChMS</h1>
+      <Link href="/auth/signin">Sign In</Link>
+    </div>
+  );
 }

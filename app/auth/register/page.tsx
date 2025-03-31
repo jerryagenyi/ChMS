@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +22,7 @@ import {
   RadioGroup,
   VStack,
   Textarea,
+  Link as ChakraLink,
 } from '@chakra-ui/react';
 import { registerSchema, type RegisterFormData } from '@/lib/schemas/auth';
 
@@ -58,14 +57,29 @@ export default function Register() {
   const handleRegistration = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      // First create user
+      const fullName = data.middleName
+        ? `${data.firstName} ${data.middleName} ${data.lastName}`
+        : `${data.firstName} ${data.lastName}`;
+
       const userRes = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: data.name,
+          name: fullName,
           email: data.email,
           password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          middleName: data.middleName,
+          phoneNumber: data.phoneNumber,
+          address: data.address,
+          occupation: data.occupation,
+          dateOfBirth: data.dateOfBirth,
+          memorableDates: data.memorableDates,
+          organization: {
+            name: data.organization.name,
+            description: data.organization.description,
+          },
         }),
       });
 
@@ -73,7 +87,6 @@ export default function Register() {
         throw new Error('Registration failed');
       }
 
-      // If new organization, create it
       if (data.organization.type === 'new' && data.organization.name) {
         const orgRes = await fetch('/api/organizations', {
           method: 'POST',
@@ -89,7 +102,6 @@ export default function Register() {
         }
       }
 
-      // Sign in the user
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
@@ -103,7 +115,6 @@ export default function Register() {
       router.push('/dashboard');
     } catch (error) {
       console.error(error);
-      // Handle error appropriately
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +127,7 @@ export default function Register() {
           <CardBody>
             <Stack spacing={6}>
               <Stack spacing={2} textAlign="center">
-                <Heading size="lg" color="purple.700">
+                <Heading size="lg" color="pink.700">
                   Create an Account
                 </Heading>
                 <Text color="gray.600">Church Management System for Africa</Text>
@@ -124,21 +135,57 @@ export default function Register() {
 
               <form onSubmit={handleSubmit(handleRegistration)}>
                 <VStack spacing={4}>
-                  <FormControl isInvalid={!!errors.name}>
-                    <FormLabel>Name</FormLabel>
-                    <Input {...register('name')} />
-                    <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
+                  <Stack direction={{ base: 'column', sm: 'row' }} spacing={2} w="full">
+                    <FormControl isRequired isInvalid={!!errors.firstName}>
+                      <FormLabel>First Name</FormLabel>
+                      <Input
+                        {...register('firstName')}
+                        focusBorderColor="pink.400"
+                        placeholder="John"
+                      />
+                      <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.lastName}>
+                      <FormLabel>Last Name</FormLabel>
+                      <Input
+                        {...register('lastName')}
+                        focusBorderColor="pink.400"
+                        placeholder="Doe"
+                      />
+                      <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
+                    </FormControl>
+                  </Stack>
+
+                  <FormControl isInvalid={!!errors.middleName}>
+                    <FormLabel>
+                      Middle Name
+                      <Text as="span" fontSize="sm" color="gray.500" ml={1}>
+                        (Optional)
+                      </Text>
+                    </FormLabel>
+                    <Input
+                      {...register('middleName')}
+                      focusBorderColor="pink.400"
+                      placeholder="James"
+                    />
+                    <FormErrorMessage>{errors.middleName?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.email}>
                     <FormLabel>Email</FormLabel>
-                    <Input type="email" {...register('email')} />
+                    <Input
+                      type="email"
+                      {...register('email')}
+                      focusBorderColor="pink.400"
+                      placeholder="john.doe@example.com"
+                    />
                     <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.password}>
                     <FormLabel>Password</FormLabel>
-                    <Input type="password" {...register('password')} />
+                    <Input type="password" {...register('password')} focusBorderColor="pink.400" />
                     <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
                   </FormControl>
 
@@ -149,9 +196,17 @@ export default function Register() {
                       onChange={(value: 'new' | 'existing' | 'invited') => setOrgType(value)}
                     >
                       <Stack>
-                        <Radio value="new">Create new organization</Radio>
-                        <Radio value="existing">Join existing organization</Radio>
-                        {inviteCode && <Radio value="invited">Join via invitation</Radio>}
+                        <Radio value="new" colorScheme="pink">
+                          Create new organization
+                        </Radio>
+                        <Radio value="existing" colorScheme="pink">
+                          Join existing organization
+                        </Radio>
+                        {inviteCode && (
+                          <Radio value="invited" colorScheme="pink">
+                            Join via invitation
+                          </Radio>
+                        )}
                       </Stack>
                     </RadioGroup>
                   </FormControl>
@@ -161,8 +216,9 @@ export default function Register() {
                       <FormLabel>Invitation Code</FormLabel>
                       <Input
                         {...register('organization.inviteCode')}
-                        defaultValue={inviteCode}
+                        defaultValue={inviteCode || undefined}
                         isReadOnly
+                        focusBorderColor="pink.400"
                       />
                     </FormControl>
                   )}
@@ -171,19 +227,22 @@ export default function Register() {
                     <>
                       <FormControl isInvalid={!!errors.organization?.name}>
                         <FormLabel>Organization Name</FormLabel>
-                        <Input {...register('organization.name')} />
+                        <Input {...register('organization.name')} focusBorderColor="pink.400" />
                         <FormErrorMessage>{errors.organization?.name?.message}</FormErrorMessage>
                       </FormControl>
 
                       <FormControl>
                         <FormLabel>Description (Optional)</FormLabel>
-                        <Textarea {...register('organization.description')} />
+                        <Textarea
+                          {...register('organization.description')}
+                          focusBorderColor="pink.400"
+                        />
                       </FormControl>
                     </>
                   ) : (
                     <FormControl>
                       <FormLabel>Organization ID</FormLabel>
-                      <Input {...register('organization.id')} />
+                      <Input {...register('organization.id')} focusBorderColor="pink.400" />
                       <Text fontSize="sm" color="gray.500">
                         Ask your organization administrator for the ID
                       </Text>
@@ -192,7 +251,7 @@ export default function Register() {
 
                   <Button
                     type="submit"
-                    colorScheme="purple"
+                    colorScheme="pink"
                     size="lg"
                     width="full"
                     isLoading={isLoading}
@@ -204,9 +263,9 @@ export default function Register() {
 
               <Text textAlign="center">
                 Already have an account?{' '}
-                <Link href="/auth/signin" style={{ color: '#553C9A' }}>
+                <ChakraLink as={Link} href="/auth/signin" variant="auth">
                   Sign in
-                </Link>
+                </ChakraLink>
               </Text>
             </Stack>
           </CardBody>

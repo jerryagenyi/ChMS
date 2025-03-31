@@ -38,7 +38,8 @@ Security standards specifically tailored for our Church Management System (ChMS)
    - Church Admin (Organization level)
    - Ministry Leader (Ministry unit level)
    - Staff Member (Limited administrative access)
-   - Member (Basic access)
+   - Member (Basic member access)
+   - Viewer (Read-only access)
 
 2. Permission Sets
 
@@ -141,6 +142,82 @@ Security standards specifically tailored for our Church Management System (ChMS)
    - Secure donation data
    - Manage ministry assignments
    - Control access to pastoral notes
+
+## File Security
+
+### Image Upload Security
+
+1. Upload Validation
+
+   - File size limits (5MB max)
+   - Format validation (jpg, jpeg, png, webp only)
+   - MIME type verification
+   - Malware scanning
+   - Metadata stripping
+
+2. Storage Security
+
+   - Encrypted storage
+   - Secure file names
+   - Access control
+   - Temporary URL generation
+   - CDN security configuration
+
+3. Processing Security
+   - Sanitized processing pipeline
+   - Resource limits
+   - Timeout controls
+   - Error handling
+   - Audit logging
+
+### Access Control
+
+1. File Access
+
+   - Role-based access
+   - Temporary URLs
+   - Signed URLs
+   - Rate limiting
+   - Access logging
+
+2. Storage Management
+   - Quota system
+   - Clean-up policies
+   - Backup procedures
+   - Version control
+   - Audit trails
+
+## API Security
+
+### Endpoint Protection
+
+- Rate limiting
+- CORS configuration
+- Input validation
+- Output sanitization
+- Error handling
+
+### Authentication & Authorization
+
+[Previous auth sections remain unchanged]
+
+## Monitoring & Auditing
+
+### Security Monitoring
+
+- Failed login attempts
+- File access patterns
+- API usage patterns
+- Error rates
+- Resource usage
+
+### Audit Logging
+
+- User actions
+- System events
+- File operations
+- Permission changes
+- Configuration updates
 
 ## Security Monitoring
 

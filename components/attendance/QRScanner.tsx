@@ -1,5 +1,6 @@
 import { Box, Text, VStack, useToast } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
+import '@/styles/components/QRScanner.css';
 
 interface QRScannerProps {
   onScan: (data: string) => void;
@@ -14,10 +15,10 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' } 
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' },
         });
-        
+
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           setHasPermission(true);
@@ -60,23 +61,9 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
         overflow="hidden"
       >
         {hasPermission ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
+          <video className="qr-scanner-video" ref={videoRef} autoPlay playsInline />
         ) : (
-          <VStack
-            h="full"
-            justify="center"
-            p={4}
-            bg="gray.100"
-          >
+          <VStack h="full" justify="center" p={4} bg="gray.100">
             <Text textAlign="center" color="gray.600">
               Camera access required for QR scanning
             </Text>

@@ -1,23 +1,23 @@
 
 export const themeConfig = {
   colors: {
-    purple: {
-      50: '#F8F6FD',
-      100: '#E9E4F9',
-      200: '#D5CBF3',
-      300: '#BFB0ED',
-      400: '#A894E6',
-      500: '#8E75DF',
-      600: '#553C9A', // Primary purple
-      700: '#4C3690',
-      800: '#442F86',
-      900: '#382873',
+    pink: {
+      50: '#FFF5F7',
+      100: '#FED7E2',
+      200: '#FBB6CE',
+      300: '#F687B3',
+      400: '#ED64A6',
+      500: '#D53F8C',
+      600: '#B83280',
+      700: '#97266D',
+      800: '#702459',
+      900: '#521B41',
     },
   },
   components: {
     Button: {
       defaultProps: {
-        colorScheme: 'purple',
+        colorScheme: 'pink',
       },
     },
   },

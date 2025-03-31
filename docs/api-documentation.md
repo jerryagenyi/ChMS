@@ -10,6 +10,149 @@ headers: {
 }
 ```
 
+## API Endpoints
+
+### Member Management
+
+#### GET /api/members/[id]
+
+Retrieves member details including profile image information.
+
+**Response:**
+
+```typescript
+{
+  id: string;
+  name: string;
+  email: string;
+  profileImage: {
+    url: string;
+    thumbnailUrl: string;
+    originalName: string;
+    size: number;
+    format: string;
+    dimensions: {
+      width: number;
+      height: number;
+    }
+  }
+  // ... other member fields
+}
+```
+
+#### PUT /api/members/[id]
+
+Updates a member's details.
+
+**Request Body:**
+
+```typescript
+{
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  dateOfBirth?: string;
+  gender?: 'male' | 'female' | 'other';
+  maritalStatus?: 'single' | 'married' | 'divorced' | 'widowed';
+  profileImage?: File;  // multipart/form-data
+  // ... other fields
+}
+```
+
+### Image Management
+
+#### POST /api/images/upload
+
+Uploads and processes images.
+
+**Request:**
+
+- Content-Type: multipart/form-data
+- Max file size: 5MB
+- Supported formats: jpg, jpeg, png, webp
+
+**Response:**
+
+```typescript
+{
+  id: string;
+  url: string;
+  thumbnailUrl: string;
+  originalName: string;
+  size: number;
+  format: string;
+  dimensions: {
+    width: number;
+    height: number;
+  }
+}
+```
+
+#### GET /api/images/[id]
+
+Retrieves image details and URLs.
+
+#### DELETE /api/images/[id]
+
+Deletes an image and its derivatives.
+
+### Security Headers
+
+All API responses include:
+
+```typescript
+{
+  'Content-Security-Policy': string;
+  'X-Content-Type-Options': 'nosniff';
+  'X-Frame-Options': 'DENY';
+  'X-XSS-Protection': '1; mode=block';
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains';
+}
+```
+
+### Rate Limiting
+
+API routes are rate limited to prevent abuse. Specific limits per endpoint:
+
+### Authentication Endpoints
+
+- Registration: 100 requests per 15 minutes per IP
+- Login: 100 requests per 15 minutes per IP
+
+Rate limit headers are included in responses:
+
+```typescript
+{
+  'X-RateLimit-Limit': string;
+  'X-RateLimit-Remaining': string;
+  'X-RateLimit-Reset': string;
+}
+```
+
+When rate limit is exceeded, the endpoint returns:
+
+- Status: 429 Too Many Requests
+- Response: "Too many requests"
+
+### Implementation Details
+
+Rate limiting is implemented using `express-rate-limit` adapted for Next.js API routes. Configuration is centralized in `src/lib/rate-limit.ts` for consistent application across all endpoints.
+
+### Error Responses
+
+Standard error format:
+
+```typescript
+{
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  }
+}
+```
+
 ## Attendance Routes
 
 ### GET /api/attendance

@@ -94,6 +94,46 @@ This document defines our core development standards and best practices, emphasi
 - Implement error boundaries
 - Handle loading states
 
+### Image Handling Components
+
+1. Implementation Standards
+
+   - Use `ProfileImageUpload` for profile images
+   - Implement loading states
+   - Handle errors gracefully
+   - Show preview before upload
+   - Support drag and drop
+
+2. Image Processing
+
+   - Use Sharp for optimization
+   - Convert to WebP format
+   - Maintain aspect ratios
+   - Generate appropriate sizes
+   - Strip EXIF data
+
+3. Performance Requirements
+
+   - Lazy load images
+   - Use appropriate sizes
+   - Implement caching
+   - Use CDN delivery
+   - Monitor performance metrics
+
+4. Example Implementation:
+
+```typescript
+const ImageComponent = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error>();
+
+  // Include error boundary
+  // Include loading states
+  // Include accessibility attributes
+  // Include image optimization
+};
+```
+
 ### State Management
 
 - Use appropriate state management
@@ -139,13 +179,98 @@ This document defines our core development standards and best practices, emphasi
 
 ### Testing
 
-- Write unit tests
-- Write integration tests
-- Write E2E tests
+- Write comprehensive tests
+  - Unit tests (Target: 85%)
+    - P0 Components must have full coverage
+    - Image handling components
+    - Authentication flows
+    - Data operations
+  - Integration tests (Target: 75%)
+    - Critical flows
+    - API integration
+    - Image processing pipeline
+  - E2E tests (Target: 60%)
+    - Critical user journeys
+    - Image upload flows
+    - Authentication flows
 - Test edge cases
 - Test error scenarios
 - Test performance
 - Test accessibility
+- Maintain coverage requirements:
+  - P0 Features: 90%+
+  - P1 Features: 80%+
+  - P2 Features: 60%+
+
+### Component Standards
+
+1. Core Requirements
+
+   - TypeScript strict mode
+   - Proper error boundaries
+   - Loading states
+   - Accessibility compliance
+   - Performance optimization
+   - Comprehensive testing
+
+2. Image Components
+
+   - Use `ProfileImageUpload` for profile images
+   - Implement proper loading states:
+     - Upload progress
+     - Processing state
+     - Error state
+   - Handle validation:
+     - File size limits
+     - Format restrictions
+     - Dimension requirements
+   - Error handling:
+     - Upload failures
+     - Processing errors
+     - Network issues
+   - Accessibility features:
+     - ARIA labels
+     - Keyboard navigation
+     - Screen reader support
+
+3. Authentication Components
+
+   - Secure token handling
+   - Session management
+   - Permission validation
+   - Rate limiting
+   - Error handling
+   - Audit logging
+
+4. Data Components
+   - Validation implementation
+   - Error handling
+   - Data sanitization
+   - Performance optimization
+   - Cache management
+
+### Documentation Requirements
+
+1. Code Documentation
+
+   - API endpoints
+   - Component props
+   - Type definitions
+   - Error handling
+   - Performance considerations
+
+2. Test Documentation
+
+   - Test coverage reports
+   - Critical path documentation
+   - Integration patterns
+   - E2E guidelines
+
+3. Performance Documentation
+   - Optimization strategies
+   - Monitoring metrics
+   - Benchmark results
+   - Performance budgets
 
 ## Documentation
 
@@ -186,15 +311,34 @@ This document defines our core development standards and best practices, emphasi
 - Optimize bundle size
 - Implement code splitting
 - Optimize images
+  - Use WebP format with JPEG fallback
+  - Implement responsive sizes
+  - Quality optimization (80% quality standard)
+  - Strip EXIF data
+  - Maximum file size: 5MB
+  - Optimized size target: < 100KB
 - Implement caching
+  - CDN caching strategy
+  - Browser caching headers
+  - Cache invalidation rules
 - Optimize API calls
 - Optimize database queries
 - Monitor performance
+  - Image upload time: < 2s
+  - Processing time: < 1s
+  - CDN response time: < 100ms
+  - Cache hit rate: > 95%
 
 ### Monitoring
 
 - Set up error tracking
+  - Upload failures
+  - Processing errors
+  - Delivery issues
 - Monitor performance
+  - First Contentful Paint: < 1.5s
+  - Largest Contentful Paint: < 2s
+  - Time to Interactive: < 3s
 - Track user analytics
 - Monitor API usage
 - Track database performance
@@ -205,69 +349,122 @@ This document defines our core development standards and best practices, emphasi
 
 ### Authentication
 
-- Implement proper auth
-- Handle sessions
-- Implement 2FA
-- Handle password reset
+- Implement proper auth following security standards
+- Handle sessions securely
+- Implement 2FA where required
+- Handle password reset securely
 - Implement rate limiting
 - Handle token refresh
-- Secure sensitive data
+- Secure sensitive data storage
 
 ### Authorization
 
-- Implement RBAC
-- Handle permissions
+- Implement RBAC (Role-Based Access Control)
+- Handle permissions granularly
 - Secure API endpoints
-- Validate input
-- Sanitize output
-- Handle CSRF
-- Implement audit logs
+- Validate all input
+- Sanitize all output
+- Handle CSRF protection
+- Implement comprehensive audit logs
 
-## Accessibility
+### Image Security
 
-### Standards
-
-- Follow WCAG guidelines
-- Implement ARIA attributes
-- Ensure keyboard navigation
-- Test with screen readers
-- Check color contrast
-- Handle focus management
-- Test with assistive tech
-
-### User Experience
-
-- Design for all users
-- Handle error states
-- Provide feedback
-- Ensure responsiveness
-- Optimize for mobile
-- Handle offline mode
-- Test with different devices
+- Validate uploads
+  - File size limits (5MB max)
+  - Format validation (jpg, jpeg, png, webp only)
+  - MIME type verification
+  - Malware scanning
+  - Metadata stripping
+- Secure storage
+  - Encrypted storage
+  - Secure file names
+  - Access control
+  - Temporary URL generation
+  - CDN security configuration
+- Processing security
+  - Sanitized processing pipeline
+  - Resource limits
+  - Timeout controls
+  - Error handling
+  - Audit logging
 
 ## Deployment
 
 ### Process
 
-- Set up CI/CD
-- Configure environments
+- Set up CI/CD pipeline
+- Configure deployment environments
 - Handle database migrations
-- Implement rollbacks
-- Monitor deployments
-- Handle secrets
-- Document process
+- Implement rollback procedures
+- Monitor deployment health
+- Secure secrets management
+- Document deployment process
 
-### Environment
+### Environment Configuration
 
-- Set up development
-- Set up staging
-- Set up production
-- Configure monitoring
-- Set up logging
-- Configure backups
-- Document setup
+- Development environment setup
+- Staging environment configuration
+- Production environment hardening
+- Monitoring implementation
+- Logging configuration
+- Backup procedures
+- Environment documentation
+
+### Image Processing Pipeline
+
+- Configure image optimization service
+- Set up CDN distribution
+- Implement caching strategy
+- Configure backup storage
+- Monitor processing performance
+- Handle failure scenarios
+- Document recovery procedures
+
+## Maintenance
+
+### Regular Audits
+
+- Security vulnerability checks
+- Performance optimization review
+- Dependency updates
+- Code quality assessment
+- Test coverage verification
+- Documentation updates
+- Accessibility compliance check
+
+### Monitoring
+
+- System health metrics
+- Performance benchmarks
+- Security alerts
+- Error tracking
+- User analytics
+- Resource utilization
+- Cost optimization
+
+### Disaster Recovery
+
+- Backup procedures
+- Data recovery process
+- System restoration
+- Business continuity
+- Incident response
+- Documentation maintenance
+- Regular testing
 
 ## Resources
+
+### Internal Documentation
+
+- Architecture overview
+- Component library
+- API documentation
+- Security guidelines
+- Testing procedures
+- Deployment guides
+- Troubleshooting guides
+
+### External References
 
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/basic-types.html)
 - [React Documentation](https://react.dev/)
@@ -278,36 +475,81 @@ This document defines our core development standards and best practices, emphasi
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Database Schema Best Practices](https://www.prisma.io/dataguide)
 
-## Security Integration
+## Version Control
 
-All development must follow the security standards defined in `docs/security-standards.md`:
+### Git Standards
 
-1. Authentication
+- Use feature branches
+- Write meaningful commit messages
+- Keep commits atomic
+- Review code before merging
+- Update documentation
+- Run tests before committing
+- Follow branching strategy
 
-   - Implement RBAC as specified
-   - Follow session management guidelines
-   - Implement proper token handling
+### Code Review Process
 
-2. Data Protection
-   - Follow encryption standards
-   - Implement proper data sanitization
-   - Handle sensitive data appropriately
+- Security review
+- Performance review
+- Accessibility review
+- Test coverage verification
+- Documentation review
+- Dependencies review
+- Standards compliance check
 
-## Performance Targets
+## Quality Assurance
 
-1. Page Load Performance
+### Code Quality
 
-   - First Contentful Paint: < 1.5s
-   - Time to Interactive: < 2s
-   - Total Bundle Size: < 200KB (initial load)
+- Maintain TypeScript strict mode
+- Follow ESLint rules
+- Implement proper error handling
+- Write comprehensive tests
+- Document complex logic
+- Optimize performance
+- Follow accessibility guidelines
 
-2. Runtime Performance
+### Testing Strategy
 
-   - API Response Time: < 200ms
-   - Animation Frame Rate: > 55fps
-   - Memory Usage: < 50MB
+- Unit testing (85% coverage)
+- Integration testing (75% coverage)
+- E2E testing (60% coverage)
+- Performance testing
+- Security testing
+- Accessibility testing
+- Cross-browser testing
 
-3. Offline Capability
-   - Core features functional offline
-   - Efficient data synchronization
-   - Minimal storage usage
+## Styling Standards
+
+### CSS Organization
+
+- All component styles are maintained in `src/styles/components/`
+- Use kebab-case for CSS file names (e.g., `qr-scanner.css`)
+- Group related styles in logical files
+- Import all component styles through `src/styles/components/index.css`
+- Use Chakra UI for primary styling; CSS files only for custom needs
+- Follow component-specific styling pattern:
+
+  ```css
+  .component-name {
+    /* Base styles */
+  }
+
+  .component-name-element {
+    /* Element-specific styles */
+  }
+  ```
+
+### Style Import Pattern
+
+- Import styles at the component level
+- Use absolute imports with `@/styles/components/` prefix
+- Keep style imports as the first import in component files
+
+### CSS Best Practices
+
+- Use Chakra UI theme tokens for consistency
+- Minimize custom CSS overrides
+- Maintain responsive design principles
+- Follow BEM-like naming convention
+- Keep selectors flat and specific

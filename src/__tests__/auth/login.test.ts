@@ -1,6 +1,6 @@
-import { loginUser } from '@/lib/auth';
+import { loginUser } from '@/services/auth';
 
-jest.mock('@/lib/auth', () => ({
+jest.mock('@/services/auth', () => ({
   loginUser: jest.fn()
 }));
 

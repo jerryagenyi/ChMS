@@ -30,26 +30,30 @@ import type { IconType } from 'react-icons';
 import { HiPlus, HiCalendar, HiUserGroup, HiChartBar } from 'react-icons/hi';
 import Dialog from '@/components/Dialog';
 
-interface IconProps {
+interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   className?: string;
 }
 
-const PlusIcon = (props: IconProps): JSX.Element => (
-  <HiPlus role="img" aria-hidden="true" {...props} />
-);
+const PlusIcon = (props: IconProps) => {
+  const Icon = HiPlus as React.FC<IconProps>;
+  return <Icon {...props} />;
+};
 
-const CalendarIcon = (props: IconProps): JSX.Element => (
-  <HiCalendar role="img" aria-hidden="true" {...props} />
-);
+const CalendarIcon = (props: IconProps) => {
+  const Icon = HiCalendar as React.FC<IconProps>;
+  return <Icon role="img" aria-hidden="true" {...props} />;
+};
 
-const UsersIcon = (props: IconProps): JSX.Element => (
-  <HiUserGroup role="img" aria-hidden="true" {...props} />
-);
+const UsersIcon = (props: IconProps) => {
+  const Icon = HiUserGroup as React.FC<IconProps>;
+  return <Icon role="img" aria-hidden="true" {...props} />;
+};
 
-const ChartIcon = (props: IconProps): JSX.Element => (
-  <HiChartBar role="img" aria-hidden="true" {...props} />
-);
+const ChartIcon = (props: IconProps) => {
+  const Icon = HiChartBar as React.FC<IconProps>;
+  return <Icon role="img" aria-hidden="true" {...props} />;
+};
 
 interface DashboardStats {
   totalMembers: number;

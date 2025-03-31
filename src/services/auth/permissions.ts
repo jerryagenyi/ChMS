@@ -1,4 +1,5 @@
-import { Permission, Role, ROLE_PERMISSIONS } from '../../types/auth';
+import { prisma } from '@/lib/prisma';
+import { Permission, Role, ROLE_PERMISSIONS } from '@/types/auth';
 
 export class PermissionChecker {
   private permissions: Permission[];
@@ -28,7 +29,11 @@ export function checkPermission(userRole: Role, permission: Permission): boolean
   return ROLE_PERMISSIONS[userRole].permissions.includes(permission);
 }
 
-export function checkPermissions(userRole: Role, permissions: Permission[], requireAll: boolean = false): boolean {
+export function checkPermissions(
+  userRole: Role, 
+  permissions: Permission[], 
+  requireAll: boolean = false
+): boolean {
   if (requireAll) {
     return permissions.every(permission => checkPermission(userRole, permission));
   }
@@ -41,4 +46,15 @@ export function getRolePermissions(role: Role): Permission[] {
 
 export function getRoleDescription(role: Role): string {
   return ROLE_PERMISSIONS[role].description;
-} 
+}
+
+// New function for checking permissions directly with userId
+export async function hasUserPermission(userId: string, permission: Permission): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true }
+  });
+
+  if (!user) return false;
+  return checkPermission(user.role as Role, permission);
+}

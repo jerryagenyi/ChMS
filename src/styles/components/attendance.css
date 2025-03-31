@@ -1,0 +1,57 @@
+/* Attendance Form Styles */
+.attendance-form-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+.attendance-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.attendance-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.attendance-form-label {
+  font-weight: 500;
+  color: var(--chakra-colors-gray-700);
+}
+
+.attendance-form-input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--chakra-colors-gray-300);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+}
+
+.attendance-form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.1);
+}
+
+.attendance-form-submit {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.attendance-form-submit:hover {
+  background: var(--chakra-colors-purple-600);
+}
+
+.attendance-form-submit:disabled {
+  background: var(--chakra-colors-gray-400);
+  cursor: not-allowed;
+}

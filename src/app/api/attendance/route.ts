@@ -3,7 +3,7 @@ import { validate } from '@/middleware/validate';
 import { createAttendanceSchema } from '@/lib/validation/schemas';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '@/services/auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 

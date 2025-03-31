@@ -115,30 +115,34 @@ Located in `src/components/attendance/`:
 
 ## 4. Process Flow
 
-### 4.1 Member Check-in Process
+### 4.1 Member Check-in Process (Updated)
 
 1. **Initial Access**:
 
    ```
-   Visit church.africa/[org-name] → Sign In → Member Dashboard
+   Visit [church-name].church.africa → Sign In → Member Dashboard
    ```
 
-2. **Member Dashboard**:
+2. **Member Dashboard** (Updated Features):
 
    - View personal details
    - Edit profile information
    - Access QR code
    - View attendance history
+   - Family check-in management
+   - Offline mode indicator
    - Sign out option
 
-3. **Check-in Options**:
+3. **Check-in Options** (Updated Flow):
 
    ```
    Member Dashboard
    ├── QR Code Scan (Mobile)
-   │   └── Camera Activation → Scan → Location Selection → Confirm
-   └── Manual Check-in (Desktop)
-       └── Form Fill → Location Selection → Submit
+   │   └── Camera Activation → Scan → Location Verification → Confirm
+   ├── Manual Check-in (Desktop)
+   │   └── Form Fill → Location Verification → Submit
+   └── Family Check-in
+       └── Select Members → Choose Method → Confirm
    ```
 
 4. **Location Selection**:
@@ -259,7 +263,7 @@ Remember: The system is designed to be flexible - if one method doesn't work, th
 
 Need more help? Feel free to ask! We're here to make this easy for you. 🚀
 
-## 8. Domain Management
+## 8. Domain Management (Updated)
 
 ### 8.1 Domain Structure
 

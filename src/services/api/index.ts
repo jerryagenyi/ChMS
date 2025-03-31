@@ -30,4 +30,29 @@ export const api = {
     getCurrent: () => get<Organization>('/organization/current'),
     update: (data: OrganizationUpdate) => put<Organization>('/organization', data),
   },
+
+  // Data sharing endpoints
+  share: {
+    export: {
+      attendance: (params: ExportParams) => get<ExportData>('/share/export/attendance', params),
+      services: (params: ExportParams) => get<ExportData>('/share/export/services', params),
+      members: (params: ExportParams) => get<ExportData>('/share/export/members', params),
+    },
+    import: {
+      attendance: (data: ImportData) => post<ImportResult>('/share/import/attendance', data),
+      services: (data: ImportData) => post<ImportResult>('/share/import/services', data),
+      members: (data: ImportData) => post<ImportResult>('/share/import/members', data),
+    },
+    apiKeys: {
+      create: (data: ApiKeyCreate) => post<ApiKey>('/share/integrations/api-keys', data),
+      list: () => get<ApiKey[]>('/share/integrations/api-keys'),
+      revoke: (id: string) => del<void>(`/share/integrations/api-keys/${id}`),
+    },
+    webhooks: {
+      register: (data: WebhookRegistration) => post<Webhook>('/share/integrations/webhooks', data),
+      list: () => get<Webhook[]>('/share/integrations/webhooks'),
+      update: (id: string, data: WebhookUpdate) => put<Webhook>(`/share/integrations/webhooks/${id}`, data),
+      delete: (id: string) => del<void>(`/share/integrations/webhooks/${id}`),
+    },
+  },
 }; 

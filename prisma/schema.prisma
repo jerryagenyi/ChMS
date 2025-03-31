@@ -61,7 +61,7 @@ model Class {
 }
 
 model ClassSession {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   classId     String
   date        DateTime
   notes       String?
@@ -69,7 +69,7 @@ model ClassSession {
   updatedAt   DateTime  @updatedAt
 
   class       Class     @relation(fields: [classId], references: [id])
-  attendance  Attendance[]
+  attendances Attendance[] @relation("ClassSessionAttendance")
 }
 
 model Member {
@@ -123,23 +123,25 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendances  Attendance[]
 }
 
 model User {
-  id            String      @id @default(cuid())
-  email         String      @unique
-  name          String?
-  password      String?
-  role          Role        @default(VIEWER)
-  emailVerified DateTime?
-  permissions   Permission[]
-  
-  // Add these relation fields
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  organizationId String?
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String?
+  password          String
+  verificationToken String?
+  emailVerified     DateTime?
+  dateOfBirth       DateTime?
+  memorableDates    Json?
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  organizationId    String?
   accounts       Account[]
   sessions       Session[]
   classInstructor ClassInstructor[]
+  auditLogs     AuditLog[]
+  permissions      Permission[]
 }
 
 model Permission {
@@ -156,6 +158,7 @@ enum Role {
   ADMIN
   MANAGER
   STAFF
+  MEMBER    // Make sure this is added
   VIEWER
 }
 
@@ -255,6 +258,7 @@ model Invitation {
   expires        DateTime
   token          String   @unique
   createdAt      DateTime @default(now())
+  used           Boolean  @default(false)
 
   organization   Organization @relation(fields: [organizationId], references: [id])
 }
@@ -305,19 +309,28 @@ model Report {
 }
 
 model Attendance {
-  id             String   @id @default(cuid())
-  memberId       String
-  classId        String?
-  sessionId      String?
-  organizationId String
-  date           DateTime
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String    @id @default(cuid())
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id])
+  classId         String?
+  class           Class?    @relation(fields: [classId], references: [id])
+  sessionId       String?
+  session         Session?  @relation(fields: [sessionId], references: [id])
+  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
+  classSessionId  String?
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  checkedInAt     DateTime  @default(now())
+  checkedOutAt    DateTime?
+  isFamily        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  member         Member       @relation(fields: [memberId], references: [id])
-  class          Class?       @relation(fields: [classId], references: [id])
-  session        ClassSession? @relation(fields: [sessionId], references: [id])
+  @@index([memberId])
+  @@index([classId])
+  @@index([sessionId])
+  @@index([organizationId])
+  @@index([classSessionId])
 }
 
 model Event {
@@ -411,4 +424,17 @@ model MinistryUnitMember {
   @@unique([ministryUnitId, memberId])
   @@index([ministryUnitId])
   @@index([memberId])
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  entityType  String    // e.g., "attendance", "member"
+  entityId    String
+  action      String    // "CREATE", "UPDATE", "DELETE"
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  changes     Json
+  timestamp   DateTime  @default(now())
+  metadata    Json?
+  @@index([userId])
 }

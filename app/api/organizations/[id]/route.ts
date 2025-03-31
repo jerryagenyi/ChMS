@@ -1,7 +1,8 @@
+
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authOptions } from "@/services/auth/auth-options"
 
 // Get specific organization
 export async function GET(
@@ -27,8 +28,7 @@ export async function GET(
         }
       },
       include: {
-        departments: true,
-        teams: true,
+        ministryUnits: true
       }
     })
 
@@ -67,8 +67,16 @@ export async function PATCH(
     const user = await prisma.user.findFirst({
       where: {
         email: session.user.email,
-        organizationId: params.id,
-        role: "ADMIN"
+        organization: {
+          id: params.id
+        },
+        permissions: {
+          some: {
+            name: {
+              in: ["SUPER_ADMIN", "ADMIN"]
+            }
+          }
+        }
       }
     })
 

@@ -1,6 +1,32 @@
+
 import { prisma } from '@/lib/prisma';
-import { Role, Permission, ROLE_PERMISSIONS } from '@/types/auth';
+import { Permission, ROLE_PERMISSIONS } from '@/types/auth';
 import { AuthorizationError } from '@/lib/errors';
+import { Role } from '@prisma/client';
+
+export const ROLE_HIERARCHY: Record<Role, number> = {
+  SUPER_ADMIN: 100,
+  ADMIN: 90,
+  MANAGER: 80,
+  STAFF: 70,
+  MEMBER: 60,
+  VIEWER: 50,
+};
+
+export function isRoleAtLeast(userRole: Role, requiredRole: Role): boolean {
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+}
+
+export function canManageRole(userRole: Role, targetRole: Role): boolean {
+  // Users can only manage roles lower than their own
+  return ROLE_HIERARCHY[userRole] > ROLE_HIERARCHY[targetRole];
+}
+
+export function getManageableRoles(userRole: Role): Role[] {
+  return Object.entries(ROLE_HIERARCHY)
+    .filter(([_, value]) => value < ROLE_HIERARCHY[userRole])
+    .map(([role]) => role as Role);
+}
 
 export async function assignRole(userId: string, role: Role, assignedBy: string) {
   // Check if assigner has permission to assign roles

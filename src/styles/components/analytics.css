@@ -1,0 +1,105 @@
+/* Analytics Dashboard */
+.analytics-dashboard {
+  padding: var(--spacing-md);
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.analytics-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--chakra-colors-gray-800);
+}
+
+.analytics-time-select {
+  width: 200px;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Metric Card */
+.metric-card {
+  padding: var(--spacing-lg);
+  background: var(--chakra-colors-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.metric-card-title {
+  font-size: 0.875rem;
+  color: var(--chakra-colors-gray-600);
+  margin-bottom: var(--spacing-sm);
+}
+
+.metric-card-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.metric-card-change {
+  font-size: 0.875rem;
+}
+
+.metric-card-change--positive {
+  color: var(--chakra-colors-green-500);
+}
+
+.metric-card-change--negative {
+  color: var(--chakra-colors-red-500);
+}
+
+.metric-card-description {
+  font-size: 0.875rem;
+  color: var(--chakra-colors-gray-600);
+  margin-top: var(--spacing-sm);
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.chart-card {
+  padding: var(--spacing-lg);
+  background: var(--chakra-colors-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.chart-container {
+  height: 300px;
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .metric-card,
+[data-theme='dark'] .chart-card {
+  background: var(--chakra-colors-gray-700);
+}
+
+[data-theme='dark'] .metric-card-title,
+[data-theme='dark'] .metric-card-description {
+  color: var(--chakra-colors-gray-200);
+}
+
+[data-theme='dark'] .metric-card-value {
+  color: var(--chakra-colors-white);
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Heading, Text, Select, Flex, useColorModeValue } from '@chakra-ui/react';
+import { Box, Grid, Heading, Text, Select, Flex, FormControl, FormLabel } from '@chakra-ui/react';
 import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -35,28 +35,19 @@ interface MetricCardProps {
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, description }) => {
-  const bgColor = useColorModeValue('white', 'gray.700');
-  const textColor = useColorModeValue('gray.600', 'gray.200');
-  const changeColor = change && change > 0 ? 'green.500' : 'red.500';
+  const changeClass =
+    change && change > 0 ? 'metric-card-change--positive' : 'metric-card-change--negative';
 
   return (
-    <Box p={6} bg={bgColor} borderRadius="lg" boxShadow="sm">
-      <Text fontSize="sm" color={textColor} mb={2}>
-        {title}
-      </Text>
-      <Heading size="lg" mb={2}>
-        {value}
-      </Heading>
+    <Box className="metric-card">
+      <Text className="metric-card-title">{title}</Text>
+      <Heading className="metric-card-value">{value}</Heading>
       {change && (
-        <Text fontSize="sm" color={changeColor}>
+        <Text className={`metric-card-change ${changeClass}`}>
           {change > 0 ? '↑' : '↓'} {Math.abs(change)}%
         </Text>
       )}
-      {description && (
-        <Text fontSize="sm" color={textColor} mt={2}>
-          {description}
-        </Text>
-      )}
+      {description && <Text className="metric-card-description">{description}</Text>}
     </Box>
   );
 };
@@ -118,25 +109,29 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   };
 
   return (
-    <Box p={4}>
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="lg">Analytics Dashboard</Heading>
-        <Select
-          w="200px"
-          value={timeRange}
-          onChange={e => {
-            // Handle time range change
-          }}
-          aria-label="Select time range"
-        >
-          <option value="day">Last 24 Hours</option>
-          <option value="week">Last 7 Days</option>
-          <option value="month">Last 30 Days</option>
-          <option value="year">Last 12 Months</option>
-        </Select>
+    <Box className="analytics-dashboard">
+      <Flex className="analytics-header">
+        <Heading className="analytics-title">Analytics Dashboard</Heading>
+        <FormControl width="200px">
+          <FormLabel htmlFor="time-range-select">Time Range</FormLabel>
+          <Select
+            id="time-range-select"
+            className="analytics-time-select"
+            value={timeRange}
+            onChange={e => {
+              // Handle time range change
+            }}
+            aria-label="Select time range for analytics"
+          >
+            <option value="day">Last 24 Hours</option>
+            <option value="week">Last 7 Days</option>
+            <option value="month">Last 30 Days</option>
+            <option value="year">Last 12 Months</option>
+          </Select>
+        </FormControl>
       </Flex>
 
-      <Grid templateColumns="repeat(4, 1fr)" gap={6} mb={8}>
+      <Grid className="analytics-grid">
         <MetricCard
           title="Total Attendance"
           value={analytics?.totals?.attendance || 0}
@@ -163,12 +158,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         />
       </Grid>
 
-      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-        <Box p={6} bg={useColorModeValue('white', 'gray.700')} borderRadius="lg" boxShadow="sm">
-          <Heading size="md" mb={4}>
-            Attendance Trends
-          </Heading>
-          <Box h="300px">
+      <Grid className="charts-grid">
+        <Box className="chart-card">
+          <Heading className="chart-title">Attendance Trends</Heading>
+          <Box className="chart-container">
             <Line
               data={attendanceData}
               options={{
@@ -184,11 +177,9 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           </Box>
         </Box>
 
-        <Box p={6} bg={useColorModeValue('white', 'gray.700')} borderRadius="lg" boxShadow="sm">
-          <Heading size="md" mb={4}>
-            Visitor Statistics
-          </Heading>
-          <Box h="300px">
+        <Box className="chart-card">
+          <Heading className="chart-title">Visitor Statistics</Heading>
+          <Box className="chart-container">
             <Bar
               data={visitorData}
               options={{

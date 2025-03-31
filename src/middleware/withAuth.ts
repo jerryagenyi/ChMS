@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { Permission, Role } from '../types/auth';
-import { hasPermission } from '../services/auth/roles';
+import { Permission, Role } from '@/types/auth';
+import { checkPermissions } from '@/services/auth/permissions';
 import { AuthenticationError, AuthorizationError, AppError } from '@/lib/errors';
-import { logger } from '../lib/logger';
+import { logger } from '@/lib/logger';
 
 interface AuthOptions {
   requiredPermissions?: Permission[];
@@ -21,7 +21,6 @@ export function withAuth(options: AuthOptions = {}) {
           throw new AuthenticationError();
         }
 
-        const userId = session.user.id;
         const userRole = session.user.role as Role;
 
         // Check if user's role is allowed
@@ -31,15 +30,11 @@ export function withAuth(options: AuthOptions = {}) {
 
         // Check if user has required permissions
         if (options.requiredPermissions) {
-          const permissionChecks = await Promise.all(
-            options.requiredPermissions.map(permission => 
-              hasPermission(userId, permission)
-            )
+          const hasRequiredPermissions = checkPermissions(
+            userRole,
+            options.requiredPermissions,
+            options.requireAllPermissions
           );
-
-          const hasRequiredPermissions = options.requireAllPermissions
-            ? permissionChecks.every(Boolean)
-            : permissionChecks.some(Boolean);
 
           if (!hasRequiredPermissions) {
             throw new AuthorizationError('You do not have permission to perform this action');

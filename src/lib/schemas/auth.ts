@@ -1,3 +1,4 @@
+
 import { z } from "zod"
 
 export const socialMediaSchema = z.object({
@@ -12,8 +13,16 @@ export const socialMediaSchema = z.object({
 }).partial();
 
 export const registerSchema = z.object({
-  // Personal Information
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  firstName: z.string()
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name must be less than 50 characters"),
+  lastName: z.string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name must be less than 50 characters"),
+  middleName: z.string()
+    .min(2, "Middle name must be at least 2 characters")
+    .max(50, "Middle name must be less than 50 characters")
+    .optional(),
   email: z.string().email("Invalid email address"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
@@ -22,8 +31,6 @@ export const registerSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
   phoneNumber: z.string()
     .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"),
-  
-  // Additional Information
   address: z.object({
     street: z.string(),
     city: z.string(),
@@ -41,21 +48,15 @@ export const registerSchema = z.object({
     "RETIRED",
     "OTHER"
   ]),
-  
-  // Optional Information
   dateOfBirth: z.date().optional(),
   memorableDates: z.object({
     weddingAnniversary: z.date().optional(),
     baptismDate: z.date().optional(),
     conversionDate: z.date().optional(),
   }).optional(),
-  
-  // Social Media Profiles
   socialMedia: socialMediaSchema,
-
-  // Organization Information
   organization: z.object({
-    type: z.enum(["new", "existing"]),
+    type: z.enum(["new", "existing", "invited"]),
     id: z.string().optional(),
     inviteCode: z.string().optional(),
     name: z.string().optional(),

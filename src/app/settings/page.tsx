@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth-options';
+import { authOptions } from '@/services/auth-options';
 import { prisma } from '@/lib/prisma';
 import SettingsForm from '@/components/settings/SettingsForm';
 

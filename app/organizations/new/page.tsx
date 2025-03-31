@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Container, Heading, Text, VStack, Skeleton } from '@chakra-ui/react';
-import OrganizationForm from '@/components/organizations/OrganizationForm';
+import OrganizationForm from '@/components/features/organization/OrganizationForm';
 
 export default function NewOrganizationPage() {
   return (

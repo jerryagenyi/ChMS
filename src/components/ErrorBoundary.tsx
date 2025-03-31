@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
-import { AppError } from "../lib/errors";
+import React from 'react';
+import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
+import { AppError } from '../lib/errors';
 
 interface Props {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to error reporting service
-    console.error("Error caught by boundary:", error, errorInfo);
+    console.error('Error caught by boundary:', error, errorInfo);
   }
 
   render() {
@@ -36,14 +36,15 @@ export class ErrorBoundary extends React.Component<Props, State> {
       const errorMessage =
         this.state.error instanceof AppError
           ? this.state.error.message
-          : "An unexpected error occurred";
+          : 'An unexpected error occurred';
 
       return (
-        <Box p={8} textAlign="center">
-          <VStack spacing={4}>
-            <Heading size="lg">Something went wrong</Heading>
-            <Text>{errorMessage}</Text>
+        <Box className="error-boundary-container">
+          <VStack className="error-boundary-content">
+            <Heading className="error-boundary-heading">Something went wrong</Heading>
+            <Text className="error-boundary-message">{errorMessage}</Text>
             <Button
+              className="error-boundary-button"
               onClick={() => {
                 this.setState({ hasError: false, error: null });
                 window.location.reload();

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { authOptions } from "@/services/auth/auth-options"
 
 export async function POST(req: Request) {
   try {
@@ -35,10 +35,14 @@ export async function POST(req: Request) {
 
       // Update the user to be an admin of this organization
       await tx.user.update({
-        where: { email: session.user.email },
+        where: { email: session.user.email! },
         data: {
-          role: "ADMIN",
           organizationId: organization.id,
+          permissions: {
+            create: {
+              name: "ADMIN"
+            }
+          }
         },
       })
 
@@ -71,7 +75,11 @@ export async function GET(req: Request) {
         users: {
           some: {
             email: session.user.email,
-            role: "ADMIN"
+            permissions: {
+              some: {
+                name: "ADMIN"
+              }
+            }
           }
         }
       }

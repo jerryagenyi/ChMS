@@ -3,11 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from './auth-options';
 import { hash } from 'bcryptjs';
 import { Role } from '@prisma/client';
-import { prisma } from './prisma';
-import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import { logger } from './logger';
-import { DatabaseError } from './errors';
+import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
+import { DatabaseError } from '@/lib/errors';
 
 interface CreateUserData {
   email: string;
@@ -38,64 +36,54 @@ export async function createUser(data: CreateUserData) {
 }
 
 export async function validateSession(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(req, res, authOptions);
   return session;
 }
 
-const authOptions: NextAuthOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
-  callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === 'google') {
-        try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
-          });
+export async function verifyEmail(token: string) {
+  const user = await prisma.user.findFirst({
+    where: { verificationToken: token }
+  });
 
-          if (!existingUser) {
-            // Create new user
-            await prisma.user.create({
-              data: {
-                email: user.email!,
-                name: user.name || undefined,
-                image: user.image || undefined,
-                organizationId: process.env.DEFAULT_OrganizatioN_ID!,
-              },
-            });
-          }
-        } catch (error) {
-          logger.error('Failed to handle user sign in', new DatabaseError('Failed to create user', error));
-          return false;
-        }
-      }
-      return true;
-    },
-    async session({ session, user }) {
-      if (session.user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: session.user.email! },
-        });
+  if (!user) {
+    throw new Error('Invalid verification token');
+  }
 
-        if (dbUser) {
-          session.user.id = dbUser.id;
-          session.user.organizationId = dbUser.organizationId;
-        }
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-  },
-  session: {
-    strategy: 'jwt',
-  },
-};
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      emailVerified: new Date(),
+      verificationToken: null
+    }
+  });
 
-export { authOptions }; 
+  return user;
+}
+
+export async function enable2FA(userId: string, method: string = 'email') {
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      twoFactorEnabled: true,
+      twoFactorMethod: method,
+      backupCodes: generateBackupCodes() // Implement this helper
+    }
+  });
+}
+
+export async function verify2FACode(userId: string, code: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+
+  if (!user?.twoFactorEnabled) {
+    return true; // 2FA not required
+  }
+
+  // Implement verification logic based on method
+  if (user.twoFactorMethod === 'email') {
+    return verifyEmailCode(user, code);
+  }
+
+  return false;
+}

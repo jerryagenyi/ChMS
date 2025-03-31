@@ -3,7 +3,7 @@ import { validate } from '@/middleware/validate';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '@/services/auth';
 import { logger } from '@/lib/logger';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 

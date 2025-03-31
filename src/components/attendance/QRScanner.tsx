@@ -1,27 +1,17 @@
-import { useState } from 'react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  VStack,
-  Text,
-  useToast,
-  Box,
-} from '@chakra-ui/react';
-import { Scanner } from '@yudiel/react-qr-scanner';
-import { useRouter } from 'next/navigation';
+import { Box, Text, VStack } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
+import '@/styles/components/QRScanner.css';
 
 interface QRScannerProps {
-  isOpen: boolean;
-  onClose: () => void;
+  onScan: (qrData: string) => void;
+  onError: (error: string) => void;
 }
 
-export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
+const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
+  const [hasPermission, setHasPermission] = useState(false);
   const [isScanning, setIsScanning] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const toast = useToast();
   const router = useRouter();
 
@@ -78,39 +68,23 @@ export default function QRScanner({ isOpen, onClose }: QRScannerProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Scan Attendance QR Code</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <VStack spacing={4}>
-            <Box position="relative" width="100%" height="300px">
-              {isScanning ? (
-                <Scanner
-                  onScan={handleScan}
-                  onError={handleError}
-                  constraints={{
-                    facingMode: 'environment',
-                  }}
-                  paused={!isScanning || isValidating}
-                />
-              ) : (
-                <Box
-                  width="100%"
-                  height="100%"
-                  bg="gray.100"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text>Scanner paused</Text>
-                </Box>
-              )}
-            </Box>
+    <VStack className="qr-scanner-container" spacing={4}>
+      <Text fontSize="lg" fontWeight="medium">
+        Scan Service QR Code
+      </Text>
+      <Box data-testid="qr-scanner-viewport" className="qr-scanner-viewport">
+        {hasPermission ? (
+          <video className="qr-scanner-video" ref={videoRef} autoPlay playsInline />
+        ) : (
+          <VStack className="qr-scanner-error">
+            <Text textAlign="center" color="gray.600">
+              Camera access required for QR scanning
+            </Text>
           </VStack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+        )}
+      </Box>
+    </VStack>
   );
-}
+};
+
+export default QRScanner;

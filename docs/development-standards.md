@@ -179,28 +179,24 @@ const ImageComponent = () => {
 
 ### Testing
 
-- Write comprehensive tests
+- Write comprehensive tests (see testing-standards.md for detailed requirements)
   - Unit tests (Target: 85%)
-    - P0 Components must have full coverage
-    - Image handling components
-    - Authentication flows
-    - Data operations
   - Integration tests (Target: 75%)
-    - Critical flows
-    - API integration
-    - Image processing pipeline
   - E2E tests (Target: 60%)
-    - Critical user journeys
-    - Image upload flows
-    - Authentication flows
-- Test edge cases
-- Test error scenarios
-- Test performance
-- Test accessibility
-- Maintain coverage requirements:
-  - P0 Features: 90%+
-  - P1 Features: 80%+
-  - P2 Features: 60%+
+  - Coverage requirements by priority:
+    - P0 Features: 90%+
+    - P1 Features: 80%+
+    - P2 Features: 60%+
+
+### UI Standards
+
+- Use Chakra UI v3 exclusively for styling
+  - No Tailwind CSS
+  - No inline styles unless absolutely necessary
+  - Follow Chakra UI best practices
+- Use react-icons exclusively for icons
+  - No Chakra UI icons
+  - Follow consistent icon naming conventions
 
 ### Component Standards
 
@@ -553,3 +549,69 @@ const ImageComponent = () => {
 - Maintain responsive design principles
 - Follow BEM-like naming convention
 - Keep selectors flat and specific
+
+## Security Practices
+
+### Environment Variables
+
+1. Validation
+
+   ```typescript
+   // Use the envSchema from @/config/security.ts
+   validateEnv();
+   ```
+
+2. Usage
+   - Never use non-null assertions (!) with env vars
+   - Always validate at startup
+   - Use centralized security constants
+
+### Authentication & Authorization
+
+1. Password Handling
+
+   ```typescript
+   // Use the security utilities
+   import { hashPassword, verifyPassword } from '@/lib/security';
+
+   // Hashing
+   const hashedPassword = await hashPassword(password);
+
+   // Verification
+   const isValid = await verifyPassword(password, hashedPassword);
+   ```
+
+2. Token Management
+
+   ```typescript
+   import { generateVerificationToken, verifyEmailVerificationToken } from '@/services/auth/tokens';
+
+   // Generate token
+   const token = generateVerificationToken();
+
+   // Verify token
+   const userId = verifyEmailVerificationToken(token);
+   ```
+
+### Error Handling
+
+Use predefined security messages:
+
+```typescript
+import { SECURITY_MESSAGES } from '@/config/security';
+
+throw new Error(SECURITY_MESSAGES.INVALID_TOKEN);
+```
+
+### Security Headers
+
+Apply security headers to all API routes:
+
+```typescript
+import { SECURITY_HEADERS } from '@/config/security';
+
+// In API route
+return new Response(data, {
+  headers: SECURITY_HEADERS,
+});
+```

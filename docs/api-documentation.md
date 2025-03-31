@@ -1,5 +1,45 @@
 # API Documentation
 
+## Security Configuration
+
+### Environment Variables
+
+Required environment variables for API functionality:
+
+```typescript
+NEXTAUTH_SECRET=<min 32 characters>
+GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
+RECAPTCHA_SECRET_KEY=<your-recaptcha-secret>
+DATABASE_URL=<your-database-url>
+```
+
+### Rate Limiting
+
+All API routes are protected by rate limiting:
+
+- 100 requests per 15 minutes per IP
+- Headers included in responses:
+  - `X-RateLimit-Limit`
+  - `X-RateLimit-Remaining`
+  - `X-RateLimit-Reset`
+
+### Security Headers
+
+All API responses include the following security headers:
+
+```typescript
+{
+  'Content-Security-Policy': "default-src 'self'...",
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+}
+```
+
 ## Authentication
 
 All API routes require authentication using NextAuth.js. Include the session token in the request headers:
@@ -97,59 +137,15 @@ Retrieves image details and URLs.
 
 Deletes an image and its derivatives.
 
-### Security Headers
-
-All API responses include:
-
-```typescript
-{
-  'Content-Security-Policy': string;
-  'X-Content-Type-Options': 'nosniff';
-  'X-Frame-Options': 'DENY';
-  'X-XSS-Protection': '1; mode=block';
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains';
-}
-```
-
-### Rate Limiting
-
-API routes are rate limited to prevent abuse. Specific limits per endpoint:
-
-### Authentication Endpoints
-
-- Registration: 100 requests per 15 minutes per IP
-- Login: 100 requests per 15 minutes per IP
-
-Rate limit headers are included in responses:
-
-```typescript
-{
-  'X-RateLimit-Limit': string;
-  'X-RateLimit-Remaining': string;
-  'X-RateLimit-Reset': string;
-}
-```
-
-When rate limit is exceeded, the endpoint returns:
-
-- Status: 429 Too Many Requests
-- Response: "Too many requests"
-
-### Implementation Details
-
-Rate limiting is implemented using `express-rate-limit` adapted for Next.js API routes. Configuration is centralized in `src/lib/rate-limit.ts` for consistent application across all endpoints.
-
 ### Error Responses
 
-Standard error format:
+Standard error responses follow this format:
 
 ```typescript
 {
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  }
+  error: string;  // One of the predefined SECURITY_MESSAGES
+  status: number; // HTTP status code
+  details?: any;  // Optional additional information
 }
 ```
 

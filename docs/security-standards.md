@@ -4,29 +4,72 @@
 
 Security standards specifically tailored for our Church Management System (ChMS), balancing robust security with performance requirements.
 
+## Configuration
+
+### Security Constants
+
+1. Environment Variables
+
+   - `NEXTAUTH_SECRET`: JWT signing key (min 32 chars)
+   - `GOOGLE_CLIENT_ID`: Google OAuth client ID
+   - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+   - `RECAPTCHA_SECRET_KEY`: reCAPTCHA secret key
+   - `DATABASE_URL`: Database connection string
+
+2. Security Constants
+
+   ```typescript
+   export const SECURITY_CONSTANTS = {
+     PASSWORD_HASH_ROUNDS: 12,
+     VERIFICATION_TOKEN_BYTES: 32,
+     SESSION_MAX_AGE: 24 * 60 * 60, // 24 hours in seconds
+     TOKEN_EXPIRY: '24h',
+     RATE_LIMIT: {
+       MAX_REQUESTS: 100,
+       WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+     },
+     RECAPTCHA: {
+       SCORE_THRESHOLD: 0.5,
+     },
+   };
+   ```
+
+3. Security Headers
+   ```typescript
+   export const SECURITY_HEADERS = {
+     'Content-Security-Policy': "default-src 'self'...",
+     'X-Content-Type-Options': 'nosniff',
+     'X-Frame-Options': 'DENY',
+     'X-XSS-Protection': '1; mode=block',
+     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+     'Referrer-Policy': 'strict-origin-when-cross-origin',
+     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+   };
+   ```
+
 ## Authentication
 
 ### User Authentication Implementation
 
 1. Secure Login
 
-   - Implement password-based authentication with email
-   - Use Argon2id for password hashing (balanced security/performance)
-   - Rate limit login attempts (max 5 attempts/5 minutes)
-   - Implement progressive security measures to maintain performance
+   - Use bcryptjs for password hashing (12 rounds)
+   - Rate limit login attempts (100 requests/15 minutes)
+   - Implement reCAPTCHA protection
+   - Validate environment variables at startup
 
 2. Session Management
 
-   - Use HttpOnly, Secure cookies for session tokens
-   - Implement sliding session expiration (2 hours default)
-   - Maintain session registry for concurrent login control
-   - Session data caching for performance optimization
+   - Use JWT strategy with NextAuth.js
+   - Session duration: 24 hours
+   - Secure token validation and expiry checks
+   - Environment-based configuration
 
-3. Multi-Factor Authentication
-   - Optional 2FA for administrative roles
-   - Support TOTP (Time-based One-Time Password)
-   - Fallback to email-based verification
-   - Cache 2FA verification status (5 minutes)
+3. Token Management
+   - Generate secure verification tokens (32 bytes)
+   - Implement password reset tokens
+   - Email verification tokens
+   - Proper error handling and logging
 
 ## Authorization
 
@@ -240,3 +283,45 @@ Security standards specifically tailored for our Church Management System (ChMS)
 - [GDPR Requirements](https://gdpr.eu/)
 - [Security Headers](https://securityheaders.com/)
 - [Web Security Guidelines](https://www.w3.org/Security/)
+
+## Development Integration
+
+### Security Implementation
+
+1. Type Safety
+
+   ```typescript
+   interface User {
+     id: string;
+     name: string | null;
+     email: string;
+     password: string | null;
+     role: string;
+     organizationId: string | null;
+     verificationToken: string | null;
+     emailVerified: Date | null;
+   }
+   ```
+
+2. Error Handling
+
+   ```typescript
+   export const SECURITY_MESSAGES = {
+     INVALID_TOKEN: 'Invalid or expired token',
+     UNAUTHORIZED: 'Unauthorized access',
+     RATE_LIMITED: 'Too many requests, please try again later',
+     INVALID_CREDENTIALS: 'Invalid credentials',
+     ACCOUNT_LOCKED: 'Account temporarily locked',
+   };
+   ```
+
+3. Environment Validation
+   ```typescript
+   export const envSchema = z.object({
+     NEXTAUTH_SECRET: z.string().min(32),
+     GOOGLE_CLIENT_ID: z.string(),
+     GOOGLE_CLIENT_SECRET: z.string(),
+     RECAPTCHA_SECRET_KEY: z.string(),
+     DATABASE_URL: z.string().url(),
+   });
+   ```

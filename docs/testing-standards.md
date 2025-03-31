@@ -234,3 +234,139 @@ export const renderWithProviders = (ui: React.ReactElement) => {
 - [MSW Documentation](https://mswjs.io/docs/)
 - [Testing Best Practices](https://testing-library.com/docs/guiding-principles)
 - [Performance Testing Guide](https://web.dev/performance-testing/)
+
+## Service Testing Standards
+
+### Service Test Structure
+
+1. **File Organization**
+
+```typescript
+// src/__tests__/services/[service-name]/[service-name].test.ts
+
+import { vi } from 'vitest';
+import { ServiceName } from '@/services/[service-name]';
+// Import dependencies and types
+
+describe('ServiceName', () => {
+  let service: ServiceName;
+
+  beforeEach(() => {
+    service = new ServiceName();
+    vi.clearAllMocks();
+  });
+
+  // Group tests by method
+  describe('methodName', () => {
+    // Individual test cases
+  });
+});
+```
+
+2. **Mock Patterns**
+
+```typescript
+// External Service Mocks
+type MockExternalClient = {
+  method: ReturnType<typeof vi.fn>;
+};
+
+vi.mock('external-package', () => ({
+  ExternalClient: vi.fn(() => ({
+    method: vi.fn(),
+  })),
+}));
+
+// Database Mocks
+type MockPrismaClient = {
+  model: {
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+  };
+};
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    model: {
+      create: vi.fn(),
+      // ... other methods
+    },
+  } as MockPrismaClient,
+}));
+```
+
+3. **Test Case Structure**
+
+```typescript
+test('should describe expected behavior', async () => {
+  // Arrange: Set up test data and mocks
+  const mockData = {
+    /* ... */
+  };
+  (dependency.method as any).mockResolvedValue(mockData);
+
+  // Act: Execute the service method
+  const result = await service.method(params);
+
+  // Assert: Verify the results
+  expect(dependency.method).toHaveBeenCalledWith(expectedParams);
+  expect(result).toEqual(expectedResult);
+});
+```
+
+### Coverage Requirements
+
+1. **Method Coverage**
+
+   - Happy path (successful execution)
+   - Error scenarios
+   - Edge cases
+   - Input validation
+   - Authorization checks
+
+2. **Error Handling**
+
+   - External service errors
+   - Database errors
+   - Validation errors
+   - Network errors
+   - Authorization errors
+
+3. **Data Operations**
+   - Create operations
+   - Read operations
+   - Update operations
+   - Delete operations
+   - Batch operations
+   - Data transformations
+
+### Best Practices
+
+1. **Mock Management**
+
+   - Clear mocks in beforeEach
+   - Type mock implementations
+   - Use consistent mock patterns
+   - Mock at module level
+
+2. **Test Isolation**
+
+   - Independent test cases
+   - No shared state
+   - Reset mocks between tests
+   - Clear test data
+
+3. **Error Testing**
+
+   - Test specific error messages
+   - Verify error types
+   - Check error propagation
+   - Test recovery scenarios
+
+4. **Performance**
+   - Fast test execution
+   - Efficient mock setup
+   - Minimal test duplication
+   - Clear test descriptions

@@ -508,12 +508,61 @@ const ImageComponent = () => {
 ### Testing Strategy
 
 - Unit testing (85% coverage)
-- Integration testing (75% coverage)
-- E2E testing (60% coverage)
-- Performance testing
-- Security testing
-- Accessibility testing
-- Cross-browser testing
+  - Service layer tests
+    - Mock external dependencies (Prisma, Sharp)
+    - Test error scenarios comprehensively
+    - Validate input/output types
+    - Test edge cases
+  - Component tests
+    - Test user interactions
+    - Validate accessibility
+    - Test loading states
+    - Test error states
+  - Integration testing (75% coverage)
+    - Test service integrations
+    - Test component interactions
+    - Test data flow
+    - Test error propagation
+  - E2E testing (60% coverage)
+    - Critical user flows
+    - Authentication flows
+    - Data persistence
+    - Error recovery
+
+### Service Testing Standards
+
+1. Mock External Dependencies
+
+   ```typescript
+   // Example: Mocking Prisma
+   const mockPrisma = {
+     member: {
+       findUnique: vi.fn(),
+       create: vi.fn(),
+       update: vi.fn(),
+     },
+   };
+   ```
+
+2. Error Handling Coverage
+
+   ```typescript
+   describe('error scenarios', () => {
+     it('handles database errors', async () => {
+       mockPrisma.member.findUnique.mockRejectedValue(new Error('DB Error'));
+       await expect(service.findMember('123')).rejects.toThrow('DB Error');
+     });
+   });
+   ```
+
+3. Input Validation
+   ```typescript
+   describe('input validation', () => {
+     it('validates required fields', async () => {
+       await expect(service.createMember({})).rejects.toThrow('Required fields missing');
+     });
+   });
+   ```
 
 ## Styling Standards
 
@@ -571,13 +620,13 @@ const ImageComponent = () => {
 1. Password Handling
 
    ```typescript
-   // Use the security utilities
-   import { hashPassword, verifyPassword } from '@/lib/security';
+   // Use the server-side auth utilities
+   import { hashPassword, verifyPassword } from '@/lib/server/auth';
 
-   // Hashing
+   // In an API route or server component:
    const hashedPassword = await hashPassword(password);
 
-   // Verification
+   // Later, to verify:
    const isValid = await verifyPassword(password, hashedPassword);
    ```
 

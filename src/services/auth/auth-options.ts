@@ -3,7 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword } from "@/lib/security";
+import { verifyPassword } from "@/lib/server/auth";
 import { SECURITY_CONSTANTS, SECURITY_MESSAGES } from "@/config/security";
 import { Role } from "@prisma/client";
 

@@ -17,9 +17,13 @@ import {
   Switch,
   FormControl,
   FormLabel,
+  InputGroup,
+  InputLeftElement,
+  Icon,
 } from '@chakra-ui/react';
+import type { IconType } from 'react-icons';
 import { HiSearch, HiRefresh } from 'react-icons/hi';
-import { ServiceSelectorProps, ServiceSelectorState, ServiceFilters } from './types';
+import { ServiceSelectorProps, ServiceSelectorState, ServiceFilters, Service } from './types';
 
 export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
   services,
@@ -83,7 +87,10 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
       if (state.filters.type && service.type !== state.filters.type) {
         return false;
       }
-      if (state.filters.date && service.date !== state.filters.date) {
+      if (
+        state.filters.date &&
+        new Date(service.date).toISOString().split('T')[0] !== state.filters.date
+      ) {
         return false;
       }
       if (state.filters.isActive !== undefined && service.isActive !== state.filters.isActive) {
@@ -139,7 +146,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
         {onRefresh && (
           <IconButton
             aria-label="Refresh"
-            icon={<RefreshIcon />}
+            icon={<Icon as={HiRefresh} />}
             onClick={handleRefresh}
             isLoading={state.isRefreshing}
           />
@@ -147,11 +154,15 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
       </HStack>
 
       <HStack spacing={4}>
-        <Input
-          placeholder="Search services..."
-          leftElement={<SearchIcon color="gray.400" />}
-          onChange={e => handleFilterChange({ search: e.target.value })}
-        />
+        <InputGroup>
+          <InputLeftElement pointerEvents="none">
+            <Icon as={HiSearch as IconType} color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search services..."
+            onChange={e => handleFilterChange({ search: e.target.value })}
+          />
+        </InputGroup>
         <Select
           title="Service Type Filter"
           aria-label="Service Type Filter"

@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { MinistryUnitService } from '@/services/ministry/ministryUnit.service'
-import { createMockContext, mockMinistryUnit } from '../../utils/test-helpers'
+import { createMockContext, mockMinistryUnit } from '@/__tests__/utils/helpers'
 import { PrismaClient } from '@prisma/client'
 
 vi.mock('@/lib/prisma', () => {
-  const { createMockContext } = require('../../utils/test-helpers')
+  const { createMockContext } = require('@/__tests__/utils/helpers')
   return {
     prisma: createMockContext().prisma,
   }

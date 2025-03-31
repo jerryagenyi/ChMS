@@ -238,3 +238,52 @@ Common issues and solutions:
    - Check Sentry configuration
    - Review log levels
    - Ensure disk space for logs
+
+## Testing Requirements
+
+### Middleware Tests
+
+```typescript
+describe('Security Middleware', () => {
+  it('applies security headers', async () => {
+    const response = await fetch('/api/test');
+    expect(response.headers.get('Content-Security-Policy')).toBeDefined();
+    expect(response.headers.get('X-Frame-Options')).toBe('DENY');
+  });
+
+  it('enforces rate limiting', async () => {
+    // Make multiple requests
+    const responses = await Promise.all(
+      Array(101)
+        .fill(null)
+        .map(() => fetch('/api/test'))
+    );
+    expect(responses[100].status).toBe(429);
+  });
+
+  it('validates authentication', async () => {
+    const response = await fetch('/api/protected');
+    expect(response.status).toBe(401);
+  });
+});
+```
+
+### Integration Tests
+
+```typescript
+describe('Middleware Integration', () => {
+  it('integrates with authentication', async () => {
+    const response = await fetch('/api/protected', {
+      headers: { Authorization: 'Bearer invalid' },
+    });
+    expect(response.status).toBe(401);
+  });
+
+  it('integrates with error handling', async () => {
+    const response = await fetch('/api/error');
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBeDefined();
+  });
+});
+```

@@ -1,65 +1,195 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { render } from '@/tests/utils/test-utils';
-import CheckInForm from '@/components/attendance/CheckInForm';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { CheckInForm } from '@/components/features/attendance/CheckInForm/CheckInForm';
+import {
+  Service,
+  Location,
+  CheckInFormData,
+  CheckInFormProps,
+} from '@/components/features/attendance/CheckInForm/types';
 
-const mockMembers = [
-  { id: '1', name: 'John Doe' },
-  { id: '2', name: 'Jane Smith' },
-];
+// Mock Chakra UI toast
+vi.mock('@chakra-ui/react', async () => {
+  const actual = await vi.importActual('@chakra-ui/react');
+  return {
+    ...actual,
+    useToast: () => vi.fn(),
+  };
+});
 
-describe('CheckInForm Component', () => {
-  const mockOnSubmit = vi.fn();
+describe('CheckInForm', () => {
+  const mockServices: Service[] = [
+    { id: '1', name: 'Sunday Service', date: new Date('2024-03-17') },
+    { id: '2', name: 'Bible Study', date: new Date('2024-03-20') },
+  ];
+
+  const mockLocations: Location[] = [
+    { id: 'loc1', name: 'Main Hall', capacity: 200 },
+    { id: 'loc2', name: 'Chapel', capacity: 50 },
+  ];
+
+  const mockOnSubmit: CheckInFormProps['onSubmit'] = vi.fn().mockResolvedValue(undefined);
+
+  const defaultProps: CheckInFormProps = {
+    services: mockServices,
+    locations: mockLocations,
+    onSubmit: mockOnSubmit,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders form elements', () => {
-    render(<CheckInForm onSubmit={mockOnSubmit} members={mockMembers} />);
+  // 1. Form rendering
+  it('renders all form fields correctly', () => {
+    render(<CheckInForm {...defaultProps} />);
 
-    expect(screen.getByTestId('check-in-form')).toBeInTheDocument();
-    expect(screen.getByTestId('member-select')).toBeInTheDocument();
-    expect(screen.getByTestId('service-select')).toBeInTheDocument();
-    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
+    expect(screen.getByLabelText(/member id/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/location/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/notes/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /check in/i })).toBeInTheDocument();
   });
 
-  it('handles form submission', async () => {
-    render(<CheckInForm onSubmit={mockOnSubmit} members={mockMembers} />);
+  it('renders service options correctly', () => {
+    render(<CheckInForm {...defaultProps} />);
+    const serviceSelect = screen.getByLabelText(/service/i);
+    fireEvent.click(serviceSelect);
 
-    const memberSelect = screen.getByTestId('member-select');
-    const serviceSelect = screen.getByTestId('service-select');
-    const submitButton = screen.getByTestId('submit-button');
+    mockServices.forEach(service => {
+      const optionText = `${service.name} - ${new Date(service.date).toLocaleDateString()}`;
+      expect(screen.getByText(optionText)).toBeInTheDocument();
+    });
+  });
 
-    fireEvent.change(memberSelect, { target: { value: '1' } });
-    fireEvent.change(serviceSelect, { target: { value: '1' } });
-    fireEvent.click(submitButton);
+  it('renders location options correctly', () => {
+    render(<CheckInForm {...defaultProps} />);
+    const locationSelect = screen.getByLabelText(/location/i);
+    fireEvent.click(locationSelect);
+
+    mockLocations.forEach(location => {
+      const optionText = location.capacity
+        ? `${location.name} (Capacity: ${location.capacity})`
+        : location.name;
+      expect(screen.getByText(optionText)).toBeInTheDocument();
+    });
+  });
+
+  // 2. Form validation
+  it('shows validation errors for required fields when submitting empty form', async () => {
+    render(<CheckInForm {...defaultProps} />);
+
+    const submitButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(submitButton);
+
+    expect(await screen.findByText('Member ID is required')).toBeInTheDocument();
+    expect(await screen.findByText('Service is required')).toBeInTheDocument();
+    expect(await screen.findByText('Location is required')).toBeInTheDocument();
+  });
+
+  // 3. Form submission
+  it('calls onSubmit with correct data when form is valid', async () => {
+    render(<CheckInForm {...defaultProps} />);
+
+    await userEvent.type(screen.getByLabelText(/member id/i), 'MEMBER123');
+    await userEvent.selectOptions(screen.getByLabelText(/service/i), '1');
+    await userEvent.selectOptions(screen.getByLabelText(/location/i), 'loc1');
+    await userEvent.type(screen.getByLabelText(/notes/i), 'Test note');
+
+    const submitButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
-        memberId: '1',
+        memberId: 'MEMBER123',
         serviceId: '1',
+        location: 'loc1',
+        notes: 'Test note',
       });
     });
   });
 
-  it('disables submit button when form is invalid', () => {
-    render(<CheckInForm onSubmit={mockOnSubmit} members={mockMembers} />);
+  // 4. Loading states
+  it('disables form fields and shows loading state during submission', async () => {
+    const slowMockSubmit: CheckInFormProps['onSubmit'] = vi
+      .fn()
+      .mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+    render(<CheckInForm {...defaultProps} onSubmit={slowMockSubmit} />);
 
-    const submitButton = screen.getByTestId('submit-button');
-    expect(submitButton).toBeDisabled();
+    await userEvent.type(screen.getByLabelText(/member id/i), 'MEMBER123');
+    await userEvent.selectOptions(screen.getByLabelText(/service/i), '1');
+    await userEvent.selectOptions(screen.getByLabelText(/location/i), 'loc1');
+
+    const submitButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(submitButton);
+
+    expect(submitButton).toHaveAttribute('disabled');
+    expect(screen.getByLabelText(/member id/i)).toBeDisabled();
+    expect(screen.getByLabelText(/service/i)).toBeDisabled();
+    expect(screen.getByLabelText(/location/i)).toBeDisabled();
+    expect(screen.getByLabelText(/notes/i)).toBeDisabled();
+    expect(screen.getByText('Checking in...')).toBeInTheDocument();
   });
 
-  it('enables submit button when form is valid', () => {
-    render(<CheckInForm onSubmit={mockOnSubmit} members={mockMembers} />);
+  // 5. Error states
+  it('displays error message when submission fails', async () => {
+    const mockError = new Error('Failed to check in');
+    const failingMockSubmit: CheckInFormProps['onSubmit'] = vi.fn().mockRejectedValue(mockError);
+    render(<CheckInForm {...defaultProps} onSubmit={failingMockSubmit} />);
 
-    const memberSelect = screen.getByTestId('member-select');
-    const serviceSelect = screen.getByTestId('service-select');
+    await userEvent.type(screen.getByLabelText(/member id/i), 'MEMBER123');
+    await userEvent.selectOptions(screen.getByLabelText(/service/i), '1');
+    await userEvent.selectOptions(screen.getByLabelText(/location/i), 'loc1');
 
-    fireEvent.change(memberSelect, { target: { value: '1' } });
-    fireEvent.change(serviceSelect, { target: { value: '1' } });
+    const submitButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(submitButton);
 
-    const submitButton = screen.getByTestId('submit-button');
-    expect(submitButton).not.toBeDisabled();
+    expect(await screen.findByText(mockError.message)).toBeInTheDocument();
+  });
+
+  // 6. Success feedback
+  it('resets form after successful submission', async () => {
+    render(<CheckInForm {...defaultProps} />);
+
+    await userEvent.type(screen.getByLabelText(/member id/i), 'MEMBER123');
+    await userEvent.selectOptions(screen.getByLabelText(/service/i), '1');
+    await userEvent.selectOptions(screen.getByLabelText(/location/i), 'loc1');
+    await userEvent.type(screen.getByLabelText(/notes/i), 'Test note');
+
+    const submitButton = screen.getByRole('button', { name: /check in/i });
+    await userEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/member id/i)).toHaveValue('');
+      expect(screen.getByLabelText(/notes/i)).toHaveValue('');
+    });
+  });
+
+  // 7. Props handling
+  it('handles disabled state correctly', () => {
+    render(<CheckInForm {...defaultProps} isDisabled={true} />);
+
+    expect(screen.getByLabelText(/member id/i)).toBeDisabled();
+    expect(screen.getByLabelText(/service/i)).toBeDisabled();
+    expect(screen.getByLabelText(/location/i)).toBeDisabled();
+    expect(screen.getByLabelText(/notes/i)).toBeDisabled();
+    expect(screen.getByRole('button', { name: /check in/i })).toBeDisabled();
+  });
+
+  it('applies default values correctly', () => {
+    const defaultValues = {
+      memberId: 'DEFAULT123',
+      serviceId: '1',
+      location: 'loc1',
+      notes: 'Default note',
+    };
+
+    render(<CheckInForm {...defaultProps} defaultValues={defaultValues} />);
+
+    expect(screen.getByLabelText(/member id/i)).toHaveValue(defaultValues.memberId);
+    expect(screen.getByLabelText(/service/i)).toHaveValue(defaultValues.serviceId);
+    expect(screen.getByLabelText(/location/i)).toHaveValue(defaultValues.location);
+    expect(screen.getByLabelText(/notes/i)).toHaveValue(defaultValues.notes);
   });
 });

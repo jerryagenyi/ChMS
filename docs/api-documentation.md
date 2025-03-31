@@ -770,3 +770,53 @@ Rate limit headers are included in responses:
   'X-RateLimit-Reset': string;
 }
 ```
+
+## Testing Guidelines
+
+### API Testing
+
+1. Authentication Tests
+
+   ```typescript
+   describe('POST /api/auth/login', () => {
+     it('authenticates valid credentials', async () => {
+       const response = await fetch('/api/auth/login', {
+         method: 'POST',
+         body: JSON.stringify({ email, password }),
+       });
+       expect(response.status).toBe(200);
+     });
+   });
+   ```
+
+2. Error Handling Tests
+
+   ```typescript
+   describe('Error Responses', () => {
+     it('handles invalid input', async () => {
+       const response = await fetch('/api/members', {
+         method: 'POST',
+         body: JSON.stringify({}),
+       });
+       expect(response.status).toBe(400);
+       const data = await response.json();
+       expect(data.error).toBeDefined();
+     });
+   });
+   ```
+
+3. Rate Limiting Tests
+   ```typescript
+   describe('Rate Limiting', () => {
+     it('enforces rate limits', async () => {
+       // Make multiple requests
+       const responses = await Promise.all(
+         Array(101)
+           .fill(null)
+           .map(() => fetch('/api/members'))
+       );
+       const lastResponse = responses[100];
+       expect(lastResponse.status).toBe(429);
+     });
+   });
+   ```

@@ -191,30 +191,136 @@ Our implementation follows these integrated standards:
 
 ## Technical Stack
 
-- **Frontend**: Next.js with TypeScript
-- **UI Framework**: Chakra UI
-- **Database**: PostgreSQL
-- **ORM**: Prisma
+- **Frontend**:
+
+  - Next.js 15 with TypeScript
+    - Server-side rendering
+    - API routes
+    - Static site generation
+  - React 18
+    - Functional components
+    - Hooks-based architecture
+    - Server components
+
+- **UI Framework**:
+
+  - Chakra UI v3
+    - Component library
+    - Theme customization
+    - Dark mode support
+  - React Icons
+    - Icon components
+
+- **Authentication & Security**:
+
+  - NextAuth.js
+    - Session management
+    - OAuth providers
+    - JWT handling
+  - Argon2
+    - Password hashing (argon2id variant)
+    - Memory-hard algorithm
+    - Configurable parameters
+  - CSRF protection
+  - Rate limiting
+
+- **Database**:
+
+  - PostgreSQL
+    - Relational database
+    - ACID compliance
+    - Complex queries
+  - Prisma ORM
+    - Type-safe queries
+    - Schema management
+    - Migrations
+
+- **Form & Validation**:
+
+  - React Hook Form
+    - Form state management
+    - Validation integration
+    - Performance optimization
+  - Zod
+    - Schema validation
+    - Type inference
+    - Runtime checks
+
 - **Testing**:
+
   - Vitest for unit and integration tests
+    - Service layer testing with comprehensive mocking
+    - Component testing with React Testing Library
+    - High coverage requirements for critical paths
   - React Testing Library
+    - User interaction testing
+    - Accessibility validation
+    - Component state verification
   - User Event for interaction testing
+    - Simulating user interactions
+    - Testing complex workflows
+    - Validating form submissions
   - Mock Service Worker (MSW)
+    - API mocking
+    - Network error simulation
+    - Response customization
   - Custom test helpers and factories
+    - Prisma mocking utilities
+    - Component test wrappers
+    - Common test scenarios
   - Schema validation testing
+    - Input validation
+    - API response validation
+    - Data integrity checks
   - Service layer testing
+    - External dependency mocking
+    - Error scenario coverage
+    - Edge case handling
+    - Type validation
+
 - **Image Processing**:
-  - Sharp for image optimization
+
+  - Sharp
+    - Image optimization
+    - Format conversion
+    - Metadata handling
   - Secure upload handling
-  - Format conversion
-- **Form Handling**: React Hook Form with Zod validation
-- **Date Handling**: date-fns
-- **Monitoring & Logging**
-  - Sentry for error tracking
-  - Pino for structured logging
+  - CDN integration
+
+- **Date & Time**:
+
+  - date-fns
+    - Date manipulation
+    - Formatting
+    - Timezone handling
+
+- **Monitoring & Logging**:
+
+  - Sentry
+    - Error tracking
+    - Performance monitoring
+    - User feedback
+  - Pino
+    - Structured logging
+    - Log levels
+    - Performance logging
   - Custom performance monitoring
   - User event tracking
   - Feature flag system
+
+- **Development Tools**:
+  - ESLint
+    - Code quality
+    - Style enforcement
+  - Prettier
+    - Code formatting
+  - Husky
+    - Git hooks
+    - Pre-commit checks
+  - TypeScript
+    - Static typing
+    - Type checking
+    - Code intelligence
 
 ## Getting Started
 

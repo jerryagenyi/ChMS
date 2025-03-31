@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Algorithm } from '@node-rs/argon2';
 
 // Environment variable validation schema
 export const envSchema = z.object({
@@ -29,7 +30,7 @@ export const SECURITY_CONSTANTS = {
     timeCost: 2,
     memoryCost: 65536, // 64MB
     parallelism: 1,
-    type: 'argon2id'
+    type: 2 as Algorithm // argon2id
   },
   
   // Rate Limiting

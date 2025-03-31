@@ -236,3 +236,106 @@ Non-critical features that enhance user experience:
    - Keep test documentation updated
    - Document test decisions
    - Maintain testing patterns
+
+## Service Testing Guidelines
+
+### 1. Mock External Dependencies
+
+```typescript
+// Example: Mocking Prisma
+type MockPrismaClient = {
+  entity: {
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+  };
+};
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    entity: {
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      findUnique: vi.fn(),
+    },
+  } as MockPrismaClient,
+}));
+
+// Example: Mocking Image Processing
+vi.mock('sharp', () => ({
+  default: vi.fn(() => ({
+    resize: vi.fn().mockReturnThis(),
+    toFormat: vi.fn().mockReturnThis(),
+    toBuffer: vi.fn().mockResolvedValue(Buffer.from('mock-data')),
+  })),
+}));
+```
+
+### 2. Test Structure Pattern
+
+```typescript
+describe('ServiceName', () => {
+  let service: ServiceType;
+
+  beforeEach(() => {
+    service = new ServiceType();
+    vi.clearAllMocks();
+  });
+
+  describe('methodName', () => {
+    test('should handle successful operation', async () => {
+      // Arrange: Set up mocks and test data
+      const mockData = {
+        /* ... */
+      };
+      (dependency.method as any).mockResolvedValue(mockData);
+
+      // Act: Call the service method
+      const result = await service.method(params);
+
+      // Assert: Verify the results
+      expect(dependency.method).toHaveBeenCalledWith(expectedParams);
+      expect(result).toEqual(expectedResult);
+    });
+
+    test('should handle errors appropriately', async () => {
+      // Arrange: Set up error scenario
+      const error = new Error('Operation failed');
+      (dependency.method as any).mockRejectedValue(error);
+
+      // Act & Assert: Verify error handling
+      await expect(service.method(params)).rejects.toThrow('User-friendly error message');
+    });
+  });
+});
+```
+
+### 3. Error Handling Coverage
+
+- Test both successful and error scenarios for each method
+- Verify error messages are user-friendly
+- Test different types of errors (validation, network, etc.)
+- Ensure proper error propagation
+
+### 4. Data Integrity
+
+- Test CRUD operations thoroughly
+- Verify data transformations
+- Test edge cases with different data types
+- Validate input/output formats
+
+### 5. Performance Considerations
+
+- Test with realistic data sizes
+- Verify memory usage for large operations
+- Test batch operations efficiently
+- Monitor test execution time
+
+### 6. Security Testing
+
+- Test authorization checks
+- Verify data access controls
+- Test input validation
+- Check for proper error masking

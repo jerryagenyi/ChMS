@@ -8,12 +8,12 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-        crypto: false,
+        crypto: require.resolve('crypto-browserify'),
         child_process: false,
         dns: false,
         os: false,
         path: false,
-        stream: false,
+        stream: require.resolve('stream-browserify'),
         http: false,
         https: false,
         zlib: false,
@@ -21,6 +21,13 @@ const nextConfig = {
         perf_hooks: false,
       };
     }
+
+    // Handle native modules
+    config.externals = [...(config.externals || [])];
+    if (isServer) {
+      config.externals.push('@node-rs/argon2');
+    }
+
     return config;
   },
 };

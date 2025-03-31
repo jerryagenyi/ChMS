@@ -1,13 +1,20 @@
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack, useToast } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import '@/styles/components/QRScanner.css';
 
 interface QRScannerProps {
-  onScan: (qrData: string) => void;
-  onError: (error: string) => void;
+  /** Whether the scanner is open */
+  isOpen: boolean;
+  /** Callback when the scanner should close */
+  onClose: () => void;
+  /** Callback when QR code is successfully scanned */
+  onScan?: (qrData: string) => void;
+  /** Callback when scanning fails */
+  onError?: (error: string) => void;
 }
 
-const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
+const QRScanner: React.FC<QRScannerProps> = ({ isOpen, onClose, onScan, onError }) => {
   const [hasPermission, setHasPermission] = useState(false);
   const [isScanning, setIsScanning] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
@@ -42,16 +49,19 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
         isClosable: true,
       });
 
+      onScan?.(qrData);
       router.push(`/attendance/class/${data.data.classId}`);
       onClose();
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to validate QR code';
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to validate QR code',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
       });
+      onError?.(errorMessage);
     } finally {
       setIsValidating(false);
     }
@@ -65,6 +75,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScan, onError }) => {
       duration: 5000,
       isClosable: true,
     });
+    onError?.(error);
   };
 
   return (

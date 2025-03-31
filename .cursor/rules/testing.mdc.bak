@@ -12,6 +12,8 @@ alwaysApply: false
    - Focus on P0 components first
    - Track progress systematically
    - Update checklist after each component completion
+   - Place all tests in the tests folder 'src/__tests__'
+   - Always update the @test-checklist.md file when a test passes.
 
 2. Component/Feature Analysis Requirements
    - Reference principles from @docs/testing-strategy.md
@@ -32,10 +34,9 @@ alwaysApply: false
    Goal: [STATE_GOAL]
    Success Criteria: [PROOF OF TEST PASSED]
    ```
-   - Request and await approval
    - Execute test implementation
    - Verify success criteria
-   - Update documentation
+   - Update documentation via @test-checklist.md file when a test passes, and other documentation files as is necessary.
 
 5. UI Standards
    - Icons: Use react-icons exclusively (no @chakra-ui/icons)

@@ -1,6 +1,5 @@
-import { hash, verify } from '@node-rs/argon2';
 import DOMPurify from 'dompurify';
-import { SECURITY_CONSTANTS, SECURITY_HEADERS } from '@/config/security';
+import { SECURITY_HEADERS } from '@/config/security';
 
 export const securityHeaders = SECURITY_HEADERS;
 
@@ -20,8 +19,17 @@ export const sanitizeInput = (data: any) => {
   return sanitize(data);
 };
 
+// Only import argon2 on the server side
+const getArgon2 = async () => {
+  if (typeof window !== 'undefined') {
+    throw new Error('Password operations are only available on the server side');
+  }
+  return await import('@node-rs/argon2');
+};
+
 export const hashPassword = async (password: string): Promise<string> => {
-  return await hash(password, {
+  const argon2 = await getArgon2();
+  return await argon2.hash(password, {
     algorithm: SECURITY_CONSTANTS.ARGON2.type,
     timeCost: SECURITY_CONSTANTS.ARGON2.timeCost,
     memoryCost: SECURITY_CONSTANTS.ARGON2.memoryCost,
@@ -31,7 +39,8 @@ export const hashPassword = async (password: string): Promise<string> => {
 
 export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
   try {
-    return await verify(hashedPassword, password);
+    const argon2 = await getArgon2();
+    return await argon2.verify(hashedPassword, password);
   } catch (error) {
     console.error('Password verification error:', error);
     return false;

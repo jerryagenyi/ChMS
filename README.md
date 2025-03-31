@@ -1,31 +1,89 @@
-# Project Name
+# Church Management System (ChMS)
+
+A modern, minimalist web-based solution for church administration, designed specifically for African churches with focus on performance and efficiency.
+
+## Key Features
+
+- **Organization Management**: Multi-department support, event management, family unit tracking
+- **Member Management**: Complete profiles, family linking, attendance tracking
+- **Visitor System**: Registration, follow-up tracking, conversion monitoring
+- **Attendance System**: Service tracking, family check-in, offline support
+- **Security**: Role-based access, data encryption, GDPR compliance
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **UI**: Chakra UI v3, React Icons
+- **Backend**: PostgreSQL, Prisma ORM
+- **Security**: NextAuth.js, Argon2 (password hashing)
+- **Testing**: Vitest, React Testing Library, MSW
+- **Other**: Sharp (image processing), date-fns, Sentry, Pino
 
 ## Setup Instructions
 
-1. **Environment Variables:**
+1. **Prerequisites**
 
-   - `DATABASE_URL`: Your PostgreSQL connection string.
-   - `NEXT_PUBLIC_APP_URL`: The base URL of your application.
-   - `NEXTAUTH_URL`: The URL used by NextAuth for authentication callbacks.
-   - `NEXTAUTH_SECRET`: A secret key for NextAuth.
-   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: Credentials for Google SSO.
+   - Node.js 18+
+   - PostgreSQL 14+
+   - Git
 
-2. **Running the Project:**
+2. **Environment Variables**
 
-   - Install dependencies: `npm install`
-   - Run the development server: `npm run dev`
+   ```bash
+   DATABASE_URL=           # PostgreSQL connection string
+   NEXT_PUBLIC_APP_URL=   # Application base URL
+   NEXTAUTH_URL=          # NextAuth callback URL
+   NEXTAUTH_SECRET=       # JWT signing key (min 32 chars)
+   GOOGLE_CLIENT_ID=      # Google OAuth client ID
+   GOOGLE_CLIENT_SECRET=  # Google OAuth client secret
+   ```
 
-3. **Authentication Features:**
+3. **Installation**
 
-   - Google SSO with backup password setup.
-   - New API route: `/api/auth/check-password-status` for password status verification.
-   - Password setup component with Chakra UI.
+   ```bash
+   git clone [repository-url]
+   cd ChMS
+   npm install
+   npm run prisma:generate
+   npm run prisma:migrate
+   ```
 
-4. **Testing:**
-   - Run tests with: `npm test`
-   - Ensure all tests pass before deploying.
+4. **Development**
+   ```bash
+   npm run dev        # Start development server
+   npm test          # Run tests
+   npm run build     # Production build
+   ```
 
-## Additional Information
+## Development Guidelines
 
-- Ensure your PostgreSQL server is running and accessible.
-- Follow best practices for security and performance.
+- Write clean, maintainable TypeScript code
+- Follow the established project structure
+- Include tests for new features
+- Optimize for low-bandwidth environments
+- Document new features and APIs
+
+## Project Structure
+
+```
+src/
+├── components/     # UI components
+├── pages/         # Next.js pages
+├── hooks/         # React hooks
+├── utils/         # Utilities
+├── types/         # TypeScript types
+├── services/      # External integrations
+└── styles/        # Global styles
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Write/update tests
+5. Submit a pull request
+
+## License
+
+MIT

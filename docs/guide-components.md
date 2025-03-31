@@ -53,9 +53,11 @@ This guide provides an overview of all components in the ChMS system, their usag
 
 ### Authentication
 
-- **PasswordSetup**
-  - Purpose: User password configuration
-  - Features: Password validation, strength indicator
+- **Location**: `src/components/auth/`
+- **Components**:
+  - Login/Logout
+  - Session management
+  - OAuth integration
 
 ### Organization
 

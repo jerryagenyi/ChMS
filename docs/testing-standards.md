@@ -2,104 +2,145 @@
 
 ## Overview
 
-This document defines our testing standards and best practices.
+This document defines our testing standards and best practices, with specific considerations for our tech stack including Chakra UI v3.
+
+## Component Testing Standards
+
+### UI Component Tests
+
+- Use React Testing Library with Chakra UI v3 providers
+- Test component rendering, interactions, and accessibility
+- Include dark mode testing where relevant
+
+```typescript
+// Example of proper Chakra UI v3 component test setup
+import { render, screen } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { theme } from '@/theme';
+
+const renderWithChakra = (ui: React.ReactElement) => {
+  return render(<ChakraProvider theme={theme}>{ui}</ChakraProvider>);
+};
+
+describe('Button Component', () => {
+  it('renders with correct Chakra UI styles', () => {
+    renderWithChakra(<Button colorScheme="brand">Click me</Button>);
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+  });
+});
+```
+
+### Theme Testing
+
+- Test theme token applications
+- Verify responsive design breakpoints
+- Validate color scheme transitions
+- Test accessibility contrast ratios
 
 ## Test Categories
 
-### Unit Tests
+### 1. Unit Tests
 
-- Test individual components
-  - Core components (ErrorBoundary, LoadingState, OfflineFallback)
-  - Feature components
-- Test utility functions
-- Test hooks
-- Test services
-  - Ministry services
-  - Other services
-- Mock external dependencies
-- Test edge cases
-- Test error scenarios
+- Individual component logic
+- Utility functions
+- Custom hooks
+- State management
+- Data transformations
 
-### Integration Tests
+### 2. Integration Tests
 
-- Test component interactions
-- Test service interactions
-- Test API integration
-- Test database operations
-- Test authentication flow
-- Test state management
-- Test error handling
+- Component interactions
+- API integration
+- State management flow
+- Theme inheritance
+- Layout composition
 
-### E2E Tests
+### 3. E2E Tests
 
-- Test user flows
-- Test critical paths
-- Test form submissions
-- Test navigation
-- Test authentication
-- Test data persistence
-- Test error recovery
+- Critical user flows
+- Form submissions
+- Navigation paths
+- Authentication flows
+- Offline functionality
 
 ## Testing Tools
 
-### Frontend Testing
+### Frontend Testing Stack
 
-- Vitest for unit tests
+- Vitest for unit/integration tests
 - React Testing Library
 - MSW for API mocking
-- Test coverage reporting
-- Performance testing
-- Accessibility testing
+- Playwright for E2E
+- Lighthouse for performance
+- Axe for accessibility
 
-### Backend Testing
+### Required Test Utilities
 
-- Vitest for unit tests
-- Prisma Test Client
-- API testing tools
-- Database testing
-- Authentication testing
-- Load testing
-- Security testing
+```typescript
+// src/test-utils/index.ts
+import { ChakraProvider } from '@chakra-ui/react';
+import { theme } from '@/theme';
 
-## Test Quality
+export const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <ChakraProvider theme={theme}>{children}</ChakraProvider>
+);
 
-### Required Standards
+export const renderWithProviders = (ui: React.ReactElement) => {
+  return render(ui, { wrapper: TestWrapper });
+};
+```
 
-- TypeScript strict mode
-- ESLint configuration
-- Prettier integration
-- Import sorting
-- Test helpers and utilities
-- Mock system
-- Test data factories
-- Custom test matchers
+## Code Quality Requirements
 
-### Code Quality Requirements
+### Testing Standards
 
-- Follow testing best practices
-- Write readable tests
-- Maintain test isolation
-- Use proper assertions
-- Handle async operations
-- Clean up after tests
-- Document test cases
+- TypeScript strict mode enabled
+- ESLint testing plugins configured
+- Proper type assertions
+- Meaningful test descriptions
+- Isolated test cases
+- Proper cleanup
 
 ### Coverage Requirements
 
-- Overall: Minimum 80%
+- Overall coverage: 80%+
 - Critical paths: 100%
-- Edge cases: 100%
-- Error scenarios: 100%
+- Components: 85%+
+- Utilities: 90%+
+- API services: 85%+
 
-### Performance Testing Requirements
+## Performance Testing
 
-- Load testing
-- Stress testing
-- Response time testing
-- Resource usage testing
-- Scalability testing
-- Endurance testing
-- Spike testing
+### Load Time Metrics
+
+- First Contentful Paint: < 1.5s
+- Time to Interactive: < 3s
+- Total Blocking Time: < 300ms
+
+### Runtime Performance
+
+- Frame rate: 60fps
+- Input latency: < 100ms
+- Memory leaks: None
+- Bundle size limits enforced
+
+## Accessibility Testing
+
+### Requirements
+
+- WCAG 2.1 AA compliance
+- Keyboard navigation
+- Screen reader compatibility
+- Color contrast validation
+- Focus management
+
+### Tools
+
+- Axe-core for automated checks
+- Manual screen reader testing
+- Keyboard navigation testing
+- Color contrast analyzers
 
 ## Test Infrastructure Requirements
 

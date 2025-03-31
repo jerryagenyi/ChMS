@@ -25,6 +25,7 @@ import {
   AttendanceListState,
   AttendanceFilters,
   AttendanceSort,
+  AttendanceRecord,
 } from './types';
 
 export const AttendanceList: React.FC<AttendanceListProps> = ({
@@ -105,13 +106,13 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
   const sortedRecords = useMemo(() => {
     return [...filteredRecords].sort((a, b) => {
       const { field, direction } = state.sort;
-      const aValue = a[field];
-      const bValue = b[field];
+      const aValue = a[field] ?? ''; // Use nullish coalescing to provide default value
+      const bValue = b[field] ?? ''; // Use nullish coalescing to provide default value
 
       if (direction === 'asc') {
-        return aValue < bValue ? -1 : 1;
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       }
-      return aValue > bValue ? -1 : 1;
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
     });
   }, [filteredRecords, state.sort]);
 
@@ -142,6 +143,8 @@ export const AttendanceList: React.FC<AttendanceListProps> = ({
           maxW="300px"
         />
         <Select
+          title="Service Filter"
+          aria-label="Filter attendance by service"
           placeholder="Filter by service"
           value={state.filters.serviceId || ''}
           onChange={e => handleFilterChange({ serviceId: e.target.value })}

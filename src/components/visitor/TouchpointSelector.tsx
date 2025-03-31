@@ -85,12 +85,15 @@ export function TouchpointSelector({
   return (
     <VStack spacing={4} align="stretch">
       <FormControl isRequired={isRequired}>
-        <FormLabel>How did you hear about us?</FormLabel>
+        <FormLabel htmlFor="touchpointType">How did you hear about us?</FormLabel>
         <Select
+          id="touchpointType"
+          name="touchpointType"
           value={value.type}
           onChange={e => handleTypeChange(e.target.value as TouchpointType)}
           bg={bgColor}
           borderColor={borderColor}
+          aria-label="Select how you heard about us"
         >
           <option value="">Select an option</option>
           {Object.entries(TOUCHPOINT_TYPES).map(([key, value]) => (
@@ -103,12 +106,15 @@ export function TouchpointSelector({
 
       {value.type && (
         <FormControl isRequired={isRequired}>
-          <FormLabel>Please specify</FormLabel>
+          <FormLabel htmlFor="touchpointSource">Please specify</FormLabel>
           <Select
+            id="touchpointSource"
+            name="touchpointSource"
             value={value.source}
             onChange={e => handleSourceChange(e.target.value as TouchpointSource)}
             bg={bgColor}
             borderColor={borderColor}
+            aria-label="Select specific source"
           >
             <option value="">Select an option</option>
             {getSourceOptions(value.type).map(source => (

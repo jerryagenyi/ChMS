@@ -18,7 +18,7 @@ import {
   FormControl,
   FormLabel,
 } from '@chakra-ui/react';
-import { SearchIcon, RefreshIcon } from '@chakra-ui/icons';
+import { HiSearch, HiRefresh } from 'react-icons/hi';
 import { ServiceSelectorProps, ServiceSelectorState, ServiceFilters } from './types';
 
 export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
@@ -153,6 +153,8 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
           onChange={e => handleFilterChange({ search: e.target.value })}
         />
         <Select
+          title="Service Type Filter"
+          aria-label="Service Type Filter"
           placeholder="Service Type"
           onChange={e => handleFilterChange({ type: e.target.value as Service['type'] })}
         >

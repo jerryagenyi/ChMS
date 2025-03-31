@@ -21,16 +21,35 @@ export function validateEnv() {
 
 // Security Constants
 export const SECURITY_CONSTANTS = {
-  PASSWORD_HASH_ROUNDS: 12,
-  VERIFICATION_TOKEN_BYTES: 32,
-  SESSION_MAX_AGE: 24 * 60 * 60, // 24 hours in seconds
-  TOKEN_EXPIRY: '24h',
-  RATE_LIMIT: {
-    MAX_REQUESTS: 100,
-    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+  // Session Management
+  SESSION_MAX_AGE: 2 * 60 * 60, // 2 hours in seconds
+  
+  // Password Hashing (Argon2id)
+  ARGON2: {
+    timeCost: 2,
+    memoryCost: 65536, // 64MB
+    parallelism: 1,
+    type: 'argon2id'
   },
+  
+  // Rate Limiting
+  RATE_LIMIT: {
+    MAX_ATTEMPTS: 5,
+    WINDOW_MS: 5 * 60 * 1000, // 5 minutes
+  },
+  
+  // File Upload
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB in bytes
+  
+  // Cache Duration
+  CACHE: {
+    PERMISSIONS_TTL: 60, // 1 minute
+    DECRYPTED_DATA_TTL: 30, // 30 seconds
+  },
+  
+  // reCAPTCHA
   RECAPTCHA: {
-    SCORE_THRESHOLD: 0.5,
+    SCORE_THRESHOLD: 0.7, // Increased from 0.5 for better security
   },
 } as const;
 
@@ -45,16 +64,12 @@ export const SECURITY_MESSAGES = {
 
 // Security Headers
 export const SECURITY_HEADERS = {
-  'Content-Security-Policy': 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;",
-  'X-Content-Type-Options': 'nosniff',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src 'self' https://www.google.com/recaptcha/; style-src 'self' 'unsafe-inline';",
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
   'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  'Expect-CT': 'max-age=86400, enforce',
+  'X-XSS-Protection': '1; mode=block'
 } as const; 

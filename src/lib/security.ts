@@ -1,19 +1,8 @@
-import { hash, compare } from 'bcryptjs';
+import { hash, verify } from '@node-rs/argon2';
 import DOMPurify from 'dompurify';
-import { SECURITY_CONSTANTS } from '@/config/security';
+import { SECURITY_CONSTANTS, SECURITY_HEADERS } from '@/config/security';
 
-export const securityHeaders = {
-  'Content-Security-Policy': 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' https://api.example.com;",
-  'X-Frame-Options': 'DENY',
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
-};
+export const securityHeaders = SECURITY_HEADERS;
 
 export const sanitizeInput = (data: any) => {
   // Recursively sanitize all string values
@@ -32,9 +21,19 @@ export const sanitizeInput = (data: any) => {
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
-  return await hash(password, SECURITY_CONSTANTS.PASSWORD_HASH_ROUNDS);
+  return await hash(password, {
+    algorithm: SECURITY_CONSTANTS.ARGON2.type,
+    timeCost: SECURITY_CONSTANTS.ARGON2.timeCost,
+    memoryCost: SECURITY_CONSTANTS.ARGON2.memoryCost,
+    parallelism: SECURITY_CONSTANTS.ARGON2.parallelism
+  });
 };
 
 export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
-  return await compare(password, hashedPassword);
+  try {
+    return await verify(hashedPassword, password);
+  } catch (error) {
+    console.error('Password verification error:', error);
+    return false;
+  }
 };

@@ -6,7 +6,7 @@ This document outlines our testing approach for the Church Management System (Ch
 
 ## Testing Priorities
 
-### P0 (Must Test)
+### P0 (Must Test - 90%+ coverage)
 
 Critical features that directly impact core business operations:
 
@@ -91,6 +91,28 @@ Non-critical features that enhance user experience:
   - Export functionality
   - Print layouts
   - Optional integrations
+
+## Testing Tools
+
+### Primary Tools
+
+- Vitest + React Testing Library: Unit and integration testing
+- Cypress: E2E testing
+- MSW (Mock Service Worker): API mocking
+- React Icons: Component icon testing
+- Chakra UI Testing Library: UI component testing
+
+### Performance Testing Tools
+
+- Lighthouse: Performance metrics
+- React DevTools Profiler: Component performance
+- Chrome DevTools: Network and runtime performance
+
+## Style and Icon Standards
+
+- All components must use Chakra UI v3 for styling
+- All icons must use react-icons library
+- No usage of Tailwind CSS or Chakra UI icons
 
 ## Critical Paths for Testing
 

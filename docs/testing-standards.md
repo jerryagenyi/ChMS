@@ -4,6 +4,27 @@
 
 This document defines our testing standards and best practices, with specific considerations for our tech stack including Chakra UI v3.
 
+## Coverage Requirements
+
+### Overall Requirements
+
+- P0 Features: 90%+
+- P1 Features: 80%+
+- P2 Features: 60%+
+
+### Specific Test Types
+
+- Unit Tests: 85%
+- Integration Tests: 75%
+- E2E Tests: 60%
+
+### Component-Specific Requirements
+
+- Critical Paths: 100%
+- Components: 85%+
+- Utilities: 90%+
+- API Services: 85%+
+
 ## Definition of Done (DoD) Guidelines
 
 ### All Tests Must
@@ -13,30 +34,19 @@ This document defines our testing standards and best practices, with specific co
 - Follow naming convention: `*.test.ts` or `*.spec.ts`
 - Avoid unnecessary dependencies
 - Handle cleanup properly
+- Use appropriate testing tools:
+  - Vitest and React Testing Library for unit/integration tests
+  - Cypress for E2E testing
+  - MSW for API mocking
 
-### Unit Tests Must
+### Styling and Icon Standards
 
-- Remain isolated (no external dependencies)
-- Cover single functionality per test
-- Implement mocks/stubs properly
-- Consider edge cases
-- Meet coverage target for priority level
-
-### Integration Tests Must
-
-- Cover happy path scenarios
-- Handle common error scenarios
-- Mock external dependencies appropriately
-- Verify data consistency
-- Implement proper cleanup
-
-### E2E Tests Must
-
-- Test complete user flows
-- Run in all specified browsers
-- Capture screenshots/videos on failure
-- Collect performance metrics
-- Handle environmental cleanup
+- All components must use Chakra UI v3 for styling
+  - No Tailwind CSS classes or configurations
+  - No inline styles unless absolutely necessary
+- All icons must use react-icons library
+  - No Chakra UI icons
+  - Consistent icon naming conventions
 
 ## Component Testing Standards
 

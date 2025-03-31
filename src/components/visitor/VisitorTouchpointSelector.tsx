@@ -48,12 +48,14 @@ export function VisitorTouchpointSelector({
   return (
     <>
       <FormControl isRequired={isRequired} isInvalid={!!error} mb={4}>
-        <FormLabel>How did you hear about us?</FormLabel>
+        <FormLabel htmlFor="visitorTouchpoint">How did you hear about us?</FormLabel>
         <Select
+          id="visitorTouchpoint"
+          name="visitorTouchpoint"
           value={value.touchpoint}
           onChange={e => onChange({ touchpoint: e.target.value, source: '' })}
           placeholder="Select type"
-          aria-label="How did you hear about us"
+          aria-label="Select how you heard about us"
         >
           {uniqueTypes.map(type => (
             <option key={type} value={type}>

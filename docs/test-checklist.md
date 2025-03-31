@@ -1,8 +1,14 @@
 # Test Checklist
 
-## Unit Tests (Target: 85%)
+## Coverage Targets (as defined in testing-standards.md)
 
-### P0 Components (Must Test)
+- Unit Tests: 85%
+- Integration Tests: 75%
+- E2E Tests: 60%
+
+## Unit Tests
+
+### P0 Components (Must Test - 90%+ coverage)
 
 - [ ] Core Authentication Components
   - [ ] LoginForm
@@ -25,7 +31,7 @@
     - [ ] Image optimization
     - [ ] Image display
 
-### P1 Components (Should Test)
+### P1 Components (Should Test - 80%+ coverage)
 
 - [ ] Main UI Components
   - [ ] DataTables

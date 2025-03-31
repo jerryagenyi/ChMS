@@ -113,15 +113,17 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       <Flex className="analytics-header">
         <Heading className="analytics-title">Analytics Dashboard</Heading>
         <FormControl width="200px">
-          <FormLabel htmlFor="time-range-select">Time Range</FormLabel>
+          <FormLabel htmlFor="timeRangeSelect" id="timeRangeLabel">
+            Time Range
+          </FormLabel>
           <Select
-            id="time-range-select"
-            className="analytics-time-select"
+            id="timeRangeSelect"
+            name="timeRange"
+            aria-labelledby="timeRangeLabel"
             value={timeRange}
             onChange={e => {
               // Handle time range change
             }}
-            aria-label="Select time range for analytics"
           >
             <option value="day">Last 24 Hours</option>
             <option value="week">Last 7 Days</option>

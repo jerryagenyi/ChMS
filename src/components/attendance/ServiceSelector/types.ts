@@ -1,3 +1,4 @@
+
 export interface Service {
   id: string;
   name: string;
@@ -7,21 +8,30 @@ export interface Service {
   isActive: boolean;
 }
 
+export interface ServiceFilters {
+  search?: string;
+  type?: Service['type'];
+  date?: string;
+  isActive?: boolean;
+}
+
 export interface ServiceSelectorProps {
   services: Service[];
   selectedServiceId?: string;
   isLoading?: boolean;
   isError?: boolean;
   error?: Error;
-  onSelect?: (serviceId: string) => void;
+  onServiceSelect: (serviceId: string) => void;
   onRefresh?: () => void;
-  includeInactive?: boolean;
-  showDescription?: boolean;
+  onFilterChange?: (filters: ServiceFilters) => void;
 }
 
 export interface ServiceSelectorState {
-  searchQuery: string;
-  selectedType?: "SUNDAY" | "WEDNESDAY";
-  sortBy: "date" | "name";
-  sortOrder: "asc" | "desc";
-} 
+  isRefreshing: boolean;
+  error: Error | null;
+  filters: ServiceFilters;
+  sortConfig: {
+    key: string | null;
+    direction: 'asc' | 'desc';
+  };
+}

@@ -1,59 +1,54 @@
 ---
-description: 
+description: Testing rules and guidelines
 globs: 
 alwaysApply: true
 ---
-I'm working on testing our Church Management System. Please help guide my testing process with these requirements:
 
-1. Use @docs/test-checklist.md as our working document, focusing on P0 components first.
+# Testing Rules
 
-2. For each component/feature I ask about, please:
-   - Reference relevant principles from @docs/testing-strategy.md
-   - Apply standards from @docs/testing-standards.md, especially the Definition of Done (DoD) guidelines
-   - Track progress in @docs/test-checklist.md
-   - Ensure test documentation follows requirements in @docs/test-tracking.md
+## Core Requirements
 
-3. Please help me ensure this test meets:
-   - The appropriate coverage target for its priority level
-   - All applicable DoD criteria
-   - Required documentation standards
+1. Use @docs/test-checklist.md as working document (focus P0 first)
+2. Reference @docs/testing-strategy.md and @docs/testing-standards.md
+3. Track in @docs/test-checklist.md
+4. Follow @docs/test-tracking.md for documentation
 
-4. Before you start any test, always clarify your goals thus:
-   - I want to work on [COMPONENT_NAME] which is a [P0/P1/P2] component.
-   - My goal is [STATE_GOAL].
-   - Success indicator is [PROOF OF TEST PASSED].
-   - Request and wait for approval to continue.
-   - After test completion, state if goal and success criteria were met.
-   - Update @docs/test-checklist.md accordingly and other relevant documents.
+## Database Handling
+- Database can be reset freely during tests (no production data)
+- Use test transactions where possible
+- Clean up test data after each test
 
-Example Goal Statements:
+## Test Implementation Template
+```
+Component: [NAME]
+Priority: [P0/P1/P2]
+Goal: [GOAL]
+Success: [CRITERIA]
+```
 
-Authentication (P0):
+## Standards
+- Testing: Vitest + RTL + MSW + Cypress
+- UI: react-icons only (no @chakra-ui/icons)
+- Styling: Chakra UI v3 only (no Tailwind)
+
+## Coverage
+- P0: 90%+
+- P1: 80%+
+- P2: 60%+
+
+## Example Goals
+
+### P0 (Authentication)
 - Component: `LoginForm`
-- Goal: "Ensure secure user authentication with proper error handling"
-- Success: "Tests verify successful login, invalid credentials handling, and session creation"
+- Goal: Secure auth with error handling
+- Success: Login flow, invalid handling, session verified
 
-Data Operations (P0):
-- Component: `DataOperations`
-- Goal: "Validate CRUD operations maintain data integrity"
-- Success: "All CRUD operations pass with proper validation, error handling, and database state verification"
-
-UI Components (P1):
-- Component: `DataTable`
-- Goal: "Verify table sorting, filtering, and pagination work correctly"
-- Success: "Tests confirm all table operations work with various data sets and edge cases"
-
-Integration (P0):
+### P0 (Integration)
 - Component: `AttendanceRecorder`
-- Goal: "Verify complete attendance recording flow"
-- Success: "End-to-end flow passes including QR scanning, validation, and database update"
+- Goal: Complete attendance flow
+- Success: QR scan → validate → DB update
 
-Error Handling (P1):
-- Component: `ErrorBoundary`
-- Goal: "Ensure proper error capture and display"
-- Success: "Tests verify error catching, logging, and user-friendly display"
-
-Performance (P2):
-- Component: `ReportGenerator`
-- Goal: "Verify report generation meets performance criteria"
-- Success: "Large dataset processing completes within specified time limits"
+### P1 (UI)
+- Component: `DataTable`
+- Goal: Table operations working
+- Success: Sort/filter/paginate verified

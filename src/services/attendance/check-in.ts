@@ -1,22 +1,22 @@
 import { prisma } from '@/lib/prisma';
 import type { CheckInData } from '@/types/attendance';
 import { getCurrentOrganizationId } from '@/lib/organization';
+import { validateCheckIn } from '@/services/attendance/validation';
 
 export async function checkInMember(data: CheckInData) {
+  const validated = await validateCheckIn(data);
+  
   return await prisma.attendance.create({
     data: {
-      memberId: data.memberId,
-      classId: data.classId,
-      sessionId: data.sessionId,
+      ...validated,
       checkedInAt: new Date(),
-      isFamily: data.isFamily || false,
-      organizationId: await getCurrentOrganizationId()
+      organizationId: await getCurrentOrganizationId(),
     },
     include: {
       member: true,
       class: true,
-      session: true
-    }
+      classSession: true,
+    },
   });
 }
 
@@ -28,7 +28,8 @@ export async function checkOutMember(attendanceId: string) {
     },
     include: {
       member: true,
-      service: true
+      class: true,
+      classSession: true,
     }
   });
 }
@@ -39,7 +40,9 @@ export async function getAttendance(serviceId: string) {
       serviceId
     },
     include: {
-      member: true
+      member: true,
+      class: true,
+      classSession: true,
     },
     orderBy: {
       checkedInAt: 'desc'
@@ -47,46 +50,3 @@ export async function getAttendance(serviceId: string) {
   });
 }
 
-export async function getAttendanceStats(serviceId: string) {
-  const attendance = await prisma.attendance.findMany({
-    where: {
-      serviceId
-    },
-    include: {
-      member: {
-        include: {
-          teams: {
-            include: {
-              team: {
-                include: {
-                  department: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-
-  const stats = {
-    totalAttendees: attendance.length,
-    newVisitors: attendance.filter(a => !a.member.teams.length).length,
-    departments: [] as { name: string; count: number }[]
-  };
-
-  const departmentCounts = new Map<string, number>();
-  attendance.forEach(a => {
-    a.member.teams.forEach(mt => {
-      const deptName = mt.team.department.name;
-      departmentCounts.set(deptName, (departmentCounts.get(deptName) || 0) + 1);
-    });
-  });
-
-  stats.departments = Array.from(departmentCounts.entries()).map(([name, count]) => ({
-    name,
-    count
-  }));
-
-  return stats;
-}

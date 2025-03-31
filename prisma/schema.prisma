@@ -131,17 +131,18 @@ model User {
   email             String      @unique
   name              String?
   password          String
+  role              Role        @default(VIEWER)
   verificationToken String?
   emailVerified     DateTime?
   dateOfBirth       DateTime?
   memorableDates    Json?
   organization      Organization? @relation(fields: [organizationId], references: [id])
   organizationId    String?
-  accounts       Account[]
-  sessions       Session[]
-  classInstructor ClassInstructor[]
-  auditLogs     AuditLog[]
-  permissions      Permission[]
+  accounts          Account[]
+  sessions          Session[]
+  classInstructor   ClassInstructor[]
+  auditLogs         AuditLog[]
+  permissions       Permission[]
 }
 
 model Permission {
@@ -284,6 +285,7 @@ model Service {
   updatedAt      DateTime @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id])
+  attendance     Attendance[]
 }
 
 model Metric {
@@ -309,28 +311,31 @@ model Report {
 }
 
 model Attendance {
-  id              String    @id @default(cuid())
+  id              String        @id @default(uuid())
   memberId        String
-  member          Member    @relation(fields: [memberId], references: [id])
+  serviceId       String
   classId         String?
-  class           Class?    @relation(fields: [classId], references: [id])
-  sessionId       String?
-  session         Session?  @relation(fields: [sessionId], references: [id])
-  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
   classSessionId  String?
   organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  checkedInAt     DateTime  @default(now())
+  checkedInAt     DateTime      @default(now())
   checkedOutAt    DateTime?
-  isFamily        Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  notes           String?
+  
+  // Relations
+  member          Member        @relation(fields: [memberId], references: [id])
+  service         Service       @relation(fields: [serviceId], references: [id])
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  class           Class?        @relation(fields: [classId], references: [id])
+  classSession    ClassSession? @relation("ClassSessionAttendance", fields: [classSessionId], references: [id])
+  session         Session?      @relation(fields: [sessionId], references: [id])
+  sessionId       String?
 
+  @@index([serviceId])
   @@index([memberId])
-  @@index([classId])
-  @@index([sessionId])
   @@index([organizationId])
+  @@index([classId])
   @@index([classSessionId])
+  @@index([sessionId])
 }
 
 model Event {

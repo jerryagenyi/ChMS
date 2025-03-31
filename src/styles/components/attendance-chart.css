@@ -1,0 +1,81 @@
+/* Attendance Chart */
+.attendance-chart {
+  position: relative;
+}
+
+.attendance-chart__tooltip {
+  position: absolute;
+  background: var(--chakra-colors-white);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.attendance-chart__tooltip-title {
+  font-weight: 600;
+}
+
+.attendance-chart__tooltip-text {
+  color: var(--chakra-colors-gray-600);
+}
+
+.attendance-chart__refresh-button {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Chart Legend */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.chart-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.chart-legend__item:hover {
+  opacity: 1;
+}
+
+.chart-legend__item--inactive {
+  opacity: 0.5;
+}
+
+.chart-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid var(--chakra-colors-gray-200);
+}
+
+.chart-legend__label {
+  font-size: 0.875rem;
+}
+
+.chart-legend__value {
+  font-size: 0.875rem;
+  color: var(--chakra-colors-gray-500);
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .attendance-chart__tooltip {
+  background: var(--chakra-colors-gray-700);
+}
+
+[data-theme='dark'] .attendance-chart__tooltip-text {
+  color: var(--chakra-colors-gray-200);
+}
+
+[data-theme='dark'] .chart-legend__color {
+  border-color: var(--chakra-colors-gray-600);
+}

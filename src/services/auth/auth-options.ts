@@ -5,6 +5,22 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/security";
 import { SECURITY_CONSTANTS, SECURITY_MESSAGES } from "@/config/security";
+import { Role } from "@prisma/client";
+
+// Extend the Session type to include our custom fields
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name?: string | null;
+      role: Role;
+    }
+  }
+  interface User {
+    role: string;
+  }
+}
 
 // Validate environment variables
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -41,30 +57,43 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              password: true,
+              role: true,
+              emailVerified: true,
+            }
+          });
+
+          if (!user?.password || !user.emailVerified) {
+            throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
+          }
+
+          const isPasswordValid = await verifyPassword(credentials.password, user.password);
+
+          if (!isPasswordValid) {
+            throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error('Authentication error:', error);
+          throw error;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-
-        if (!user || !user.password) {
-          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
-        }
-
-        const isPasswordValid = await verifyPassword(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       }
     })
   ],
@@ -72,7 +101,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub!;
-        session.user.role = token.role as string;
+        session.user.role = token.role as Role;
       }
       return session;
     },
@@ -84,4 +113,4 @@ export const authOptions: NextAuthOptions = {
     }
   },
   secret: process.env.NEXTAUTH_SECRET,
-}; 
+} as const; 

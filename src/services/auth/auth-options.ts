@@ -1,15 +1,24 @@
-
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
+import { verifyPassword } from "@/lib/security";
+import { SECURITY_CONSTANTS, SECURITY_MESSAGES } from "@/config/security";
+
+// Validate environment variables
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+  throw new Error('Google OAuth credentials are not properly configured');
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: SECURITY_CONSTANTS.SESSION_MAX_AGE,
   },
   pages: {
     signIn: "/auth/signin",
@@ -17,8 +26,13 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -28,7 +42,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
         }
 
         const user = await prisma.user.findUnique({
@@ -36,13 +50,13 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          return null;
+          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password);
+        const isPasswordValid = await verifyPassword(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          return null;
+          throw new Error(SECURITY_MESSAGES.INVALID_CREDENTIALS);
         }
 
         return {
@@ -68,5 +82,6 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     }
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }; 

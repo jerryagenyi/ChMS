@@ -1,5 +1,6 @@
-import { hash } from 'bcryptjs';
+import { hash, compare } from 'bcryptjs';
 import DOMPurify from 'dompurify';
+import { SECURITY_CONSTANTS } from '@/config/security';
 
 export const securityHeaders = {
   'Content-Security-Policy': 
@@ -31,5 +32,9 @@ export const sanitizeInput = (data: any) => {
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
-  return await hash(password, 12);
+  return await hash(password, SECURITY_CONSTANTS.PASSWORD_HASH_ROUNDS);
+};
+
+export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+  return await compare(password, hashedPassword);
 };

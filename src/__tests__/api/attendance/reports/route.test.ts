@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+// Move the entire content of src/app/api/attendance/reports/__tests__/route.test.ts hereimport { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '../route';
 import { prisma } from '@/lib/prisma';
 

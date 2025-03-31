@@ -9,9 +9,13 @@ This document defines our testing standards and best practices.
 ### Unit Tests
 
 - Test individual components
+  - Core components (ErrorBoundary, LoadingState, OfflineFallback)
+  - Feature components
 - Test utility functions
 - Test hooks
 - Test services
+  - Ministry services
+  - Other services
 - Mock external dependencies
 - Test edge cases
 - Test error scenarios
@@ -40,9 +44,8 @@ This document defines our testing standards and best practices.
 
 ### Frontend Testing
 
-- Jest for unit tests
+- Vitest for unit tests
 - React Testing Library
-- Cypress for E2E
 - MSW for API mocking
 - Test coverage reporting
 - Performance testing
@@ -50,7 +53,7 @@ This document defines our testing standards and best practices.
 
 ### Backend Testing
 
-- Jest for unit tests
+- Vitest for unit tests
 - Prisma Test Client
 - API testing tools
 - Database testing
@@ -60,7 +63,18 @@ This document defines our testing standards and best practices.
 
 ## Test Quality
 
-### Code Quality
+### Required Standards
+
+- TypeScript strict mode
+- ESLint configuration
+- Prettier integration
+- Import sorting
+- Test helpers and utilities
+- Mock system
+- Test data factories
+- Custom test matchers
+
+### Code Quality Requirements
 
 - Follow testing best practices
 - Write readable tests
@@ -72,15 +86,12 @@ This document defines our testing standards and best practices.
 
 ### Coverage Requirements
 
-- 80% code coverage
-- 100% critical paths
-- Test all edge cases
-- Test error scenarios
-- Test performance
-- Test accessibility
-- Test security
+- Overall: Minimum 80%
+- Critical paths: 100%
+- Edge cases: 100%
+- Error scenarios: 100%
 
-### Performance Testing
+### Performance Testing Requirements
 
 - Load testing
 - Stress testing
@@ -90,29 +101,26 @@ This document defines our testing standards and best practices.
 - Endurance testing
 - Spike testing
 
-## Test Infrastructure
+## Test Infrastructure Requirements
 
-### CI/CD Integration
+### Basic Setup
 
-- Automated test runs
+- Test configuration
+- Mock system
+- Test helpers
+- Test data factories
+- Custom matchers
 - Coverage reporting
+
+### CI/CD Requirements
+
+- CI/CD integration
+- Automated test runs
 - Performance monitoring
 - Security scanning
 - Accessibility checking
-- Documentation generation
-- Deployment gates
 
-### Test Environment
-
-- Isolated test database
-- Mock external services
-- Test data management
-- Environment variables
-- Test configuration
-- Test utilities
-- Test helpers
-
-## Test Documentation
+## Test Documentation Requirements
 
 ### Test Cases
 

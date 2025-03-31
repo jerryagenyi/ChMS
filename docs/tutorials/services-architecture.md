@@ -32,16 +32,35 @@ src/lib/
 
 ## The New Services Architecture
 
-### 1. Services Directory Structure
+### Ministry Management Services
+
+The new ministry management structure replaces the old department/team system with a more flexible MinistryUnit approach:
 
 ```plaintext
-src/services/
-├── api/              # API client and endpoints
-├── db/               # Database operations
-├── auth/             # Authentication and authorization
-├── attendance/       # Attendance management
-└── organization/     # Organization management
+src/services/ministry/
+├── ministryUnit.service.ts    # Core ministry unit operations
+├── ministryMember.service.ts  # Member assignment and management
+└── __tests__/                # Service-specific tests
 ```
+
+### Key Features
+
+1. Hierarchical Structure
+
+   - Support for nested units (departments containing teams)
+   - Flexible categorization
+   - Clear leadership roles
+
+2. Member Management
+
+   - Tracked membership status
+   - Role-based assignments
+   - Leadership positions
+
+3. Organization Integration
+   - Direct connection to organization
+   - Proper relationship tracking
+   - Enhanced querying capabilities
 
 ### 2. Service Types
 

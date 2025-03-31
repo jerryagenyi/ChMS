@@ -87,4 +87,46 @@ describe('ContentLayout', () => {
     const container = screen.getByText('Test Content').parentElement?.parentElement;
     expect(container).toHaveStyle({ boxShadow: 'lg' });
   });
+
+  it('handles ministry unit content layout', () => {
+    renderWithChakra(
+      <ContentLayout
+        breadcrumbs={<div>Home / Ministry Units / Department Name</div>}
+        title="Department Overview"
+      >
+        <div>Ministry Unit Details</div>
+      </ContentLayout>
+    );
+
+    expect(screen.getByText('Department Overview')).toBeInTheDocument();
+    expect(screen.getByText('Home / Ministry Units / Department Name')).toBeInTheDocument();
+  });
+
+  it('supports ministry management actions', () => {
+    renderWithChakra(
+      <ContentLayout
+        actions={
+          <div>
+            <button>Add Member</button>
+            <button>Edit Unit</button>
+          </div>
+        }
+      >
+        <div>Unit Content</div>
+      </ContentLayout>
+    );
+
+    expect(screen.getByRole('button', { name: 'Add Member' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit Unit' })).toBeInTheDocument();
+  });
+
+  it('handles loading states', () => {
+    renderWithChakra(
+      <ContentLayout isLoading>
+        <div>Loading Content...</div>
+      </ContentLayout>
+    );
+
+    expect(screen.getByText('Loading Content...')).toBeInTheDocument();
+  });
 });

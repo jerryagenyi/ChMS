@@ -6,7 +6,28 @@ This plan outlines the steps needed to align our codebase with the technical spe
 
 ## Phase 1: Directory Structure Cleanup
 
-### 1.1 Consolidate Test Directories
+### 1.1 Database Schema Restructuring [IN PROGRESS]
+
+- [x] Replace Department/Team models with new MinistryUnit structure
+
+  - [x] Add MinistryUnitType enum
+  - [x] Add MinistryCategory enum
+  - [x] Add LeadershipRole enum
+  - [x] Add MemberRole enum
+  - [x] Add MembershipStatus enum
+  - [x] Create MinistryUnit model
+  - [x] Create MinistryUnitLeader model
+  - [x] Create MinistryUnitMember model
+  - [x] Update Organization model relations
+  - [x] Update Member model relations
+
+- [ ] Create new schema-related files:
+  - [ ] `src/lib/validation/schemas/ministryUnit.schema.ts`
+  - [ ] `src/lib/validation/schemas/ministryMember.schema.ts`
+  - [ ] `src/services/ministry/ministryUnit.service.ts`
+  - [ ] `src/services/ministry/ministryMember.service.ts`
+
+### 1.2 Consolidate Test Directories
 
 - [ ] Create new `src/__tests__` directory
 - [ ] Move tests from `src/test` to `src/__tests__`
@@ -15,15 +36,16 @@ This plan outlines the steps needed to align our codebase with the technical spe
 - [ ] Update import paths in all test files
 - [ ] Verify test configuration in `vitest.config.ts`
 
-### 1.2 Create Missing Core Directories
+### 1.3 Create Missing Core Directories
 
 - [ ] Create `src/services/` for external integrations
+  - [ ] Add `ministry/` subdirectory for new ministry unit services
 - [ ] Create `src/store/` for state management
 - [ ] Create `src/utils/` for utility functions
 - [ ] Create `src/config/` for configurations
 - [ ] Create `src/theme/` for Chakra UI theme
 
-### 1.3 Reorganize Existing Directories
+### 1.4 Reorganize Existing Directories
 
 - [ ] Move utility functions from `lib` to `utils`
 - [ ] Move API-related code to `services/api`
@@ -32,15 +54,26 @@ This plan outlines the steps needed to align our codebase with the technical spe
 
 ## Phase 2: Component Structure Standardization
 
-### 2.1 Create Base Component Structure
+### 2.1 Create Ministry Management Components [NEW]
 
-- [x] Create template for new component structure:
+- [ ] Create base component structure:
   ```
-  ComponentName/
-  ├── index.ts
-  ├── ComponentName.tsx
-  ├── ComponentName.test.tsx
-  └── types.ts
+  src/components/Ministry/
+  ├── UnitList/
+  │   ├── index.ts
+  │   ├── UnitList.tsx
+  │   ├── UnitList.test.tsx
+  │   └── types.ts
+  ├── UnitForm/
+  │   ├── index.ts
+  │   ├── UnitForm.tsx
+  │   ├── UnitForm.test.tsx
+  │   └── types.ts
+  └── MemberAssignment/
+      ├── index.ts
+      ├── MemberAssignment.tsx
+      ├── MemberAssignment.test.tsx
+      └── types.ts
   ```
 
 ### 2.2 Update Existing Components
@@ -352,31 +385,28 @@ This plan outlines the steps needed to align our codebase with the technical spe
 
 ## Implementation Order
 
-1. Start with Phase 1 (Directory Structure)
-2. Move to Phase 2 (Component Structure)
-3. Implement Phase 3 (API Routes)
-4. Set up Phase 4 (State Management)
-5. Configure Phase 5 (Styling)
-6. Build Phase 6 (Testing)
-7. Complete Phase 7 (Documentation)
-8. Finalize Phase 8 (Quality)
+1. Complete Phase 1.1 (Database Schema Restructuring) [CURRENT]
+2. Implement Phase 1.2-1.4 (Directory Structure)
+3. Move to Phase 2 (Component Structure)
+4. Continue with remaining phases...
 
 ## Success Criteria
 
-1. All directories follow the new structure
-2. All components follow the standard pattern
-3. All API routes are properly organized
-4. State management is properly configured
-5. Theme and styling are consistent
-6. Test coverage meets requirements
-7. Documentation is complete and up-to-date
-8. Code quality checks pass
+1. New MinistryUnit structure implemented and tested
+2. All directories follow the new structure
+3. All components follow the standard pattern
+4. All API routes are properly organized
+5. State management is properly configured
+6. Theme and styling are consistent
+7. Test coverage meets requirements
+8. Documentation is complete and up-to-date
+9. Code quality checks pass
 
 ## Notes
 
-- Each phase should be completed before moving to the next
-- Tests should be written/updated alongside changes
-- Documentation should be updated as changes are made
+- Schema changes are being made early in development, minimizing impact
+- No data migration needed as database is new
+- Components and services will be built around new schema
 - Regular commits should be made with clear messages
 - Each major change should be reviewed before merging
 

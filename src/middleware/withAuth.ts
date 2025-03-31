@@ -1,8 +1,8 @@
- import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { Permission, Role } from '../types/auth';
-import { checkPermission, checkPermissions } from '../lib/auth/permissions';
-import { AuthenticationError, AuthorizationError, AppError } from '../lib/errors';
+import { hasPermission } from '../services/auth/roles';
+import { AuthenticationError, AuthorizationError, AppError } from '@/lib/errors';
 import { logger } from '../lib/logger';
 
 interface AuthOptions {
@@ -21,6 +21,7 @@ export function withAuth(options: AuthOptions = {}) {
           throw new AuthenticationError();
         }
 
+        const userId = session.user.id;
         const userRole = session.user.role as Role;
 
         // Check if user's role is allowed
@@ -30,31 +31,26 @@ export function withAuth(options: AuthOptions = {}) {
 
         // Check if user has required permissions
         if (options.requiredPermissions) {
-          const hasPermission = options.requireAllPermissions
-            ? checkPermissions(userRole, options.requiredPermissions, true)
-            : checkPermissions(userRole, options.requiredPermissions);
+          const permissionChecks = await Promise.all(
+            options.requiredPermissions.map(permission => 
+              hasPermission(userId, permission)
+            )
+          );
 
-          if (!hasPermission) {
+          const hasRequiredPermissions = options.requireAllPermissions
+            ? permissionChecks.every(Boolean)
+            : permissionChecks.some(Boolean);
+
+          if (!hasRequiredPermissions) {
             throw new AuthorizationError('You do not have permission to perform this action');
           }
         }
 
-        // Add user and role information to the request
-        const requestWithAuth = new Request(req.url, {
-          headers: req.headers,
-          method: req.method,
-          body: req.body,
-        });
-
-        // @ts-ignore - Adding custom properties to Request
-        requestWithAuth.user = session.user;
-        // @ts-ignore
-        requestWithAuth.role = userRole;
-
-        return handler(requestWithAuth);
+        return handler(req);
       } catch (error) {
         const appError = error instanceof AppError ? error : new AppError('Authentication error');
-        logger.error('Auth middleware error', appError, undefined, {
+        logger.error('Auth middleware error', {
+          error: appError,
           path: new URL(req.url).pathname,
           method: req.method,
         });

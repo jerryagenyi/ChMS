@@ -2,167 +2,164 @@
 
 ## Overview
 
-This document defines our security standards and best practices.
+Security standards specifically tailored for our Church Management System (ChMS), balancing robust security with performance requirements.
 
 ## Authentication
 
-### User Authentication
+### User Authentication Implementation
 
-- Implement secure login
-- Use password hashing
-- Implement 2FA
-- Handle session management
-- Implement password reset
-- Handle account lockout
-- Implement remember me
+1. Secure Login
 
-### API Authentication
+   - Implement password-based authentication with email
+   - Use Argon2id for password hashing (balanced security/performance)
+   - Rate limit login attempts (max 5 attempts/5 minutes)
+   - Implement progressive security measures to maintain performance
 
-- Use JWT tokens
-- Implement token refresh
-- Handle token expiration
-- Secure token storage
-- Implement rate limiting
-- Handle API keys
-- Implement OAuth
+2. Session Management
+
+   - Use HttpOnly, Secure cookies for session tokens
+   - Implement sliding session expiration (2 hours default)
+   - Maintain session registry for concurrent login control
+   - Session data caching for performance optimization
+
+3. Multi-Factor Authentication
+   - Optional 2FA for administrative roles
+   - Support TOTP (Time-based One-Time Password)
+   - Fallback to email-based verification
+   - Cache 2FA verification status (5 minutes)
 
 ## Authorization
 
-### Access Control
+### Role-Based Access Control (RBAC)
 
-- Implement RBAC
-- Define user roles
-- Define permissions
-- Handle resource access
-- Implement audit logs
-- Handle admin access
-- Implement escalation
+1. Church-Specific Roles
 
-### API Security
+   - Super Admin (System level)
+   - Church Admin (Organization level)
+   - Ministry Leader (Ministry unit level)
+   - Staff Member (Limited administrative access)
+   - Member (Basic access)
 
-- Secure endpoints
-- Validate input
-- Sanitize output
-- Handle CORS
-- Implement rate limiting
-- Handle API versioning
-- Implement API keys
+2. Permission Sets
+
+   - Attendance Management
+     - View attendance records
+     - Record attendance
+     - Generate reports
+   - Member Management
+     - View member profiles
+     - Edit member details
+     - Manage family units
+   - Ministry Management
+     - Create/edit ministry units
+     - Assign leaders/members
+     - Manage ministry events
+
+3. Access Control Implementation
+   - Use middleware for route protection
+   - Implement view-level permission checks
+   - Cache permission checks (1 minute TTL)
+   - Audit all permission changes
 
 ## Data Security
 
-### Data Protection
+### Personal Information Protection
 
-- Encrypt sensitive data
-- Handle PII
-- Implement data masking
-- Handle data retention
-- Implement backups
-- Handle data deletion
-- Implement archiving
+1. Member Data Encryption
 
-### Database Security
+   - Encrypt sensitive fields (contact details, family information)
+   - Use AES-256-GCM for field-level encryption
+   - Implement key rotation policy
+   - Cache decrypted data briefly (30 seconds)
 
-- Secure connections
-- Implement row-level security
-- Handle migrations
-- Implement backups
-- Handle encryption
-- Implement auditing
-- Handle access control
+2. Data Access Controls
+   - Implement data access logging
+   - Restrict PII access by role
+   - Enforce data retention policies
+   - Monitor unusual access patterns
 
-## Application Security
+### Security-Performance Balance
 
-### Frontend Security
+1. Caching Strategy
 
-- Implement CSP
-- Handle XSS
-- Handle CSRF
-- Secure cookies
-- Handle local storage
-- Implement input validation
-- Handle file uploads
+   - Cache permission checks
+   - Cache non-sensitive user data
+   - Use Redis for session storage
+   - Implement cache invalidation
 
-### Backend Security
+2. Performance Optimization
+   - Batch database operations
+   - Optimize encryption operations
+   - Minimize authentication overhead
+   - Use connection pooling
 
-- Secure headers
-- Handle SQL injection
-- Implement rate limiting
-- Handle file uploads
-- Implement logging
-- Handle errors
-- Implement monitoring
+## Integration with Development Standards
 
-## Infrastructure Security
+### Secure Coding Practices
 
-### Network Security
+1. Input Validation
 
-- Implement firewalls
-- Handle SSL/TLS
-- Implement VPN
-- Handle DNS
-- Implement monitoring
-- Handle DDoS
-- Implement backups
+   - Validate all user inputs
+   - Sanitize data for XSS prevention
+   - Use parameterized queries
+   - Implement request size limits
 
-### Cloud Security
+2. Output Encoding
+   - Encode all dynamic content
+   - Use Content Security Policy
+   - Implement CSRF protection
+   - Set security headers
 
-- Secure cloud resources
-- Handle IAM
-- Implement monitoring
-- Handle backups
-- Implement logging
-- Handle compliance
-- Implement disaster recovery
+### Security Testing Requirements
+
+1. Automated Security Tests
+
+   - SAST (Static Application Security Testing)
+   - DAST (Dynamic Application Security Testing)
+   - Dependency scanning
+   - Regular penetration testing
+
+2. Performance Impact Testing
+   - Measure authentication overhead
+   - Monitor encryption performance
+   - Test security feature impact
+   - Benchmark security middleware
 
 ## Compliance
 
 ### Data Protection
 
-- Handle GDPR
-- Handle CCPA
-- Implement data rights
-- Handle data requests
-- Implement consent
-- Handle data breaches
-- Implement reporting
+1. GDPR Compliance
 
-### Industry Standards
+   - Implement data export
+   - Support data deletion
+   - Track consent
+   - Document processing activities
 
-- Follow OWASP
-- Implement PCI DSS
-- Handle HIPAA
-- Implement SOC 2
-- Handle ISO 27001
-- Implement NIST
-- Handle compliance
+2. Church-Specific Requirements
+   - Protect attendance records
+   - Secure donation data
+   - Manage ministry assignments
+   - Control access to pastoral notes
 
-## Security Process
+## Security Monitoring
 
-### Development
+1. Real-time Monitoring
 
-- Secure coding
-- Code review
-- Security testing
-- Vulnerability scanning
-- Dependency scanning
-- Security training
-- Incident response
+   - Log security events
+   - Monitor authentication attempts
+   - Track permission changes
+   - Alert on suspicious activity
 
-### Operations
-
-- Security monitoring
-- Incident handling
-- Vulnerability management
-- Patch management
-- Access management
-- Security reporting
-- Compliance monitoring
+2. Performance Monitoring
+   - Track security overhead
+   - Monitor response times
+   - Measure encryption impact
+   - Log security cache hits/misses
 
 ## Resources
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [NIST Guidelines](https://www.nist.gov/cybersecurity)
-- [GDPR Guidelines](https://gdpr-info.eu/)
-- [PCI DSS](https://www.pcisecuritystandards.org/)
-- [HIPAA Guidelines](https://www.hhs.gov/hipaa/index.html)
-- [Security Best Practices](https://www.cisecurity.org/)
+- [GDPR Requirements](https://gdpr.eu/)
+- [Security Headers](https://securityheaders.com/)
+- [Web Security Guidelines](https://www.w3.org/Security/)

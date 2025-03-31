@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]';
+import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
 
 const reportSchema = z.object({

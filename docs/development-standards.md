@@ -2,9 +2,77 @@
 
 ## Overview
 
-This document defines our core development standards and best practices.
+This document defines our core development standards and best practices, emphasizing minimalist design and performance optimization.
+
+## Design Principles
+
+### Minimalist Design
+
+1. Code Simplicity
+
+   - Write clear, self-documenting code
+   - Avoid premature optimization
+   - Minimize dependencies
+   - Keep components focused and single-purpose
+   - Prefer simple solutions over complex ones
+
+2. Feature Implementation
+
+   - Start with minimal viable implementation
+   - Add complexity only when justified
+   - Regular refactoring to maintain simplicity
+   - Document complexity when unavoidable
+
+3. Dependency Management
+   - Carefully evaluate new dependencies
+   - Regular dependency audits
+   - Remove unused dependencies
+   - Prefer native solutions when practical
+
+### Performance Optimization
+
+1. Database Operations
+
+   - Optimize common queries
+     - Member lookup patterns
+     - Attendance tracking queries
+     - Family unit relationships
+   - Use appropriate indexes
+   - Implement query caching
+   - Monitor query performance
+
+2. Frontend Performance
+
+   - Minimize bundle size
+   - Implement code splitting
+   - Optimize image loading
+   - Use efficient state management
+   - Implement proper caching
+
+3. API Optimization
+   - Minimize payload size
+   - Implement response caching
+   - Optimize endpoint design
+   - Use appropriate batch operations
 
 ## Code Standards
+
+### Database Schema
+
+- Use meaningful model names
+- Implement proper relations
+- Use appropriate field types
+- Define proper indexes
+- Use enums for fixed values
+- Document model relationships
+- Follow naming conventions:
+  - Models: PascalCase (e.g., `MinistryUnit`)
+  - Fields: camelCase
+  - Enums: UPPER_CASE for values
+- Include timestamps (`createdAt`, `updatedAt`) for all models
+- Use appropriate cascade deletions
+- Implement proper foreign key constraints
+- Document complex relationships
 
 ### TypeScript
 
@@ -37,6 +105,17 @@ This document defines our core development standards and best practices.
 - Handle offline mode
 
 ## Development Process
+
+### Schema Changes
+
+- Make schema changes early in development
+- Document all model relationships
+- Update affected validation schemas
+- Create corresponding service files
+- Update affected components
+- Write migration scripts if needed
+- Test all related functionality
+- Update documentation
 
 ### Git Workflow
 
@@ -196,3 +275,39 @@ This document defines our core development standards and best practices.
 - [Chakra UI Documentation](https://chakra-ui.com/docs)
 - [Testing Library Documentation](https://testing-library.com/docs/)
 - [WCAG Guidelines](https://www.w3.org/WAI/standards-guidelines/wcag/)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Database Schema Best Practices](https://www.prisma.io/dataguide)
+
+## Security Integration
+
+All development must follow the security standards defined in `docs/security-standards.md`:
+
+1. Authentication
+
+   - Implement RBAC as specified
+   - Follow session management guidelines
+   - Implement proper token handling
+
+2. Data Protection
+   - Follow encryption standards
+   - Implement proper data sanitization
+   - Handle sensitive data appropriately
+
+## Performance Targets
+
+1. Page Load Performance
+
+   - First Contentful Paint: < 1.5s
+   - Time to Interactive: < 2s
+   - Total Bundle Size: < 200KB (initial load)
+
+2. Runtime Performance
+
+   - API Response Time: < 200ms
+   - Animation Frame Rate: > 55fps
+   - Memory Usage: < 50MB
+
+3. Offline Capability
+   - Core features functional offline
+   - Efficient data synchronization
+   - Minimal storage usage

@@ -76,12 +76,26 @@ export const GET = validate(reportSchema, async (req: Request) => {
     // Get attendance records
     const attendanceRecords = await prisma.attendance.findMany({
       where,
-      select: {
-        id: true,
-        memberId: true,
-        date: true,
-        status: true,
-        notes: true,
+      include: {
+        member: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        service: {
+          select: {
+            id: true,
+            name: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+      },
+      orderBy: {
+        date: 'asc',
       },
     });
 

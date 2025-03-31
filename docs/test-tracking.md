@@ -14,11 +14,23 @@ This document tracks the implementation status of all tests in the codebase.
 
 #### Services
 
+- [x] Ministry Service Tests
+  - [x] MinistryUnitService
+  - [x] MinistryMemberService
 - [ ] API Service
 - [ ] Database Service
 - [ ] Auth Service
 - [ ] Attendance Service
 - [ ] Organization Service
+
+#### Schemas
+
+- [x] Ministry Schemas
+  - [x] MinistryUnit Schema
+  - [x] MinistryMember Schema
+- [ ] Organization Schema
+- [ ] Member Schema
+- [ ] Attendance Schema
 
 #### Components
 
@@ -32,6 +44,10 @@ This document tracks the implementation status of all tests in the codebase.
 
 #### Utils
 
+- [x] Test Helpers
+  - [x] Mock Context Creation
+  - [x] Test Data Factories
+  - [x] Date Utilities
 - [ ] Validation Utils
 - [ ] Formatting Utils
 - [ ] Date Utils
@@ -113,10 +129,10 @@ This document tracks the implementation status of all tests in the codebase.
 
 ### Current Coverage
 
-- Unit Tests: 3%
+- Unit Tests: 15%
 - Integration Tests: 0%
 - E2E Tests: 0%
-- Overall: 1%
+- Overall: 5%
 
 ### Target Coverage
 

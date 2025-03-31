@@ -1,36 +1,39 @@
 import { NextResponse } from 'next/server';
 import { validate } from '@/middleware/validate';
-import { createAttendanceSchema, updateAttendanceSchema } from '@/lib/validation/schemas';
+import { createAttendanceSchema } from '@/lib/validation/schemas';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
-interface ValidatedRequest extends Request {
-  validatedData: {
-    body?: unknown;
-    query?: unknown;
-    params?: unknown;
-  };
-}
+const attendanceQuerySchema = z.object({
+  memberId: z.string().uuid().optional(),
+  classId: z.string().uuid().optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  status: z.enum(['present', 'absent', 'late']).optional(),
+  page: z.number().int().positive().default(1),
+  limit: z.number().int().positive().max(100).default(10),
+});
 
 // Create attendance record
 export const POST = validate({
   body: createAttendanceSchema,
-})(async (req: ValidatedRequest) => {
+})(async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { body } = req.validatedData;
+    const validatedReq = req as unknown as { validatedData: { body: z.infer<typeof createAttendanceSchema> } };
+    const { body } = validatedReq.validatedData;
 
     const attendance = await prisma.attendance.create({
       data: {
         ...body,
-        organizationId: session.user.organizationId,
+        organizationId: session.user.organizationId ?? '',
       },
       include: {
         member: true,
@@ -57,23 +60,16 @@ export const POST = validate({
 
 // Get attendance records with pagination and filters
 export const GET = validate({
-  query: z.object({
-    memberId: z.string().uuid().optional(),
-    classId: z.string().uuid().optional(),
-    startDate: z.string().datetime().optional(),
-    endDate: z.string().datetime().optional(),
-    status: z.enum(['present', 'absent', 'late']).optional(),
-    page: z.number().int().positive().default(1),
-    limit: z.number().int().positive().max(100).default(10),
-  }),
-})(async (req: ValidatedRequest) => {
+  query: attendanceQuerySchema,
+})(async (req: Request) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { query } = req.validatedData;
+    const validatedReq = req as unknown as { validatedData: { query: z.infer<typeof attendanceQuerySchema> } };
+    const { query } = validatedReq.validatedData;
 
     const where = {
       organizationId: session.user.organizationId,

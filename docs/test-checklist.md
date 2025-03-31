@@ -8,9 +8,20 @@ This document tracks all test requirements and their implementation status acros
 
 ### Critical (Must Have)
 
+- [x] Test Infrastructure Setup
+  - [x] Vitest Configuration
+  - [x] Mock System
+  - [x] Test Helpers
 - [ ] Authentication & User Management
-- [ ] Core Service Tests (API, Database, Auth)
-- [ ] Basic Component Tests
+- [x] Core Service Tests
+  - [x] Ministry Management Services
+  - [ ] API Services
+  - [ ] Database Services
+  - [ ] Auth Services
+- [x] Schema Validation Tests
+  - [x] Ministry Unit Schema
+  - [x] Ministry Member Schema
+- [x] Basic Component Tests
 - [ ] Security Tests
 
 ### Important (Should Have)
@@ -30,14 +41,19 @@ This document tracks all test requirements and their implementation status acros
 
 ### Completed
 
+- [x] Test infrastructure setup
+- [x] Ministry service tests
+- [x] Ministry schema tests
 - [x] ErrorBoundary component tests
 - [x] LoadingState component tests
 - [x] OfflineFallback component tests
+- [x] Test helpers and utilities
 
 ### In Progress
 
-- [ ] Authentication & User Management
-- [ ] Core Service Tests
+- [ ] API service tests
+- [ ] Database service tests
+- [ ] Auth service tests
 
 ### Not Started
 

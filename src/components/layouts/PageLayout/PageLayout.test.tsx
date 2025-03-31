@@ -106,4 +106,47 @@ describe('PageLayout', () => {
     fireEvent.click(toggleButton);
     expect(onSidebarToggle).toHaveBeenCalled();
   });
+
+  it('renders with ministry management structure', () => {
+    renderWithChakra(
+      <PageLayout sidebar={<div>Ministry Units</div>} header={<div>Ministry Management</div>}>
+        <div>Ministry Content</div>
+      </PageLayout>
+    );
+
+    expect(screen.getByText('Ministry Units')).toBeInTheDocument();
+    expect(screen.getByText('Ministry Management')).toBeInTheDocument();
+    expect(screen.getByText('Ministry Content')).toBeInTheDocument();
+  });
+
+  it('handles nested ministry unit navigation', () => {
+    renderWithChakra(
+      <PageLayout
+        sidebar={
+          <div>
+            <div>Parent Unit</div>
+            <div>└─ Sub Unit</div>
+          </div>
+        }
+      >
+        <div>Unit Details</div>
+      </PageLayout>
+    );
+
+    expect(screen.getByText('Parent Unit')).toBeInTheDocument();
+    expect(screen.getByText('└─ Sub Unit')).toBeInTheDocument();
+  });
+
+  it('maintains layout on different viewport sizes', () => {
+    // Test mobile view
+    window.resizeTo(375, 812);
+
+    renderWithChakra(
+      <PageLayout sidebar={<div>Ministry Navigation</div>} header={<div>Ministry Dashboard</div>}>
+        <div>Content Area</div>
+      </PageLayout>
+    );
+
+    // Add your responsive layout assertions here
+  });
 });

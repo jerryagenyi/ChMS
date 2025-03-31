@@ -1,6 +1,27 @@
 # Church Management System (ChMS)
 
-A modern web-based solution for church administration, designed specifically for African churches.
+A modern, minimalist web-based solution for church administration, designed specifically for African churches with focus on performance and efficiency.
+
+## Core Architecture Principles
+
+### 1. Minimalist Design
+
+- Simple, focused feature set addressing core church management needs
+- Intuitive, clean user interface requiring minimal training
+- Efficient workflows minimizing clicks and user actions
+- Carefully curated dependencies to maintain small bundle size
+- Progressive enhancement approach for feature additions
+
+### 2. Performance First
+
+- Optimized for low-bandwidth environments
+- Offline-first architecture for core features
+- Efficient data structures for common operations
+  - Optimized member lookups
+  - Fast attendance tracking
+  - Efficient family unit management
+- Minimal client-side JavaScript
+- Strategic code splitting and lazy loading
 
 ## Core Features (MVP)
 
@@ -16,6 +37,30 @@ A modern web-based solution for church administration, designed specifically for
   - Brand assets (logo, favicon)
   - Customizable UI theme
   - Accessible through settings dashboard
+
+### Technical Implementation Approach
+
+Each feature is implemented following our core principles:
+
+1. Minimalist Implementation
+
+   - Simple, maintainable code
+   - Clear separation of concerns
+   - Minimal dependencies
+   - Focused feature scope
+
+2. Performance Optimization
+
+   - Efficient database queries
+   - Optimized API responses
+   - Strategic caching
+   - Minimal network requests
+
+3. Security Integration
+   - Built-in security controls
+   - Data privacy by design
+   - Role-based access control
+   - Regular security audits
 
 ### Member Management
 
@@ -110,13 +155,42 @@ A modern web-based solution for church administration, designed specifically for
 - GDPR compliance
 - Regular backups
 
+## Standards Integration
+
+Our implementation follows these integrated standards:
+
+1. Development Standards
+
+   - Clean code principles
+   - Performance optimization guidelines
+   - Security-first development
+   - Accessibility requirements
+
+2. Testing Standards
+
+   - Comprehensive test coverage
+   - Performance benchmarking
+   - Security testing
+   - Accessibility testing
+
+3. Security Standards
+   - Data protection
+   - Access control
+   - Audit logging
+   - Compliance requirements
+
 ## Technical Stack
 
 - **Frontend**: Next.js with TypeScript
 - **UI Framework**: Chakra UI
 - **Database**: PostgreSQL
 - **ORM**: Prisma
-- **Testing**: Jest, React Testing Library, MSW
+- **Testing**:
+  - Vitest for unit and integration tests
+  - Mock Service Worker (MSW)
+  - Custom test helpers and factories
+  - Schema validation testing
+  - Service layer testing
 - **Form Handling**: React Hook Form with Zod validation
 - **Date Handling**: date-fns
 - **Monitoring & Logging**
@@ -132,6 +206,9 @@ A modern web-based solution for church administration, designed specifically for
   - [x] User event tracking
   - [x] Progressive enhancement
   - [x] Form validation and security
+  - [x] Test infrastructure setup
+  - [x] Service layer testing
+  - [x] Schema validation testing
 
 ## Getting Started
 

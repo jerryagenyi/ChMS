@@ -5,12 +5,14 @@ import { Sidebar } from './Sidebar';
 
 interface LayoutProps {
   children: ReactNode;
+  showMinistryNav?: boolean;
+  ministryUnitId?: string;
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, showMinistryNav = false, ministryUnitId }: LayoutProps) {
   return (
     <Flex minH="100vh" bg="gray.50">
-      <Sidebar />
+      <Sidebar showMinistryNav={showMinistryNav} activeUnitId={ministryUnitId} />
       <Box flex="1">
         <Header />
         <Container maxW="container.xl" py={8}>

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { toast } from 'react-hot-toast';
 import {
   Box,
   Button,
@@ -27,8 +26,30 @@ import {
   CardHeader,
   CardFooter,
 } from '@chakra-ui/react';
+import type { IconType } from 'react-icons';
+import { HiPlus, HiCalendar, HiUserGroup, HiChartBar } from 'react-icons/hi';
 import Dialog from '@/components/Dialog';
-import { AddIcon, CalendarIcon, UserAddIcon, ChartBarIcon } from '@chakra-ui/icons';
+
+interface IconProps {
+  size?: number;
+  className?: string;
+}
+
+const PlusIcon = (props: IconProps): JSX.Element => (
+  <HiPlus role="img" aria-hidden="true" {...props} />
+);
+
+const CalendarIcon = (props: IconProps): JSX.Element => (
+  <HiCalendar role="img" aria-hidden="true" {...props} />
+);
+
+const UsersIcon = (props: IconProps): JSX.Element => (
+  <HiUserGroup role="img" aria-hidden="true" {...props} />
+);
+
+const ChartIcon = (props: IconProps): JSX.Element => (
+  <HiChartBar role="img" aria-hidden="true" {...props} />
+);
 
 interface DashboardStats {
   totalMembers: number;
@@ -105,11 +126,25 @@ export default function DashboardPage() {
     try {
       setIsSigningOut(true);
       await signOut({ redirect: false });
-      toast.success('Signed out successfully');
+      // Fix toast usage
+      toast({
+        title: 'Success',
+        description: 'Signed out successfully',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       router.replace('/auth/signin');
     } catch (error) {
       console.error('Sign out error:', error);
-      toast.error('Failed to sign out. Please try again.');
+      // Fix toast usage
+      toast({
+        title: 'Error',
+        description: 'Failed to sign out. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setIsSigningOut(false);
       setShowConfirmDialog(false);
@@ -188,7 +223,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <HStack>
-                    <CalendarIcon />
+                    <CalendarIcon size={24} />
                     <Heading size="md">Events</Heading>
                   </HStack>
                 </CardHeader>
@@ -197,7 +232,7 @@ export default function DashboardPage() {
                 </CardBody>
                 <CardFooter>
                   <Button
-                    leftIcon={<AddIcon />}
+                    leftIcon={<PlusIcon size={20} />}
                     colorScheme="blue"
                     onClick={() => router.push('/events/new')}
                   >
@@ -209,7 +244,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <HStack>
-                    <UserAddIcon />
+                    <UsersIcon size={24} />
                     <Heading size="md">Members</Heading>
                   </HStack>
                 </CardHeader>
@@ -218,7 +253,7 @@ export default function DashboardPage() {
                 </CardBody>
                 <CardFooter>
                   <Button
-                    leftIcon={<AddIcon />}
+                    leftIcon={<PlusIcon size={20} />}
                     colorScheme="blue"
                     onClick={() => router.push('/members/register')}
                   >
@@ -230,7 +265,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <HStack>
-                    <ChartBarIcon />
+                    <ChartIcon size={24} />
                     <Heading size="md">Analytics</Heading>
                   </HStack>
                 </CardHeader>
@@ -239,7 +274,7 @@ export default function DashboardPage() {
                 </CardBody>
                 <CardFooter>
                   <Button
-                    leftIcon={<ChartBarIcon />}
+                    leftIcon={<ChartIcon size={20} />}
                     colorScheme="blue"
                     onClick={() => router.push('/analytics')}
                   >
@@ -253,30 +288,14 @@ export default function DashboardPage() {
 
         <Dialog
           isOpen={showConfirmDialog}
-          onClose={() => !isSigningOut && setShowConfirmDialog(false)}
-          title="Confirm Sign Out"
-        >
-          <Box>
-            <Text mb={6}>Are you sure you want to sign out?</Text>
-            <Flex justify="flex-end" gap={4}>
-              <Button
-                variant="ghost"
-                onClick={() => setShowConfirmDialog(false)}
-                isDisabled={isSigningOut}
-              >
-                Cancel
-              </Button>
-              <Button
-                colorScheme="purple"
-                onClick={handleSignOut}
-                isLoading={isSigningOut}
-                loadingText="Signing out..."
-              >
-                Sign Out
-              </Button>
-            </Flex>
-          </Box>
-        </Dialog>
+          onClose={() => setShowConfirmDialog(false)}
+          onConfirm={handleSignOut}
+          title="Sign Out"
+          message="Are you sure you want to sign out?"
+          confirmText="Sign Out"
+          cancelText="Cancel"
+          isLoading={isSigningOut}
+        />
       </Container>
     </Box>
   );

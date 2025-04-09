@@ -40,9 +40,15 @@ export class ClaudeTaskMaster {
    *
    * @param config - Configuration for the TaskMaster including API key and model strategy
    */
-  constructor(config: TaskMasterConfig) {
+  constructor(config?: Partial<TaskMasterConfig>) {
+    // Get API key from environment variable
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY environment variable is required');
+    }
+
     // Set default model strategy based on cost efficiency
-    this.defaultModel = config.defaultModel || 'claude-3-haiku-20240229';
+    this.defaultModel = config?.defaultModel || 'claude-3-haiku-20240229';
 
     // Initialize model selection strategy with defaults
     this.modelStrategy = {
@@ -50,16 +56,17 @@ export class ClaudeTaskMaster {
       medium: 'claude-3-haiku-20240229',   // Still use Haiku for medium complexity
       high: 'claude-3-sonnet-20240229',    // Use Sonnet for complex tasks
       critical: 'claude-3-opus-20240229',  // Use Opus only for critical tasks
-      ...config.modelStrategy              // Override with any user-provided strategy
+      ...config?.modelStrategy              // Override with any user-provided strategy
     };
 
     // Initialize client with default model
-    this.client = new ClaudeClient(config.apiKey, this.defaultModel);
+    this.client = new ClaudeClient(apiKey, this.defaultModel);
     this.tasks = new Map();
     this.activeTasks = new Set();
     
     // Initialize rate limiter (default: 10 requests per minute)
-    this.rateLimiter = new RateLimiter(config.rateLimit || 10, 60000);
+    const rateLimit = config?.rateLimit || 10;
+    this.rateLimiter = new RateLimiter(rateLimit, 60000);
     
     // Initialize batch processor
     this.batchProcessor = new BatchProcessor(this);

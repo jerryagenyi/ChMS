@@ -12,8 +12,6 @@ export type TaskComplexity = 'low' | 'medium' | 'high' | 'critical';
  * Configuration options for the ClaudeTaskMaster.
  */
 export interface TaskMasterConfig {
-  /** Anthropic API key */
-  apiKey: string;
   /** Default Claude model to use */
   defaultModel?: ClaudeModel;
   /** Maximum tokens to generate in the response */

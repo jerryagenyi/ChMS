@@ -19,6 +19,22 @@ A modern, minimalist web-based solution for church administration, designed spec
 - **Testing**: Vitest, React Testing Library, MSW
 - **Other**: Sharp (image processing), date-fns, Sentry, Pino
 
+## Documentation
+
+This project's documentation is organized into two main directories:
+
+- **[docs/](./docs/)**: Application and developer documentation
+
+  - User guides, API documentation, development standards, tutorials
+  - See [docs/README.md](./docs/README.md) for a complete overview
+
+- **[pm/](./pm/)**: Project management artifacts
+
+  - Product requirements, technical architecture, user stories, feature specifications
+  - See [pm/README.md](./pm/README.md) for a complete overview
+
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)**: Guidelines for contributing to the project
+
 ## Setup Instructions
 
 1. **Prerequisites**
@@ -74,15 +90,24 @@ src/
 ├── types/         # TypeScript types
 ├── services/      # External integrations
 └── styles/        # Global styles
+docs/              # Application and developer documentation
+pm/                # Project management artifacts
 ```
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Write/update tests
-5. Submit a pull request
+Please read our [Contributing Guidelines](./CONTRIBUTING.md) for detailed information on:
+
+1. Setting up your development environment
+2. Coding standards and practices
+3. Testing requirements
+4. Pull request process
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
+
+Documentation follows a similar versioning scheme, with changes tracked in each document's version history section.
 
 ## License
 

@@ -1,5 +1,11 @@
 # Test Checklist
 
+> **Related Documents:**
+>
+> - [Testing Strategy](./testing-strategy.md) - Overall testing approach and priorities
+> - [Testing Standards](../docs/standards/testing-standards.md) - Detailed testing standards and requirements
+> - [Testing Strategy Tutorial](../docs/tutorials/testing-strategy.md) - Tutorial on implementing tests
+
 ## Coverage Targets (as defined in testing-standards.md)
 
 - Unit Tests: 85%

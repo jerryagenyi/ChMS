@@ -4,6 +4,12 @@
 
 This document outlines our testing approach for the Church Management System (ChMS), following a pragmatic, priority-based methodology.
 
+> **Related Documents:**
+>
+> - [Testing Standards](../docs/standards/testing-standards.md) - Detailed testing standards and requirements
+> - [Test Checklist](./test-checklist.md) - Checklist for test coverage
+> - [Testing Strategy Tutorial](../docs/tutorials/testing-strategy.md) - Tutorial on implementing tests
+
 ## Testing Priorities
 
 ### P0 (Must Test - 90%+ coverage)

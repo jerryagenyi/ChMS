@@ -4,6 +4,12 @@
 
 This document defines our testing standards and best practices, with specific considerations for our tech stack including Chakra UI v3.
 
+> **Related Documents:**
+>
+> - [Testing Strategy](../../pm/testing-strategy.md) - Overall testing approach and priorities
+> - [Test Checklist](../../pm/test-checklist.md) - Checklist for test coverage
+> - [Testing Strategy Tutorial](../tutorials/testing-strategy.md) - Tutorial on implementing tests
+
 ## Coverage Requirements
 
 ### Overall Requirements

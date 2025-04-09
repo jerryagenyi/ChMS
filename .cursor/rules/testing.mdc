@@ -1,6 +1,6 @@
 ---
 description: Testing rules and guidelines
-globs: 
+globs:
 alwaysApply: true
 ---
 
@@ -8,10 +8,10 @@ alwaysApply: true
 
 ## Core Requirements
 
-1. Use @docs/test-checklist.md as working document (focus P0 first)
-2. Reference @docs/testing-strategy.md and @docs/testing-standards.md
-3. Track in @docs/test-checklist.md
-4. Follow @docs/test-tracking.md for documentation
+1. Use @pm/test-checklist.md as working document (focus P0 first)
+2. Reference @pm/testing-strategy.md and @docs/standards/testing-standards.md
+3. Track in @pm/test-checklist.md
+4. Follow @docs/tutorials/testing-strategy.md for implementation guidance
 
 ## Database Handling
 - Database can be reset freely during tests (no production data)

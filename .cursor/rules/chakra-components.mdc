@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
  # Chakra UI Components in ChMS
@@ -8,6 +8,10 @@ alwaysApply: true
 ## Overview
 
 This document outlines how we use various Chakra UI components in our project, including modals, tables, and data display components.
+
+> **Related Documents:**
+> - [UI Elements Design Specifications](../../pm/ui-elements-design-spec.md) - High-level design specifications
+> - [Chakra UI Usage Guidelines](./chakra-usage.mdc) - General usage guidelines and best practices
 
 ## Modals
 

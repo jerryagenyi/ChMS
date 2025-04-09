@@ -4,6 +4,12 @@
 
 This tutorial explains how we test our application to ensure it works correctly and reliably. We use a combination of different testing approaches to cover all aspects of our application.
 
+> **Related Documents:**
+>
+> - [Testing Strategy](../../pm/testing-strategy.md) - Overall testing approach and priorities
+> - [Testing Standards](../standards/testing-standards.md) - Detailed testing standards and requirements
+> - [Test Checklist](../../pm/test-checklist.md) - Checklist for test coverage
+
 ## Testing Pyramid
 
 ```mermaid

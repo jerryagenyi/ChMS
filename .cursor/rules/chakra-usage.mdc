@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
  # Chakra UI Usage in ChMS
@@ -8,6 +8,10 @@ alwaysApply: true
 ## Overview
 
 This document outlines how Chakra UI is used in the ChMS project, including our conventions, patterns, and best practices.
+
+> **Related Documents:**
+> - [UI Elements Design Specifications](../../pm/ui-elements-design-spec.md) - High-level design specifications
+> - [Chakra UI Components](./chakra-components.mdc) - Component implementation examples
 
 ## Theme Configuration
 

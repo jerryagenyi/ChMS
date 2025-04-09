@@ -4,6 +4,11 @@
 
 This document lists all UI elements requiring design specifications for our ChMS project using Chakra UI v3.
 
+> **Related Documents:**
+>
+> - [Chakra UI Components](./.cursor/rules/chakra-components.mdc) - Component implementation examples
+> - [Chakra UI Usage](./.cursor/rules/chakra-usage.mdc) - Usage guidelines and best practices
+
 ## Core Elements
 
 ### Buttons

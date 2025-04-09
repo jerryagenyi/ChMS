@@ -6,11 +6,48 @@ The Claude Taskmaster is a robust implementation for managing AI tasks using Ant
 
 The Taskmaster implements a cost-efficient model selection strategy that automatically chooses the appropriate Claude model based on task complexity:
 
-- **Low/Medium Complexity**: Uses Claude 3 Haiku (most cost-effective)
-- **High Complexity**: Uses Claude 3 Sonnet (balanced performance/cost)
-- **Critical Tasks**: Uses Claude 3 Opus (highest capability)
+### Models and Their Characteristics
 
-This approach optimizes for both cost and performance. See [model-selection-strategy.md](./model-selection-strategy.md) for details.
+| Model               | Strengths                                   | Use Cases                                               | Relative Cost |
+| ------------------- | ------------------------------------------- | ------------------------------------------------------- | ------------- |
+| **Claude 3 Haiku**  | Fast, cost-effective, good for most tasks   | Simple questions, formatting, basic summaries           | $ (Lowest)    |
+| **Claude 3 Sonnet** | More capable, balanced performance          | Complex analysis, creative tasks, detailed explanations | $$ (Medium)   |
+| **Claude 3 Opus**   | Most powerful, highest reasoning capability | Critical tasks, deep expertise, complex reasoning       | $$$ (Highest) |
+
+### Task Complexity Levels
+
+1. **Low**: Simple tasks like basic questions or formatting
+
+   - Example: "What's the capital of France?"
+   - Default model: Claude 3 Haiku
+
+2. **Medium**: Moderate complexity tasks like summaries or simple analysis
+
+   - Example: "Summarize the key points of this article"
+   - Default model: Claude 3 Haiku
+
+3. **High**: Complex tasks requiring deeper analysis or specialized knowledge
+
+   - Example: "Analyze the implications of this research paper"
+   - Default model: Claude 3 Sonnet
+
+4. **Critical**: Highest importance tasks requiring maximum capability
+   - Example: "Debug this complex algorithm and suggest optimizations"
+   - Default model: Claude 3 Opus
+
+### Default Strategy Implementation
+
+```typescript
+// Default model selection strategy
+this.modelStrategy = {
+  low: 'claude-3-haiku-20240229', // Most cost-effective for simple tasks
+  medium: 'claude-3-haiku-20240229', // Still use Haiku for medium complexity
+  high: 'claude-3-sonnet-20240229', // Use Sonnet for complex tasks
+  critical: 'claude-3-opus-20240229', // Use Opus only for critical tasks
+};
+```
+
+This approach optimizes for both cost and performance by using more powerful (and expensive) models only when necessary.
 
 ## Core Components
 

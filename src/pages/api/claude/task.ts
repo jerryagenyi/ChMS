@@ -15,10 +15,16 @@ function validateEnvironment() {
 // Validate environment on module initialization
 validateEnvironment();
 
-// Initialize the TaskMaster with the API key
+// Initialize the TaskMaster with the API key and model selection strategy
 const taskMaster = new ClaudeTaskMaster({
   apiKey: process.env.ANTHROPIC_API_KEY as string,
-  model: 'claude-3-sonnet-20240229'
+  defaultModel: 'claude-3-haiku-20240229',
+  modelStrategy: {
+    low: 'claude-3-haiku-20240229',      // Most cost-effective for simple tasks
+    medium: 'claude-3-haiku-20240229',   // Still use Haiku for medium complexity
+    high: 'claude-3-sonnet-20240229',    // Use Sonnet for complex tasks
+    critical: 'claude-3-opus-20240229'   // Use Opus only for critical tasks
+  }
 });
 
 /**
@@ -32,7 +38,7 @@ const taskMaster = new ClaudeTaskMaster({
  * Handles POST requests to create and execute a new task.
  */
 async function handlePostRequest(req: NextApiRequest, res: NextApiResponse) {
-  const { description, metadata } = req.body;
+  const { description, metadata, complexity, model } = req.body;
 
   if (!description) {
     return res.status(400).json({
@@ -42,8 +48,13 @@ async function handlePostRequest(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    // Create a new task
-    const task = await taskMaster.createTask(description, metadata);
+    // Create a new task with complexity information
+    const task = await taskMaster.createTask({
+      description,
+      complexity,
+      metadata,
+      model
+    });
 
     // Execute the task
     const result = await taskMaster.executeTask(task.id);

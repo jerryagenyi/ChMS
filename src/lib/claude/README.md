@@ -445,6 +445,144 @@ function TranslationTool() {
 }
 ```
 
+### Coding-Specific Examples
+
+1. Test Generator
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function TestGenerator() {
+  const [code, setCode] = useState<string>('');
+
+  return (
+    <TaskMaster
+      systemPrompt={`You are a test-driven development expert. Generate comprehensive tests that:
+        1. Cover edge cases
+        2. Follow testing best practices
+        3. Use modern testing patterns
+        4. Include meaningful assertions`}
+      initialPrompt={`Generate tests for this code:\n\`\`\`typescript\n${code}\n\`\`\``}
+      showCodeBlocks={true}
+      model="claude-3-sonnet-20240229"
+      onTaskComplete={async result => {
+        await createTestFile(result);
+        runTestSuite();
+      }}
+    />
+  );
+}
+```
+
+2. Code Explainer
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function CodeExplainer() {
+  return (
+    <TaskMaster
+      systemPrompt={`You are a coding mentor explaining complex code concepts.
+        Break down the explanation into:
+        1. High-level overview
+        2. Detailed line-by-line explanation
+        3. Key concepts and patterns used
+        4. Potential improvements`}
+      showCodeBlocks={true}
+      showResponseInMarkdown={true}
+      temperature={0.3} // Lower temperature for more precise explanations
+    />
+  );
+}
+```
+
+3. Code Refactoring Assistant
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function RefactorHelper() {
+  const [complexity, setComplexity] = useState<'low' | 'medium' | 'high'>('medium');
+
+  return (
+    <TaskMaster
+      systemPrompt={`You are a refactoring expert. Suggest improvements focusing on:
+        1. Code readability
+        2. Performance optimization
+        3. Design patterns
+        4. Modern language features
+        Provide before/after comparisons and explain changes.`}
+      model={complexity === 'high' ? 'claude-3-opus-20240229' : 'claude-3-sonnet-20240229'}
+      showCodeBlocks={true}
+      preserveFormatting={true}
+      onTaskComplete={result => {
+        showDiff(result);
+        suggestGitCommitMessage(result);
+      }}
+    />
+  );
+}
+```
+
+4. Documentation Generator
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function DocGenerator() {
+  return (
+    <TaskMaster
+      systemPrompt={`You are a technical documentation expert. Generate documentation that:
+        1. Follows JSDoc standards
+        2. Includes clear examples
+        3. Documents edge cases
+        4. Provides type information
+        5. Lists dependencies and requirements`}
+      showCodeBlocks={true}
+      showResponseInMarkdown={true}
+      onTaskComplete={async result => {
+        await updateDocFiles(result);
+        generateTypedoc();
+      }}
+    />
+  );
+}
+```
+
+5. Bug Detective
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function BugDetective() {
+  const [errorLog, setErrorLog] = useState<string>('');
+  const [codeContext, setCodeContext] = useState<string>('');
+
+  return (
+    <TaskMaster
+      systemPrompt={`You are a debugging expert. Analyze issues by:
+        1. Identifying the root cause
+        2. Explaining the problem
+        3. Suggesting fixes
+        4. Providing prevention tips
+        Include code examples and debugging steps.`}
+      initialPrompt={`Debug this error:
+        Error Log:
+        ${errorLog}
+        
+        Code Context:
+        ${codeContext}`}
+      model="claude-3-sonnet-20240229"
+      showCodeBlocks={true}
+      onTaskComplete={result => {
+        createJiraTicket(result);
+        suggestPRFix(result);
+      }}
+    />
+  );
+}
+```
+
 ### Troubleshooting
 
 1. API Key Issues

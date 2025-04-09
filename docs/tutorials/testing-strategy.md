@@ -1,5 +1,40 @@
 # Testing Strategy Tutorial
 
+> **Difficulty Level**: Intermediate
+> **Prerequisites**: Basic JavaScript/TypeScript, React fundamentals
+> **Version**: Jest 29+, React Testing Library 13+, Cypress 12+
+
+## Quick Reference
+
+```typescript
+// Unit test (Jest + React Testing Library)
+describe('Component', () => {
+  it('renders correctly', () => {
+    render(<Component prop="value" />);
+    expect(screen.getByText('Expected text')).toBeInTheDocument();
+  });
+});
+
+// API test
+describe('API', () => {
+  it('returns data', async () => {
+    const { req, res } = createMocks({ method: 'GET' });
+    await handler(req, res);
+    expect(res._getStatusCode()).toBe(200);
+  });
+});
+
+// E2E test (Cypress)
+describe('User flow', () => {
+  it('completes registration', () => {
+    cy.visit('/register');
+    cy.get('input[name="email"]').type('user@example.com');
+    cy.get('button[type="submit"]').click();
+    cy.url().should('include', '/dashboard');
+  });
+});
+```
+
 ## Overview
 
 This tutorial explains how we test our application to ensure it works correctly and reliably. We use a combination of different testing approaches to cover all aspects of our application.
@@ -301,6 +336,48 @@ it('creates related records', async () => {
 });
 ```
 
+## Troubleshooting
+
+### Common Testing Issues
+
+| Issue                                            | Solution                                                  |
+| ------------------------------------------------ | --------------------------------------------------------- |
+| Tests are flaky (sometimes pass, sometimes fail) | Add proper cleanup, avoid test interdependence            |
+| Tests are slow                                   | Mock external dependencies, use test databases            |
+| Difficult to test certain components             | Refactor for better testability, use dependency injection |
+| Test coverage is low                             | Start with critical paths, gradually increase coverage    |
+
+### Debugging Tips
+
+```typescript
+// Debug test output
+screen.debug(); // In React Testing Library
+
+// Force test to pause
+await new Promise(resolve => setTimeout(resolve, 5000));
+
+// Log element state in Cypress
+cy.get('element').then($el => {
+  console.log($el.text());
+});
+```
+
+## Test Coverage Checklist
+
+- [ ] Critical user flows have E2E tests
+- [ ] API endpoints have integration tests
+- [ ] UI components have unit tests
+- [ ] Edge cases and error states are tested
+- [ ] Authentication and authorization are tested
+- [ ] Form validation is tested
+- [ ] Accessibility is tested
+
+## Related Tutorials
+
+- [Component Testing](./component-testing.md)
+- [API Testing](./api-testing.md)
+- [Test-Driven Development](./tdd-approach.md)
+
 ## Further Reading
 
 1. **Testing Fundamentals**
@@ -319,3 +396,7 @@ it('creates related records', async () => {
    - [Test-Driven Development](https://www.agilealliance.org/glossary/tdd/)
    - [Continuous Integration](https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment)
    - [Performance Testing](https://web.dev/performance-testing/)
+
+## Keywords
+
+Testing, Jest, React Testing Library, Cypress, unit tests, integration tests, E2E tests, test coverage, mocking, assertions, TDD

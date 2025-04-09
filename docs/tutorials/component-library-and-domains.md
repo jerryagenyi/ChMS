@@ -1,5 +1,35 @@
 # Component Libraries & Domain Management Tutorial
 
+> **Difficulty Level**: Intermediate to Advanced
+> **Prerequisites**: React, TypeScript, npm package management
+> **Version**: React 18+, Next.js 13+
+
+## Quick Reference
+
+```typescript
+// Publishing a component library
+// package.json
+{
+  "name": "@your-org/components",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  }
+}
+
+// Domain management in Next.js
+// middleware.ts
+export function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host') || '';
+  const subdomain = hostname.split('.')[0];
+  return NextResponse.rewrite(new URL(`/tenant/${subdomain}`, request.url));
+}
+```
+
 ## 1. Creating Reusable Component Libraries
 
 ### 1.1 Why Create a Component Library?
@@ -220,3 +250,43 @@ import { ComponentName, type ComponentNameProps } from '@your-org/component-libr
    - Domain health checks
    - SSL certificate monitoring
    - Usage analytics
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue                                | Solution                                             |
+| ------------------------------------ | ---------------------------------------------------- |
+| Component library version conflicts  | Use semantic versioning and peer dependencies        |
+| SSL certificate errors               | Verify DNS configuration and certificate renewal     |
+| Subdomain not resolving              | Check wildcard DNS records and DNS propagation       |
+| Cross-origin resource sharing (CORS) | Configure proper CORS headers for multi-domain setup |
+
+### Debugging Tips
+
+```typescript
+// Debug component library issues
+npm ls @your-org/component-library
+
+// Check SSL certificate
+echo | openssl s_client -servername tenant.example.com -connect tenant.example.com:443 2>/dev/null | openssl x509 -noout -dates
+
+// Test subdomain resolution
+nslookup tenant.example.com
+```
+
+## Related Tutorials
+
+- [Storybook Setup](./storybook-setup.md)
+- [Multi-tenant Database Design](./multi-tenant-database.md)
+- [CI/CD for Component Libraries](./cicd-component-libraries.md)
+
+## Further Reading
+
+- [Monorepo Strategies](https://www.atlassian.com/git/tutorials/monorepos)
+- [Multi-tenant Architecture](https://www.digitalocean.com/community/tutorials/multitenancy-in-web-applications)
+- [Component-Driven Development](https://www.componentdriven.org/)
+
+## Keywords
+
+Component library, multi-tenant, subdomains, custom domains, npm packages, React components, SSL certificates, DNS configuration, middleware, Next.js

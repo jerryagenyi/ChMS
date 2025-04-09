@@ -1,8 +1,40 @@
 # React Hooks Tutorial
 
+> **Difficulty Level**: Beginner to Intermediate
+> **Prerequisites**: Basic knowledge of React, JavaScript fundamentals
+> **Version**: React 18+
+
+## Quick Reference
+
+```typescript
+// State management
+const [value, setValue] = useState(initialValue);
+
+// Side effects
+useEffect(() => {
+  /* effect code */
+}, [dependencies]);
+
+// Form handling with react-hook-form
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm();
+
+// Custom hook pattern
+function useCustomHook(param) {
+  const [state, setState] = useState(initialValue);
+  useEffect(() => {
+    /* effect code */
+  }, [param]);
+  return { state, setState };
+}
+```
+
 ## Overview
 
-Hooks are React's way of letting you use state and other React features in functional components. This tutorial explains how we use hooks in our project and how to create custom hooks.
+Hooks are React's way of letting you use state and other React features in functional components. This tutorial explains how we use hooks in our project and how to create custom hooks. Hooks were introduced in React 16.8 to allow using state and other React features without writing a class.
 
 ## Built-in Hooks We Use
 
@@ -285,6 +317,46 @@ describe('EventRegistration', () => {
 });
 ```
 
+## Troubleshooting
+
+### Common Issues
+
+| Issue                                                             | Solution                                                  |
+| ----------------------------------------------------------------- | --------------------------------------------------------- |
+| "Cannot update a component while rendering a different component" | Move state updates to useEffect or event handlers         |
+| Infinite re-renders                                               | Check dependency array in useEffect                       |
+| Stale closures                                                    | Ensure all dependencies are included in dependency arrays |
+| Hook rules violation                                              | Only call hooks at the top level of your component        |
+
+### Debugging Tips
+
+```typescript
+// Debug re-renders with useEffect
+useEffect(() => {
+  console.log('Component rendered with state:', someState);
+}, [someState]);
+
+// Debug dependency changes
+useEffect(() => {
+  console.log('Dependency changed:', dependency);
+}, [dependency]);
+```
+
+## Hook Decision Tree
+
+- **Need to manage local state?** → `useState`
+- **Need to perform side effects?** → `useEffect`
+- **Need to optimize performance?** → `useMemo`, `useCallback`
+- **Need to access context?** → `useContext`
+- **Need to manage complex state logic?** → `useReducer`
+- **Need to access DOM elements?** → `useRef`
+
+## Related Tutorials
+
+- [Component Lifecycle](./component-lifecycle.md)
+- [State Management](./state-management.md)
+- [Performance Optimization](./performance-optimization.md)
+
 ## Further Reading
 
 1. **React Hooks Documentation**
@@ -301,3 +373,7 @@ describe('EventRegistration', () => {
 3. **Best Practices**
    - [React Hooks Best Practices](https://reactjs.org/docs/hooks-faq.html)
    - [Custom Hook Patterns](https://usehooks.com/)
+
+## Keywords
+
+React, hooks, useState, useEffect, custom hooks, functional components, state management, side effects, react-hook-form, useContext

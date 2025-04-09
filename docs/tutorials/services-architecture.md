@@ -1,8 +1,32 @@
 # Services Architecture Tutorial
 
+> **Difficulty Level**: Intermediate
+> **Prerequisites**: Basic TypeScript, familiarity with API design
+> **Version**: Next.js 13+, Prisma 4+
+
+## Quick Reference
+
+```typescript
+// API Service
+import { apiService } from '@/services/api';
+const data = await apiService.users.getById(userId);
+
+// Database Service
+import { db } from '@/services/db';
+const user = await db.user.findUnique({ where: { id: userId } });
+
+// Auth Service
+import { authService } from '@/services/auth';
+const isAuthorized = await authService.hasPermission(userId, 'edit:users');
+
+// Business Logic Service
+import { userService } from '@/services/user';
+const result = await userService.updateProfile(userId, profileData);
+```
+
 ## Overview
 
-This tutorial explains our services architecture and how it evolved from the old `lib` folder structure. The new architecture provides better separation of concerns and clearer organization of our application's functionality.
+This tutorial explains our services architecture and how it evolved from the old `lib` folder structure. The new architecture provides better separation of concerns and clearer organization of our application's functionality. Services are specialized modules that handle specific aspects of the application, such as API communication, database operations, or business logic.
 
 ## The Old `lib` Folder
 
@@ -279,6 +303,50 @@ When moving from `lib` to services:
    - Add new test cases
    - Verify coverage
 
+## Troubleshooting
+
+### Common Issues
+
+| Issue                       | Solution                                              |
+| --------------------------- | ----------------------------------------------------- |
+| Circular dependencies       | Restructure services to avoid circular imports        |
+| Service bloat               | Split large services into smaller, focused ones       |
+| Inconsistent error handling | Implement standardized error handling across services |
+| Difficulty testing          | Use dependency injection to make services testable    |
+
+### Debugging Tips
+
+```typescript
+// Add logging to service methods
+const result = await db.user.findMany();
+console.log('DB Service result:', result);
+
+// Track service performance
+const start = performance.now();
+const result = await service.method();
+const duration = performance.now() - start;
+console.log(`Service call took ${duration}ms`);
+```
+
+## Service Architecture Diagram
+
+```mermaid
+graph TD
+    A[UI Components] --> B[API Services]
+    A --> C[Business Logic Services]
+    B --> D[External APIs]
+    C --> E[Database Services]
+    C --> F[Auth Services]
+    E --> G[Database]
+    F --> H[Auth Provider]
+```
+
+## Related Tutorials
+
+- [API Design Patterns](./api-design.md)
+- [Database Access Patterns](./database-access.md)
+- [Authentication and Authorization](./auth-patterns.md)
+
 ## Next Steps
 
 1. Learn about service patterns
@@ -292,3 +360,7 @@ When moving from `lib` to services:
 - [Service Layer Pattern](https://martinfowler.com/eaaCatalog/serviceLayer.html)
 - [Dependency Injection](https://www.martinfowler.com/articles/injection.html)
 - [TypeScript Best Practices](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html)
+
+## Keywords
+
+Services, architecture, API, database, business logic, separation of concerns, dependency injection, Prisma, Next.js, TypeScript

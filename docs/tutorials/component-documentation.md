@@ -1,8 +1,36 @@
 # Component Documentation Template
 
+> **Difficulty Level**: Beginner
+> **Prerequisites**: Basic React knowledge
+> **Version**: React 18+
+
+## Quick Reference
+
+````markdown
+# ComponentName
+
+## Description
+
+Brief description of the component's purpose.
+
+## Props
+
+| Prop  | Type   | Default | Required | Description          |
+| ----- | ------ | ------- | -------- | -------------------- |
+| prop1 | string | -       | Yes      | Description of prop1 |
+
+## Examples
+
+```tsx
+<ComponentName prop1="value" />
+```
+````
+
+`````
+
 ## Overview
 
-This template provides a standardised way to document components in our ChMS project. Each component should follow this structure to ensure consistency and maintainability.
+This template provides a standardised way to document components in our ChMS project. Each component should follow this structure to ensure consistency and maintainability. Good documentation helps team members understand how to use components correctly and efficiently.
 
 ## Template Structure
 
@@ -25,7 +53,8 @@ Brief description of what the component does and its purpose.
   prop2={123}
   children={<OtherComponent />}
 />
-```
+`````
+
 ````
 
 ## Props
@@ -87,13 +116,15 @@ Brief description of what the component does and its purpose.
 
 ### 1. QRCodeScanner Component
 
-```markdown
+````markdown
 # QRCodeScanner
 
 ## Description
+
 A reusable QR code scanner component that uses the device's camera to scan QR codes for attendance tracking.
 
 ## Usage
+
 ```tsx
 import { QRCodeScanner } from '@/components/QRCodeScanner';
 
@@ -106,6 +137,7 @@ import { QRCodeScanner } from '@/components/QRCodeScanner';
   onError={handleError}
   retryCount={3}
 />
+```
 ````
 
 ## Props
@@ -277,3 +309,39 @@ export const WithChildren: Story = {
   },
 };
 ```
+
+## Troubleshooting
+
+### Common Documentation Issues
+
+| Issue                      | Solution                                                     |
+| -------------------------- | ------------------------------------------------------------ |
+| Missing props              | Ensure all props are documented, including inherited ones    |
+| Outdated examples          | Update examples when component API changes                   |
+| Unclear descriptions       | Be specific about what the component does and when to use it |
+| Missing accessibility info | Always document ARIA attributes and keyboard navigation      |
+
+### Documentation Checklist
+
+- [ ] Component purpose is clearly described
+- [ ] All props are documented with types and descriptions
+- [ ] Examples cover basic and advanced usage
+- [ ] Accessibility considerations are documented
+- [ ] Related components are linked
+- [ ] Changelog is maintained
+
+## Related Tutorials
+
+- [Component Design Principles](./component-design.md)
+- [Accessibility Guidelines](./accessibility.md)
+- [Storybook Setup](./storybook-setup.md)
+
+## Further Reading
+
+- [React Component Documentation Best Practices](https://reactjs.org/docs/components-and-props.html)
+- [Storybook Documentation](https://storybook.js.org/docs/react/writing-docs/introduction)
+- [JSDoc for React Components](https://jsdoc.app/)
+
+## Keywords
+
+Component documentation, React, props, examples, accessibility, Storybook, component API, documentation template

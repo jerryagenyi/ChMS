@@ -1,5 +1,38 @@
 # TypeScript Types Tutorial
 
+> **Difficulty Level**: Beginner to Intermediate
+> **Prerequisites**: Basic JavaScript knowledge
+> **Version**: TypeScript 4.5+
+
+## Quick Reference
+
+```typescript
+// Primitive types
+let str: string = 'text';
+let num: number = 42;
+let bool: boolean = true;
+
+// Object types
+interface User {
+  id: string;
+  name: string;
+  age?: number; // Optional property
+}
+
+// Function types
+type Callback = (data: string) => void;
+
+// Generics
+function getFirst<T>(items: T[]): T | undefined {
+  return items[0];
+}
+
+// Type guards
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+```
+
 ## Basic Types
 
 ```typescript
@@ -263,8 +296,47 @@ function processValue(value: unknown) {
    }
    ```
 
+## Troubleshooting
+
+### Common Type Errors
+
+| Error                                   | Solution                                                           |
+| --------------------------------------- | ------------------------------------------------------------------ |
+| Type 'X' is not assignable to type 'Y'  | Ensure the types are compatible or use type assertion if necessary |
+| Property 'X' does not exist on type 'Y' | Check if the property exists or add it to the interface/type       |
+| Cannot find name 'X'                    | Import the type or define it in the current scope                  |
+| Type 'X' has no index signature         | Add index signature or use Record<K, V>                            |
+
+### Debugging Tips
+
+```typescript
+// Use type assertions when you know more than TypeScript
+const element = document.getElementById('root') as HTMLDivElement;
+
+// Check types during development
+function debug<T>(value: T): T {
+  console.log(typeof value, value);
+  return value;
+}
+
+// Type narrowing with type guards
+if (typeof value === 'string') {
+  // TypeScript knows value is a string here
+}
+```
+
+## Related Tutorials
+
+- [Advanced TypeScript Patterns](./advanced-typescript.md)
+- [React with TypeScript](./react-typescript.md)
+- [Type-Safe API Calls](./type-safe-api.md)
+
 ## Resources
 
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/basic-types.html)
 - [TypeScript Playground](https://www.typescriptlang.org/play)
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
+
+## Keywords
+
+TypeScript, types, interfaces, generics, type guards, type inference, type assertion, union types, intersection types, utility types

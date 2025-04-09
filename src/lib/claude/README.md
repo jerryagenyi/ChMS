@@ -352,6 +352,115 @@ function EventPlanner() {
 }
 ```
 
+### Church-Specific Examples
+
+// ... existing church examples ...
+
+### Generic Usage Examples
+
+1. Content Generation
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function BlogPostGenerator() {
+  const systemPrompt = `You are a professional content writer.
+    Create engaging, SEO-optimized content with proper headings and structure.`;
+
+  return (
+    <TaskMaster
+      systemPrompt={systemPrompt}
+      initialPrompt="Write a blog post about sustainable living practices"
+      showResponseInMarkdown={true}
+      maxTokens={2000}
+    />
+  );
+}
+```
+
+2. Code Review Assistant
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function CodeReviewHelper() {
+  const handleReview = async result => {
+    await createGitHubComment(result);
+    updateReviewStatus();
+  };
+
+  return (
+    <TaskMaster
+      systemPrompt="You are a senior developer reviewing code. Focus on best practices, security, and performance."
+      onTaskComplete={handleReview}
+      showCodeBlocks={true}
+      model="claude-3-sonnet-20240229" // Using more capable model for code review
+    />
+  );
+}
+```
+
+3. Data Analysis
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function DataAnalyzer() {
+  const [data, setData] = useState<string>('');
+
+  return (
+    <TaskMaster
+      systemPrompt="You are a data analyst. Provide insights and visualizations using markdown tables and charts."
+      initialPrompt={`Analyze this dataset and provide key insights:\n${data}`}
+      showResponseInMarkdown={true}
+      streamResponse={true}
+      onProgress={partial => updateProgressBar(partial)}
+    />
+  );
+}
+```
+
+4. Customer Support Helper
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function SupportAssistant() {
+  return (
+    <TaskMaster
+      systemPrompt="You are a helpful customer support agent. Be empathetic and solution-focused."
+      initialPrompt="Draft a response to this customer inquiry about a refund"
+      temperature={0.7} // Slightly more creative for human-like responses
+      onTaskComplete={async result => {
+        await updateTicket(result);
+        sendEmailDraft(result);
+      }}
+    />
+  );
+}
+```
+
+5. Language Translation
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function TranslationTool() {
+  const [sourceLang, setSourceLang] = useState('en');
+  const [targetLang, setTargetLang] = useState('es');
+
+  return (
+    <TaskMaster
+      systemPrompt={`You are a professional translator. 
+        Translate from ${sourceLang} to ${targetLang} maintaining context and nuance.`}
+      initialPrompt="Translate this text while preserving formatting"
+      preserveFormatting={true}
+      onError={error => showTranslationError(error)}
+    />
+  );
+}
+```
+
 ### Troubleshooting
 
 1. API Key Issues

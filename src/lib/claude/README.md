@@ -279,22 +279,6 @@ Potential enhancements for the Taskmaster include:
 5. Response streaming
 6. Task cancellation
 
-### Project Structure
-
-It's recommended to mirror this project structure in your implementation:
-
-```
-src/
-└── lib/
-    └── claude/
-        ├── README.md           # This documentation
-        ├── client.ts           # Claude API client
-        ├── types.ts            # Type definitions
-        └── components/
-            ├── TaskForm.tsx    # Task input form
-            └── TaskMaster.tsx  # Main component
-```
-
 ### Usage Examples
 
 1. Basic Task Creation

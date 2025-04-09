@@ -20,11 +20,19 @@ yarn add @chakra-ui/react @emotion/react @emotion/styled framer-motion
 
 ### 2. Environment Variables
 
-Create or update your `.env.local` file with:
+Create a `.env.local` file in your project root directory (same level as `package.json`) with:
 
 ```env
 ANTHROPIC_API_KEY=your_api_key_here  # Get this from https://console.anthropic.com
 ```
+
+You can also copy the example configuration from `.env.example` in your project root:
+
+```bash
+cp .env.example .env.local
+```
+
+Then update the `ANTHROPIC_API_KEY` value in your `.env.local` file.
 
 For production deployments (e.g., Vercel), add `ANTHROPIC_API_KEY` to your environment variables in your deployment platform's settings.
 
@@ -270,3 +278,111 @@ Potential enhancements for the Taskmaster include:
 4. Advanced prompt templating
 5. Response streaming
 6. Task cancellation
+
+### Project Structure
+
+It's recommended to mirror this project structure in your implementation:
+
+```
+src/
+└── lib/
+    └── claude/
+        ├── README.md           # This documentation
+        ├── client.ts           # Claude API client
+        ├── types.ts            # Type definitions
+        └── components/
+            ├── TaskForm.tsx    # Task input form
+            └── TaskMaster.tsx  # Main component
+```
+
+### Usage Examples
+
+1. Basic Task Creation
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function MyPage() {
+  return (
+    <TaskMaster
+      onTaskComplete={result => console.log('Task completed:', result)}
+      initialPrompt="Help me write a prayer for Sunday service"
+    />
+  );
+}
+```
+
+2. Custom Task Form with System Prompt
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function SermonHelper() {
+  const systemPrompt = `You are a helpful assistant for creating sermon outlines.
+    Focus on biblical accuracy and clear structure.`;
+
+  return (
+    <TaskMaster
+      systemPrompt={systemPrompt}
+      initialPrompt="Create an outline for a sermon on John 3:16"
+      showResponseInMarkdown={true}
+    />
+  );
+}
+```
+
+3. Integration with Church Events
+
+```tsx
+import { TaskMaster } from '@/lib/claude/components/TaskMaster';
+
+function EventPlanner() {
+  const handleTaskComplete = async result => {
+    await saveToDatabase(result);
+    notifyTeam(result);
+  };
+
+  return (
+    <TaskMaster
+      onTaskComplete={handleTaskComplete}
+      initialPrompt="Plan a youth ministry event for next month"
+      autoSubmit={false} // Allow editing before submission
+    />
+  );
+}
+```
+
+### Troubleshooting
+
+1. API Key Issues
+
+   - Ensure `.env.local` is in the project root
+   - Verify API key is valid at https://console.anthropic.com
+   - Check for any whitespace in the API key
+   - For production: verify environment variables in deployment platform
+
+2. Response Formatting
+
+   - If markdown isn't rendering: check `showResponseInMarkdown` prop
+   - For code blocks: ensure proper language tags (e.g., ```typescript)
+   - Long responses: use `maxTokens` prop to limit length
+
+3. Common Errors
+
+   ```typescript
+   // Error: API key not found
+   // Solution: Check .env.local file
+   ANTHROPIC_API_KEY = your_api_key_here;
+
+   // Error: Response timeout
+   // Solution: Increase timeout in client config
+   const client = new ClaudeClient({
+     apiKey: process.env.ANTHROPIC_API_KEY,
+     timeout: 60000, // 60 seconds
+   });
+   ```
+
+4. Performance Tips
+   - Use `autoSubmit={false}` for long prompts
+   - Enable `streamResponse` for faster perceived performance
+   - Implement error boundaries for graceful failure handling

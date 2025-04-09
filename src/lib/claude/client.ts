@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { TaskResult } from './types';
+import { ClaudeModel, TaskResult } from './types';
 
 /**
  * Message structure for Claude API requests.
@@ -17,23 +17,43 @@ type Message = {
  */
 export class ClaudeClient {
   private client: Anthropic;
-  private model: string;
+  private model: ClaudeModel;
+  private apiKey: string;
 
   /**
    * Creates a new ClaudeClient instance.
    *
    * @param apiKey - Anthropic API key for authentication
-   * @param model - Claude model to use (defaults to claude-3-sonnet-20240229)
+   * @param model - Claude model to use (defaults to claude-3-haiku-20240229 for cost efficiency)
    */
-  constructor(apiKey: string, model = 'claude-3-sonnet-20240229') {
+  constructor(apiKey: string, model: ClaudeModel = 'claude-3-haiku-20240229') {
     if (!apiKey) {
       throw new Error('API key is required for ClaudeClient');
     }
 
+    this.apiKey = apiKey;
     this.client = new Anthropic({
       apiKey,
     });
     this.model = model;
+  }
+
+  /**
+   * Gets the API key used by this client.
+   *
+   * @returns The Anthropic API key
+   */
+  getApiKey(): string {
+    return this.apiKey;
+  }
+
+  /**
+   * Gets the model being used by this client.
+   *
+   * @returns The Claude model ID
+   */
+  getModel(): ClaudeModel {
+    return this.model;
   }
 
   /**
@@ -79,16 +99,25 @@ export class ClaudeClient {
         };
       }
 
+      // Estimate tokens used (this is approximate since the API doesn't return this directly)
+      const tokensUsed = {
+        prompt: Math.ceil(prompt.length / 4), // Rough estimate: ~4 chars per token
+        completion: Math.ceil(responseText.length / 4)
+      };
+
       return {
         success: true,
-        data: responseText
+        data: responseText,
+        model: this.model,
+        tokensUsed: tokensUsed.prompt + tokensUsed.completion
       };
     } catch (error) {
       console.error('Claude API Error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        code: 'API_ERROR'
+        code: 'API_ERROR',
+        model: this.model
       };
     }
   }

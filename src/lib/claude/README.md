@@ -2,6 +2,16 @@
 
 The Claude Taskmaster is a robust implementation for managing AI tasks using Anthropic's Claude API. It provides a structured way to create, execute, and track tasks that involve generating responses from Claude.
 
+## Model Selection Strategy
+
+The Taskmaster implements a cost-efficient model selection strategy that automatically chooses the appropriate Claude model based on task complexity:
+
+- **Low/Medium Complexity**: Uses Claude 3 Haiku (most cost-effective)
+- **High Complexity**: Uses Claude 3 Sonnet (balanced performance/cost)
+- **Critical Tasks**: Uses Claude 3 Opus (highest capability)
+
+This approach optimizes for both cost and performance. See [model-selection-strategy.md](./model-selection-strategy.md) for details.
+
 ## Core Components
 
 ### ClaudeTaskMaster
@@ -13,6 +23,8 @@ The `ClaudeTaskMaster` class manages tasks for Claude AI interactions. It provid
 - Track task status ('pending', 'in-progress', 'completed', 'failed')
 - Retrieve tasks by ID or get all tasks
 - Reset failed tasks for retry
+- Select appropriate Claude model based on task complexity
+- Track token usage for cost monitoring
 
 ### ClaudeClient
 
@@ -22,6 +34,7 @@ The `ClaudeClient` class handles communication with the Anthropic Claude API. It
 - Formats requests according to the API requirements
 - Processes responses from the API
 - Handles errors gracefully
+- Estimates token usage for cost tracking
 
 ### API Endpoint
 
@@ -51,11 +64,14 @@ The Taskmaster implements several key features for effective task management:
 
 ## Usage
 
-### Basic Usage
+### Basic Usage with Complexity
 
 ```typescript
-// Create a task
-const task = await taskMaster.createTask("Explain quantum computing in simple terms");
+// Create a task with complexity information
+const task = await taskMaster.createTask({
+  description: 'Explain quantum computing in simple terms',
+  complexity: 'medium', // Will use Claude 3 Haiku by default
+});
 
 // Execute the task
 const result = await taskMaster.executeTask(task.id);
@@ -63,23 +79,27 @@ const result = await taskMaster.executeTask(task.id);
 // Check the result
 if (result.success) {
   console.log(result.data); // Claude's response
+  console.log(`Model used: ${result.model}`); // Model that was used
+  console.log(`Tokens used: ${result.tokensUsed}`); // Estimated token usage
 } else {
   console.error(result.error); // Error message
 }
 ```
 
-### With Metadata
+### With Metadata and Model Override
 
 ```typescript
-// Create a task with metadata
-const task = await taskMaster.createTask(
-  "Summarize this article", 
-  { 
-    priority: "high",
-    category: "content",
-    source: "user-request"
-  }
-);
+// Create a task with metadata and specific model
+const task = await taskMaster.createTask({
+  description: 'Summarize this article',
+  complexity: 'high', // Would normally use Sonnet
+  model: 'claude-3-opus-20240229', // Override to use Opus
+  metadata: {
+    priority: 'high',
+    category: 'content',
+    source: 'user-request',
+  },
+});
 ```
 
 ### Resetting Failed Tasks

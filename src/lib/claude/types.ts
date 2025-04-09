@@ -1,13 +1,30 @@
 /**
+ * Available Claude models.
+ */
+export type ClaudeModel = 'claude-3-opus-20240229' | 'claude-3-sonnet-20240229' | 'claude-3-haiku-20240229';
+
+/**
+ * Task complexity levels for model selection.
+ */
+export type TaskComplexity = 'low' | 'medium' | 'high' | 'critical';
+
+/**
  * Configuration options for the ClaudeTaskMaster.
  */
 export interface TaskMasterConfig {
   /** Anthropic API key */
   apiKey: string;
-  /** Claude model to use */
-  model?: 'claude-3-opus-20240229' | 'claude-3-sonnet-20240229' | 'claude-3-haiku-20240229';
+  /** Default Claude model to use */
+  defaultModel?: ClaudeModel;
   /** Maximum tokens to generate in the response */
   maxTokens?: number;
+  /** Model selection strategy configuration */
+  modelStrategy?: {
+    low?: ClaudeModel;
+    medium?: ClaudeModel;
+    high?: ClaudeModel;
+    critical?: ClaudeModel;
+  };
 }
 
 /**
@@ -37,6 +54,12 @@ export interface Task {
   completedAt?: Date;
   /** When the task status was last updated */
   statusUpdatedAt?: Date;
+  /** Complexity level of the task */
+  complexity?: TaskComplexity;
+  /** Claude model used for this task */
+  model?: ClaudeModel;
+  /** Tokens used for this task (for cost tracking) */
+  tokensUsed?: number;
 }
 
 /**
@@ -61,4 +84,8 @@ export interface TaskResult<T = any> {
   error?: string;
   /** Error code for programmatic handling */
   code?: TaskErrorCode;
+  /** The Claude model used for this task */
+  model?: ClaudeModel;
+  /** Estimated number of tokens used (for cost tracking) */
+  tokensUsed?: number;
 }

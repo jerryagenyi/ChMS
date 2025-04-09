@@ -1,0 +1,64 @@
+/**
+ * Configuration options for the ClaudeTaskMaster.
+ */
+export interface TaskMasterConfig {
+  /** Anthropic API key */
+  apiKey: string;
+  /** Claude model to use */
+  model?: 'claude-3-opus-20240229' | 'claude-3-sonnet-20240229' | 'claude-3-haiku-20240229';
+  /** Maximum tokens to generate in the response */
+  maxTokens?: number;
+}
+
+/**
+ * Possible statuses for a task.
+ */
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'failed';
+
+/**
+ * Represents a task to be executed by Claude.
+ */
+export interface Task {
+  /** Unique identifier for the task */
+  id: string;
+  /** The prompt or description sent to Claude */
+  description: string;
+  /** Current status of the task */
+  status: TaskStatus;
+  /** Result returned from Claude (if successful) */
+  result?: any;
+  /** Error message (if failed) */
+  error?: string;
+  /** Additional metadata associated with the task */
+  metadata?: Record<string, any>;
+  /** When the task was created */
+  createdAt?: Date;
+  /** When the task was completed */
+  completedAt?: Date;
+  /** When the task status was last updated */
+  statusUpdatedAt?: Date;
+}
+
+/**
+ * Error codes for task execution failures.
+ */
+export type TaskErrorCode =
+  | 'TASK_NOT_FOUND'
+  | 'TASK_FAILED'
+  | 'API_ERROR'
+  | 'EXECUTION_ERROR'
+  | 'VALIDATION_ERROR';
+
+/**
+ * Result of a task execution.
+ */
+export interface TaskResult<T = any> {
+  /** Whether the task was successful */
+  success: boolean;
+  /** The data returned from the task (if successful) */
+  data?: T;
+  /** Error message (if unsuccessful) */
+  error?: string;
+  /** Error code for programmatic handling */
+  code?: TaskErrorCode;
+}

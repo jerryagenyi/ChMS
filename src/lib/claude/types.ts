@@ -25,12 +25,14 @@ export interface TaskMasterConfig {
     high?: ClaudeModel;
     critical?: ClaudeModel;
   };
+  /** Rate limit configuration (requests per minute) */
+  rateLimit?: number;
 }
 
 /**
  * Possible statuses for a task.
  */
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'failed';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'failed' | 'cancelled';
 
 /**
  * Represents a task to be executed by Claude.
@@ -60,6 +62,12 @@ export interface Task {
   model?: ClaudeModel;
   /** Tokens used for this task (for cost tracking) */
   tokensUsed?: number;
+  /** Priority level of the task (1-5, 1 being highest) */
+  priority?: number;
+  /** Progress of the task (0-1) */
+  progress?: number;
+  /** Progress callback for long-running tasks */
+  onProgress?: (progress: number) => void;
 }
 
 /**
@@ -70,7 +78,9 @@ export type TaskErrorCode =
   | 'TASK_FAILED'
   | 'API_ERROR'
   | 'EXECUTION_ERROR'
-  | 'VALIDATION_ERROR';
+  | 'VALIDATION_ERROR'
+  | 'TASK_RUNNING'
+  | 'TASK_CANCELLED';
 
 /**
  * Result of a task execution.

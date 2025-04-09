@@ -13,6 +13,10 @@ export interface TaskCreationInfo {
   metadata?: Record<string, any>;
   /** Override the model selection strategy for this specific task */
   model?: ClaudeModel;
+  /** Priority level of the task (1-5, 1 being highest) */
+  priority?: number;
+  /** Optional progress callback for long-running tasks */
+  onProgress?: (progress: number) => void;
 }
 
 /**
@@ -27,6 +31,9 @@ export class ClaudeTaskMaster {
   private tasks: Map<string, Task>;
   private defaultModel: ClaudeModel;
   private modelStrategy: Record<TaskComplexity, ClaudeModel>;
+  private rateLimiter: RateLimiter;
+  private batchProcessor: BatchProcessor;
+  private activeTasks: Set<string>;
 
   /**
    * Creates a new ClaudeTaskMaster instance.
@@ -49,6 +56,13 @@ export class ClaudeTaskMaster {
     // Initialize client with default model
     this.client = new ClaudeClient(config.apiKey, this.defaultModel);
     this.tasks = new Map();
+    this.activeTasks = new Set();
+    
+    // Initialize rate limiter (default: 10 requests per minute)
+    this.rateLimiter = new RateLimiter(config.rateLimit || 10, 60000);
+    
+    // Initialize batch processor
+    this.batchProcessor = new BatchProcessor(this);
   }
 
   /**
@@ -75,7 +89,7 @@ export class ClaudeTaskMaster {
    * @returns A new Task object with a unique ID and 'pending' status
    */
   async createTask(taskInfo: TaskCreationInfo): Promise<Task> {
-    const { description, metadata, complexity } = taskInfo;
+    const { description, metadata, complexity, priority, onProgress } = taskInfo;
     if (!description || description.trim() === '') {
       throw new Error('Task description cannot be empty');
     }
@@ -89,19 +103,16 @@ export class ClaudeTaskMaster {
       createdAt: new Date(),
       metadata,
       complexity,
-      model
+      model,
+      priority: priority || 3,
+      progress: 0,
+      onProgress
     };
 
     this.tasks.set(taskId, task);
     return task;
   }
 
-  /**
-   * Executes a task by sending its description to Claude and recording the result.
-   *
-   * @param taskId - The ID of the task to execute
-   * @returns A TaskResult object containing the success status and either data or error
-   */
   /**
    * Executes a task by sending its description to Claude and recording the result.
    * Uses the model specified in the task or falls back to the default model.
@@ -125,8 +136,18 @@ export class ClaudeTaskMaster {
       return { success: false, error: task.error || 'Task previously failed', code: 'TASK_FAILED' };
     }
 
+    // Check if task is already running
+    if (this.activeTasks.has(taskId)) {
+      return { success: false, error: 'Task is already running', code: 'TASK_RUNNING' };
+    }
+
     try {
+      this.activeTasks.add(taskId);
       this.updateTaskStatus(task, 'in-progress');
+      this.updateTaskProgress(task, 0.1);
+
+      // Wait for rate limiter
+      await this.rateLimiter.acquire();
 
       // Create a client with the task's model if specified
       const modelToUse = task.model || this.defaultModel;
@@ -135,10 +156,13 @@ export class ClaudeTaskMaster {
       // Execute the task with the appropriate model
       const result = await clientForTask.generateResponse(task.description);
 
+      this.updateTaskProgress(task, 0.9);
+
       if (result.success) {
         this.updateTaskStatus(task, 'completed');
         task.result = result.data;
         task.completedAt = new Date();
+        this.updateTaskProgress(task, 1);
 
         // Store tokens used if available (for cost tracking)
         if (result.tokensUsed) {
@@ -170,6 +194,49 @@ export class ClaudeTaskMaster {
         code: 'EXECUTION_ERROR',
         model: task.model || this.defaultModel
       };
+    } finally {
+      this.activeTasks.delete(taskId);
+    }
+  }
+
+  /**
+   * Executes multiple tasks in parallel, respecting rate limits and priorities.
+   *
+   * @param taskIds - Array of task IDs to execute
+   * @returns Array of task results
+   */
+  async executeTasks(taskIds: string[]): Promise<TaskResult[]> {
+    return this.batchProcessor.processBatch(taskIds);
+  }
+
+  /**
+   * Cancels a running task.
+   *
+   * @param taskId - The ID of the task to cancel
+   * @returns True if the task was cancelled, false otherwise
+   */
+  async cancelTask(taskId: string): Promise<boolean> {
+    const task = this.tasks.get(taskId);
+    if (!task || !this.activeTasks.has(taskId)) {
+      return false;
+    }
+
+    this.updateTaskStatus(task, 'cancelled');
+    this.activeTasks.delete(taskId);
+    return true;
+  }
+
+  /**
+   * Updates a task's progress and calls the progress callback if provided.
+   *
+   * @param task - The task to update
+   * @param progress - The new progress value (0-1)
+   * @private
+   */
+  private updateTaskProgress(task: Task, progress: number): void {
+    task.progress = progress;
+    if (task.onProgress) {
+      task.onProgress(progress);
     }
   }
 
@@ -221,5 +288,73 @@ export class ClaudeTaskMaster {
   private updateTaskStatus(task: Task, status: TaskStatus): void {
     task.status = status;
     task.statusUpdatedAt = new Date();
+  }
+}
+
+/**
+ * Rate limiter to control API request frequency.
+ */
+class RateLimiter {
+  private tokens: number;
+  private lastRefill: number;
+  private refillRate: number;
+  private maxTokens: number;
+
+  constructor(requestsPerMinute: number, timeWindow: number) {
+    this.maxTokens = requestsPerMinute;
+    this.tokens = requestsPerMinute;
+    this.refillRate = requestsPerMinute / timeWindow;
+    this.lastRefill = Date.now();
+  }
+
+  async acquire(): Promise<void> {
+    this.refill();
+    
+    if (this.tokens <= 0) {
+      const waitTime = Math.ceil((1 - this.tokens) / this.refillRate);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      this.refill();
+    }
+    
+    this.tokens--;
+  }
+
+  private refill(): void {
+    const now = Date.now();
+    const timePassed = now - this.lastRefill;
+    this.tokens = Math.min(this.maxTokens, this.tokens + timePassed * this.refillRate);
+    this.lastRefill = now;
+  }
+}
+
+/**
+ * Batch processor for handling multiple tasks efficiently.
+ */
+class BatchProcessor {
+  private taskMaster: ClaudeTaskMaster;
+  private maxConcurrent: number;
+
+  constructor(taskMaster: ClaudeTaskMaster, maxConcurrent: number = 5) {
+    this.taskMaster = taskMaster;
+    this.maxConcurrent = maxConcurrent;
+  }
+
+  async processBatch(taskIds: string[]): Promise<TaskResult[]> {
+    const results: TaskResult[] = [];
+    const tasks = taskIds.map(id => this.taskMaster.getTask(id)).filter(Boolean) as Task[];
+    
+    // Sort tasks by priority (1 is highest)
+    tasks.sort((a, b) => (a.priority || 3) - (b.priority || 3));
+    
+    // Process tasks in chunks
+    for (let i = 0; i < tasks.length; i += this.maxConcurrent) {
+      const chunk = tasks.slice(i, i + this.maxConcurrent);
+      const chunkResults = await Promise.all(
+        chunk.map(task => this.taskMaster.executeTask(task.id))
+      );
+      results.push(...chunkResults);
+    }
+    
+    return results;
   }
 }

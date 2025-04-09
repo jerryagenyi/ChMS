@@ -2,6 +2,97 @@
 
 The Claude Taskmaster is a robust implementation for managing AI tasks using Anthropic's Claude API. It provides a structured way to create, execute, and track tasks that involve generating responses from Claude.
 
+## Installation & Setup
+
+### 1. Dependencies
+
+```bash
+# Install the Anthropic SDK
+npm install @anthropic-ai/sdk
+# or
+yarn add @anthropic-ai/sdk
+
+# Install Chakra UI if not already installed (for UI components)
+npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
+# or
+yarn add @chakra-ui/react @emotion/react @emotion/styled framer-motion
+```
+
+### 2. Environment Variables
+
+Create or update your `.env.local` file with:
+
+```env
+ANTHROPIC_API_KEY=your_api_key_here  # Get this from https://console.anthropic.com
+```
+
+For production deployments (e.g., Vercel), add `ANTHROPIC_API_KEY` to your environment variables in your deployment platform's settings.
+
+### 3. Required Files Structure
+
+```
+src/
+  ├── lib/
+  │   └── claude/
+  │       ├── client.ts      # Claude API client
+  │       ├── taskmaster.ts  # Task management implementation
+  │       └── types.ts       # TypeScript types
+  ├── pages/
+  │   └── api/
+  │       └── claude/
+  │           └── task.ts    # API endpoint
+  └── components/
+      └── ClaudeTaskForm.tsx # UI component
+```
+
+### 4. API Key Security
+
+- Never commit your API key to version control
+- Use environment variables for all sensitive data
+- In production, use secure secret management
+- For Vercel deployment, add `ANTHROPIC_API_KEY` to your project's Environment Variables
+
+### 5. Import and Initialize
+
+```typescript
+// pages/your-page.tsx
+import { ClaudeTaskForm } from '@/components/ClaudeTaskForm';
+
+export default function YourPage() {
+  return (
+    <div>
+      <h1>Ask Claude</h1>
+      <ClaudeTaskForm />
+    </div>
+  );
+}
+
+// Or initialize TaskMaster directly
+import { ClaudeTaskMaster } from '@/lib/claude/taskmaster';
+
+const taskMaster = new ClaudeTaskMaster({
+  apiKey: process.env.ANTHROPIC_API_KEY as string,
+  defaultModel: 'claude-3-haiku-20240229', // optional
+});
+```
+
+### 6. Testing Setup
+
+For testing, you should mock the Anthropic SDK:
+
+```typescript
+// In your test file
+jest.mock('@anthropic-ai/sdk', () => {
+  return jest.fn().mockImplementation(() => ({
+    messages: {
+      create: jest.fn().mockResolvedValue({
+        content: [{ type: 'text', text: 'Mock response' }],
+      }),
+    },
+  }));
+});
+```
+
 ## Model Selection Strategy
 
 The Taskmaster implements a cost-efficient model selection strategy that automatically chooses the appropriate Claude model based on task complexity:
